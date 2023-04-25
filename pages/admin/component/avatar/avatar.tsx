@@ -7,10 +7,12 @@ import {
 	SettingOutlined,
 	AudioOutlined,
 	BellOutlined,
+	EnvironmentOutlined,
 } from '@ant-design/icons'
 import { Avatar, MenuProps } from 'antd'
 import { Dropdown, Space, Input, Tooltip } from 'antd'
 import SelectSearch from '../common/inputSelectSearch'
+import CartItem from '../main/cartItem'
 
 const items: MenuProps['items'] = [
 	{
@@ -57,13 +59,24 @@ const suffix = (
 
 const onSearch = (value: string) => console.log(value)
 const AvatarComponent: React.FC = () => (
-	<div>
+	<div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>
+		<div
+			style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', alignItems: 'center' }}
+		>
+			<Tooltip title="Tìm kiếm khu vực tại đây" color={'red'} key={'red'}>
+				<EnvironmentOutlined style={{ fontSize: '22px', width: '30px', display: 'flex' }} />
+			</Tooltip>
+		</div>
+
 		<div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>
 			<SelectSearch />
 			<Space wrap>
 				<Tooltip title="Bạn có 23 thông báo cho danh mục sản phẩm" color={'red'} key={'red'}>
-					<BellOutlined style={{ fontSize: '24px', width: '30px' }} />
+					<BellOutlined style={{ fontSize: '22px', width: '30px', display: 'flex' }} />
 				</Tooltip>
+			</Space>
+			<Space wrap>
+				<CartItem />
 			</Space>
 
 			<Dropdown menu={{ items }} trigger={['click']}>
