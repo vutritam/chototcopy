@@ -1,7 +1,7 @@
 import React from 'react'
 import RenderedComponent from '@/components/common/renderComponent'
 
-const AdminPage: React.FC = () => {
+const Employee: React.FC = () => {
 	return (
 		<>
 			<RenderedComponent />
@@ -9,4 +9,4 @@ const AdminPage: React.FC = () => {
 	)
 }
 
-export default AdminPage
+export default Employee

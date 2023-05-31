@@ -6,7 +6,7 @@ interface inputProps {
 	label: string
 	title: string
 }
-const ModalConfirm: React.FC = (props: inputProps) => {
+const ModalConfirm = (props: inputProps): JSX.Element => {
 	const [open, setOpen] = useState(false)
 	const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default')
 

@@ -14,6 +14,47 @@
     display: flex;
     align-items: center;
 }
+.flex-box{
+  align-items: center;
+    display: flex;
+    /* display: inline-block; */
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.style-checkout{
+  position: absolute;
+  bottom: 2%;
+  width: 90%;
+
+}
+.custom-login{
+  width: 100%;
+    /* margin: 50px auto; */
+    height: 100vh;
+    display: flex;
+    /* overflow-y: hidden; */
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+}
+.showScroll {
+  overflow-y: hidden;
+  max-height: 360px;
+}
+.showScroll:hover {
+  overflow-y: auto;
+}
+.backgound-img{
+  background-image: url('../public/images/black-and-white-coffee-shop-background-eps-free-vector.jpg');
+}
+.form-template{
+  border: 1px solid #ebdbdb;
+  border-radius: 9px;
+  width: 400px;
+  padding: 30px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
 
 @font-face {
   font-family: "Rubik";

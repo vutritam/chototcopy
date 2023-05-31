@@ -1,14 +1,12 @@
 import { useState } from 'react'
+import Link from 'next/link'
 import { Layout, Menu, Image } from 'antd'
 const { Sider } = Layout
-import type { MenuProps } from 'antd'
-import logo from '../../../../public/images/Logo.png'
-type MenuItem = Required<MenuProps>['items'][number]
 
 interface items {
 	collapsed: boolean
 	items: any
-	handleChangeComponent: any
+	handleChangeComponent?: any
 }
 
 export function SideBar(props: items) {
@@ -34,8 +32,14 @@ export function SideBar(props: items) {
 					gap: '10px',
 				}}
 			>
-				<Image width={20} height={20} fallback="" />
-				<a style={{ color: 'white' }}>GOLD COFFE</a>
+				<Image src="/images/Logo.png" width={collapsed ? 40 : 20} height={collapsed ? 40 : 20} />
+				{!collapsed ? (
+					<Link href="/admin" style={{ color: 'white' }}>
+						GOLD COFFE
+					</Link>
+				) : (
+					''
+				)}
 			</div>
 			<Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={props.items} />
 		</Sider>

@@ -36,15 +36,15 @@ export default function ManageWork({}: Props) {
 					</li>
 					<li className="flex-box">
 						<div>Nhân viên</div>
-						<div>1231203asdhasgdashdj</div>
+						<div>Vũ Trí Tâm</div>
 					</li>
 					<li className="flex-box">
 						<div>Giờ đóng ca</div>
-						<div>1231203asdhasgdashdj</div>
+						<div>12:30 Ngày 12-04-2023</div>
 					</li>
 					<li className="flex-box">
 						<div>Giờ mở ca</div>
-						<div>1231203asdhasgdashdj</div>
+						<div>12:30 Ngày 13-04-2023</div>
 					</li>
 					<li className="flex-box">
 						<div>

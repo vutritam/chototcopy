@@ -1,7 +1,7 @@
 import { Button, Dropdown, Space } from 'antd'
 import React from 'react'
 import type { MenuProps } from 'antd'
-import ModalConfirm from '../common/modalConfirm'
+import ModalConfirm from '@/components/common/modalConfirm'
 type Props = {}
 
 export default function ManageMoney({}: Props) {
