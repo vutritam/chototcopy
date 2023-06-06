@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import ListItem from '@/components/main/listItem'
 import ManageWork from '@/components/main/manageWork'
 import Products from '@/components/main/products'
+import DetailOrder from '../main/detailOrder'
 
 const RenderedComponent: React.FC = () => {
 	const router = useRouter()
@@ -39,6 +40,8 @@ const RenderedComponent: React.FC = () => {
 		switch (router) {
 			case '/order/[order]':
 				return <Products />
+			case '/order/detail/[orderDetail]':
+				return <DetailOrder />
 			// Xử lý cho các component khác tùy theo số lượng và tên của chúng
 			// default:
 			// return <ListItem />

@@ -63,6 +63,11 @@ const items: MenuProps['items'] = [
 	},
 ]
 
+interface propsData {
+	userInfo: object
+	dataNoti: Array<any>
+}
+
 const onSearch = (value: string) => console.log(value)
 const AvatarComponent: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
@@ -72,9 +77,77 @@ const AvatarComponent: React.FC = () => {
 	const message = useSelector((state: any) => state.message.message.data)
 	const [userRequest, setUserRequest] = React.useState('')
 	const [showMessage, setShowMessage] = React.useState<Boolean>(false)
+	const [dataLocal, setDataLocal] = React.useState<Object>([
+		{
+			userInfo: {},
+			dataNoti: [],
+		},
+	])
+
 	const [showMenu, setShowMenu] = React.useState([])
 
+	const onSetDataLocal = (data: propsData, callback: Function) => {
+		const { userInfo, dataNoti } = data
+		setDataLocal({ userInfo: userInfo, dataNoti: dataNoti })
+
+		// Gọi callback (nếu có)
+		if (typeof callback === 'function') {
+			callback(data)
+		}
+	}
 	useEffect(() => {
+		;(async () => {
+			let obj = {
+				userInfo: {},
+				dataNoti: [],
+			}
+			if (typeof window !== 'undefined') {
+				obj.userInfo = JSON.parse(localStorage.getItem('user'))
+				obj.dataNoti = message
+				onSetDataLocal(obj, async ({ userInfo, dataNoti }: propsData) => {
+					if (userInfo) {
+						try {
+							if (!isOrderPage) {
+								const { payload } = await dispatch(fetchUserById(userInfo.userId))
+								if (payload?.success) {
+									setUserRequest(payload.data.username)
+									return
+								}
+								toast('user not found', {
+									position: 'top-center',
+									autoClose: 1000,
+									hideProgressBar: false,
+									closeOnClick: true,
+									pauseOnHover: true,
+									draggable: true,
+									progress: undefined,
+									type: 'error',
+								})
+								return
+							}
+						} catch (error) {
+							console.error(error)
+						}
+					}
+					if (dataNoti && dataNoti.length > 0 && message !== null) {
+						setShowMessage(true)
+						setShowMenu(dataNoti)
+						setTimeout(() => {
+							setShowMessage(false)
+						}, 2000)
+					}
+				})
+			}
+		})()
+	}, [])
+
+	console.log(dataLocal, 'dataLocal')
+
+	useEffect(() => {
+		// let dataNoti
+		// if (typeof window !== 'undefined') {
+		// dataNoti = JSON.parse(localStorage.getItem('notification'))
+		// }
 		if (message !== null) {
 			setShowMessage(true)
 			setShowMenu(message)
@@ -83,52 +156,8 @@ const AvatarComponent: React.FC = () => {
 			}, 2000)
 		}
 	}, [message])
-	console.log(message, 'user1213')
-
-	useEffect(() => {
-		let userInfo
-		if (typeof window !== 'undefined') {
-			userInfo = JSON.parse(localStorage.getItem('user'))
-		}
-
-		const fetchData = async () => {
-			try {
-				if (!isOrderPage) {
-					const { payload } = await dispatch(fetchUserById(userInfo.userId))
-					if (payload?.success) {
-						setUserRequest(payload.data.username)
-						return
-					}
-
-					toast('user not found', {
-						position: 'top-center',
-						autoClose: 1000,
-						hideProgressBar: false,
-						closeOnClick: true,
-						pauseOnHover: true,
-						draggable: true,
-						progress: undefined,
-						type: 'error',
-					})
-					return
-				}
-			} catch (error) {
-				console.error(error)
-			}
-		}
-
-		fetchData()
-	}, [])
 
 	const handleShowOptionMenu = () => {
-		// Lấy thời gian hiện tại
-		var thoiGianHienTai = new Date()
-
-		// Lấy giờ, phút và giây
-		var gio = thoiGianHienTai.getHours()
-		var phut = thoiGianHienTai.getMinutes()
-		var giay = thoiGianHienTai.getSeconds()
-		var gioPhutGiay = gio + ':' + phut + ':' + giay
 		return showMenu?.length > 0 ? (
 			showMenu.map((ele, index) => (
 				<Menu.Item
@@ -142,11 +171,17 @@ const AvatarComponent: React.FC = () => {
 					}}
 				>
 					<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
-					<a style={{ marginLeft: '5px', fontWeight: '600' }}>{ele}</a>
+					<a style={{ marginLeft: '5px', fontWeight: '600' }}>{ele.noti}</a>
 					<div style={{ fontSize: '12px' }}>
 						<span>Thời gian: </span>
-						<span>{gioPhutGiay}</span>
+						<span>{ele.time}</span>
 					</div>
+					<Link
+						style={{ fontSize: '12px', color: 'blue' }}
+						href={`/order/detail/${JSON.stringify(router.query)}`}
+					>
+						xem chi tiết
+					</Link>
 				</Menu.Item>
 			))
 		) : (
@@ -171,7 +206,7 @@ const AvatarComponent: React.FC = () => {
 				<Space wrap>
 					<Dropdown
 						dropdownRender={(menu) => (
-							<Menu style={{ height: '200px' }}>
+							<Menu className="showScroll">
 								<Menu.Item>
 									<h5>Thông báo của bạn</h5>
 								</Menu.Item>

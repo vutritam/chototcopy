@@ -1,7 +1,11 @@
+import { Avatar, Button, List, Skeleton, Space, Spin, Tooltip } from 'antd'
+import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import { Affix, Avatar, Button, List, Skeleton } from 'antd'
-import PaginationCustom from '@/components/common/pagination'
+import { decodeNumber, encodeNumber } from '../common/hashCode'
+import { RollbackOutlined } from '@ant-design/icons'
+import PaginationCustom from '../common/pagination'
 import { io } from 'socket.io-client'
+import { setMessage } from '@/redux/componentSlice/messageSocketSlice'
 
 interface DataType {
 	gender?: string
@@ -19,17 +23,17 @@ interface DataType {
 	nat?: string
 	loading: boolean
 }
-
 const count = 3
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`
-
-const OrderByUser: React.FC = () => {
+const DetailOrder: React.FC = () => {
+	const [idTable, setIdTable] = useState<any>(0)
+	let router = useRouter()
+	const [openModal, setOpenModal] = useState(false)
 	const [initLoading, setInitLoading] = useState(true)
 	const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
-	// useEffect(() => {}, [])
 	useEffect(() => {
 		const newSocket = io('http://localhost:3500')
 		setSocket(newSocket)
@@ -48,10 +52,27 @@ const OrderByUser: React.FC = () => {
 				setData(res.results)
 				setList(res.results)
 			})
+
+		setTimeout(() => {
+			setLoading(false)
+		}, 1000)
 		return () => {
 			newSocket.disconnect()
 		}
 	}, [])
+
+	useEffect(() => {
+		// setLoading(true)
+		let num = router?.query?.order || null // c0
+		let convert
+		if (isNaN(num)) {
+			const [decoded, originalNum] = decodeNumber(num)
+			convert = decoded
+		} else {
+			convert = encodeNumber(Number(num))
+		}
+		setIdTable(convert)
+	}, [router?.query])
 
 	const onLoadMore = (page) => {
 		setLoading(true)
@@ -72,26 +93,22 @@ const OrderByUser: React.FC = () => {
 			})
 	}
 
-	const loadMore =
-		!initLoading && !loading ? (
-			<div
-				style={{
-					textAlign: 'right',
-					marginTop: 12,
-					height: 32,
-					lineHeight: '32px',
-				}}
-			>
-				{/* <Affix offsetBottom={150}> */}
-				<Button onClick={onLoadMore} type="primary">
-					loading more
-				</Button>
-				{/* </Affix> */}
-			</div>
-		) : null
-
+	const handleGoBack = () => {
+		router.back()
+	}
 	return (
 		<>
+			<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+				<div>
+					<Tooltip placement="left" title={'quay lại'}>
+						<RollbackOutlined
+							style={{ color: 'blue', fontSize: '17px', cursor: 'pointer' }}
+							onClick={handleGoBack}
+						/>
+					</Tooltip>
+				</div>
+				<h4 style={{ margin: '0' }}>Danh sách đặt món bàn của bạn ({idTable})</h4>
+			</div>
 			<List
 				className="demo-loadmore-list showScroll"
 				loading={initLoading}
@@ -99,12 +116,7 @@ const OrderByUser: React.FC = () => {
 				// loadMore={loadMore}
 				dataSource={list}
 				renderItem={(item) => (
-					<List.Item
-						actions={[
-							<Button type="dashed">Hủy bỏ</Button>,
-							<Button type="primary">Xác nhận</Button>,
-						]}
-					>
+					<List.Item actions={[<Button type="dashed">Hủy bỏ</Button>]}>
 						<Skeleton avatar title={false} loading={item.loading} active>
 							<List.Item.Meta
 								avatar={<Avatar src={item.picture.large} />}
@@ -121,4 +133,4 @@ const OrderByUser: React.FC = () => {
 	)
 }
 
-export default OrderByUser
+export default DetailOrder

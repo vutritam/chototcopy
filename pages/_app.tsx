@@ -2,7 +2,7 @@ import '@/styles/globals.css'
 import 'semantic-ui-css/semantic.min.css'
 import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux'
-import store from '@/redux/store/store'
+// import { store, persistor } from '';
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useRouter } from 'next/router'
@@ -17,6 +17,8 @@ import {
 import { MenuProps } from 'antd'
 import Link from 'next/link'
 import PrivateRoute from '@/components/common/privateRoute'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistor, store } from '@/redux/store/store'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -106,8 +108,10 @@ export default function App({ Component, pageProps }: AppProps) {
 
 	return (
 		<Provider store={store}>
-			<ToastContainer />
-			{renderPage()}
+			<PersistGate loading={null} persistor={persistor}>
+				<ToastContainer />
+				{renderPage()}
+			</PersistGate>
 		</Provider>
 	)
 }

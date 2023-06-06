@@ -38,6 +38,15 @@
     justify-content: center;
 
 }
+/* width */
+.showScroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
 .showScroll {
   overflow-y: hidden;
   max-height: 360px;

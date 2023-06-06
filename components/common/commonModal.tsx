@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Avatar, Button, InputNumber, List, Modal, Space, Spin } from 'antd'
+import { Alert, Avatar, Button, InputNumber, List, Modal, Select, Space, Spin } from 'antd'
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
 import Toasty from './toasty'
 import { Label } from 'semantic-ui-react'
@@ -17,6 +17,10 @@ const CommonModal = (props: inputProps): JSX.Element => {
 
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
+	const [dataInput, setDataInput] = useState({
+		quantity: 1,
+		location: '',
+	})
 	const [modalText, setModalText] = useState('Content of the modal')
 	const dispatch = useDispatch()
 	const showModal = () => {
@@ -43,13 +47,21 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		setConfirmLoading(true)
 		setTimeout(() => {
 			setOpen(false)
+			setDataInput({
+				quantity: 0,
+				location: '',
+			})
 			setConfirmLoading(false)
 			// Toasty.success('Đặt món thành công')
 			if (socket) {
+				// gửi sự kiện get sản phẩm
+				socket.emit('getProductOrder', { message: 'Gửi sự kiện lấy sản phẩm' })
+
 				// Gửi sự kiện tới Socket.IO server
 				socket.emit('myEvent', { message: 'Hello from client' })
 				socket.on('response', async (response) => {
 					await dispatch(setMessage(response))
+					localStorage.setItem('notification', JSON.stringify(response))
 					console.log('Received response:', response)
 				})
 			}
@@ -59,17 +71,26 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	const handleCancel = () => {
 		console.log('Clicked cancel button')
 		setOpen(false)
+		setDataInput({
+			quantity: 0,
+			location: '',
+		})
 	}
-	const onChange = (value: number) => {
-		console.log('changed', value)
+
+	const onChangeQuantity = (value: any) => {
+		setDataInput({ ...dataInput, quantity: value })
 	}
+	const onChangeLocation = (label: any) => {
+		setDataInput({ ...dataInput, location: label })
+	}
+	console.log('changed', dataInput)
 	return (
 		<>
 			<Button type="primary" onClick={showModal}>
 				{props.label}
 			</Button>
 			<Modal
-				title={confirmLoading ? '' : props.tittle}
+				title={confirmLoading ? '' : <p style={{ color: 'blue' }}>{props.tittle}</p>}
 				open={open}
 				onOk={handleOk}
 				confirmLoading={confirmLoading}
@@ -78,7 +99,13 @@ const CommonModal = (props: inputProps): JSX.Element => {
 					<Button key="2" onClick={handleCancel}>
 						Hủy
 					</Button>,
-					<Button key="3" type="primary" loading={confirmLoading} onClick={handleOk}>
+					<Button
+						key="3"
+						type="primary"
+						loading={confirmLoading}
+						onClick={handleOk}
+						disabled={!dataInput.location || dataInput.quantity <= 0}
+					>
 						Đặt ngay
 					</Button>,
 				]}
@@ -107,7 +134,37 @@ const CommonModal = (props: inputProps): JSX.Element => {
 						</List.Item>
 						<Space>
 							<h5>Nhập số lượng: </h5>
-							<InputNumber min={1} max={10} defaultValue={3} onChange={onChange} />
+							<InputNumber min={1} max={10} defaultValue={1} onChange={onChangeQuantity} />
+						</Space>
+						<Space style={{ marginTop: '5px' }}>
+							<h5>Nhập vị trí: </h5>
+							<Select
+								showSearch
+								style={{ width: 200 }}
+								placeholder="Search to Select"
+								optionFilterProp="children"
+								onChange={onChangeLocation}
+								filterOption={(input, option) => (option?.label ?? '').includes(input)}
+								filterSort={(optionA, optionB) =>
+									(optionA?.label ?? '')
+										.toLowerCase()
+										.localeCompare((optionB?.label ?? '').toLowerCase())
+								}
+								options={[
+									{
+										value: 'Not Identified',
+										label: 'Not Identified',
+									},
+									{
+										value: 'Closed',
+										label: 'Closed',
+									},
+									{
+										value: 'Communicated',
+										label: 'Communicated',
+									},
+								]}
+							/>
 						</Space>
 					</List>
 				)}
