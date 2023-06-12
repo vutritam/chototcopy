@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Affix, Avatar, Button, List, Skeleton } from 'antd'
 import PaginationCustom from '@/components/common/pagination'
 import { io } from 'socket.io-client'
+import { useDispatch } from 'react-redux'
+import { setOrder } from '@/redux/componentSlice/orderSlice'
+import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 
 interface DataType {
 	gender?: string
@@ -21,55 +24,59 @@ interface DataType {
 }
 
 const count = 3
-const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`
 
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
+	const dispatch = useDispatch()
 	const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
+
 	// useEffect(() => {}, [])
 	useEffect(() => {
-		const newSocket = io('http://localhost:3500')
-		setSocket(newSocket)
-		if (socket) {
-			// Gửi sự kiện tới Socket.IO server
-			socket.on('response', async (response) => {
-				await dispatch(setMessage(response))
-				localStorage.setItem('notification', JSON.stringify(response))
-				console.log('Received response:', response)
-			})
-		}
-		fetch(fakeDataUrl)
-			.then((res) => res.json())
-			.then((res) => {
+		;(async () => {
+			const newSocket = io('http://localhost:3500')
+			setSocket(newSocket)
+			const { payload } = await dispatch(fetchAllProduct())
+			if (payload.success) {
 				setInitLoading(false)
-				setData(res.results)
-				setList(res.results)
-			})
-		return () => {
-			newSocket.disconnect()
-		}
+				setData(payload.data)
+				setList(payload.data)
+			}
+		})()
+		// if (socket) {
+		// 	// Gửi sự kiện tới Socket.IO server
+		// 	socket.on('response', async (response) => {
+		// 		await dispatch(setMessage(response))
+		// 		// localStorage.setItem('notification', JSON.stringify(response))
+		// 		console.log('Received response:', response)
+		// 	})
+		// }
 	}, [])
+
+	useEffect(() => {
+		console.log('listening socket', socket)
+		if (socket && socket.connected) {
+			socket.on('resProductOrder', async (response) => {
+				// await dispatch(setOrder(response))
+				// localStorage.setItem('notification', JSON.stringify(response))
+				console.log('Received resProductOrder:', response)
+			})
+			// setInitLoading(false)
+			// 	setData(res.results)
+			// 	setList(res.results)
+			return () => {
+				socket.disconnect()
+			}
+		}
+	}, [socket])
 
 	const onLoadMore = (page) => {
 		setLoading(true)
 		setList(
 			data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
 		)
-		fetch(fakeDataUrl)
-			.then((res) => res.json())
-			.then((res) => {
-				const newData = data.concat(res.results)
-				setData(newData)
-				setList(newData)
-				setLoading(false)
-				// Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-				// In real scene, you can using public method of react-virtualized:
-				// https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-				window.dispatchEvent(new Event('resize'))
-			})
 	}
 
 	const loadMore =
@@ -107,11 +114,11 @@ const OrderByUser: React.FC = () => {
 					>
 						<Skeleton avatar title={false} loading={item.loading} active>
 							<List.Item.Meta
-								avatar={<Avatar src={item.picture.large} />}
-								title={<a href="https://ant.design">{item.name?.last}</a>}
-								description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+								avatar={<Avatar src={item.file} />}
+								title={item.name}
+								description={item.Description}
 							/>
-							<div>16-12-2023</div>
+							<div>{item.EndDate}</div>
 						</Skeleton>
 					</List.Item>
 				)}

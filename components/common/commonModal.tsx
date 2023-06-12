@@ -7,6 +7,11 @@ import SocketClient from './socketIoConnect'
 import io from 'socket.io-client'
 import { setMessage } from '@/redux/componentSlice/messageSocketSlice'
 import { useDispatch } from 'react-redux'
+import { fetchCreateOrder, setOrder } from '@/redux/componentSlice/orderSlice'
+import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
+import { useRouter } from 'next/router'
+import { decodeNumber, encodeNumber } from './hashCode'
+
 interface inputProps {
 	label: string
 	tittle: string
@@ -14,7 +19,8 @@ interface inputProps {
 }
 const CommonModal = (props: inputProps): JSX.Element => {
 	// console.log(props.item)
-
+	const [idTable, setIdTable] = useState<any>(0)
+	let router = useRouter()
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const [dataInput, setDataInput] = useState({
@@ -42,21 +48,52 @@ const CommonModal = (props: inputProps): JSX.Element => {
 			newSocket.disconnect()
 		}
 	}, [])
+
+	useEffect(() => {
+		// setLoading(true)
+		let num = router?.query?.order || null // c0
+		let convert
+		if (isNaN(num)) {
+			const [decoded, originalNum] = decodeNumber(num)
+			convert = decoded
+		} else {
+			convert = encodeNumber(Number(num))
+		}
+		setIdTable(convert)
+	}, [router?.query])
+
 	const handleOk = () => {
 		setModalText('The modal will be closed after two seconds')
 		setConfirmLoading(true)
-		setTimeout(() => {
+		setTimeout(async () => {
 			setOpen(false)
 			setDataInput({
 				quantity: 0,
 				location: '',
 			})
 			setConfirmLoading(false)
-			// Toasty.success('Đặt món thành công')
-			if (socket) {
-				// gửi sự kiện get sản phẩm
-				socket.emit('getProductOrder', { message: 'Gửi sự kiện lấy sản phẩm' })
+			const { payload } = await dispatch(
+				fetchCreateOrder({
+					tableNumber: idTable,
+					productId: props.item.id,
+					location: dataInput.location,
+				})
+			)
+			if (payload?.success) {
+				if (socket) {
+					// gửi sự kiện get sản phẩm
+					socket.emit('getProductOrder', {
+						message: 'Gửi sự kiện lấy sản phẩm',
+						location: dataInput.location,
+					})
+					socket.on('resProductOrder', async (response) => {
+						await dispatch(setOrder(response))
+						console.log('Received resProductOrder:', response)
+					})
+				}
+			}
 
+			if (socket) {
 				// Gửi sự kiện tới Socket.IO server
 				socket.emit('myEvent', { message: 'Hello from client' })
 				socket.on('response', async (response) => {
@@ -65,6 +102,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 					console.log('Received response:', response)
 				})
 			}
+			// Toasty.success('Đặt món thành công')
 		}, 2000)
 	}
 
@@ -83,7 +121,11 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	const onChangeLocation = (label: any) => {
 		setDataInput({ ...dataInput, location: label })
 	}
-	console.log('changed', dataInput)
+	console.log('changed', {
+		tableNumber: idTable,
+		productId: props.item.id,
+		location: dataInput.location,
+	})
 	return (
 		<>
 			<Button type="primary" onClick={showModal}>
@@ -119,18 +161,18 @@ const CommonModal = (props: inputProps): JSX.Element => {
 				) : (
 					<List>
 						<List.Item
-							key={props.item.title}
+							key={props.item.id}
 							actions={[
 								<IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
 								<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
 							]}
 						>
 							<List.Item.Meta
-								avatar={<Avatar src={props.item.avatar} />}
-								title={<a href={props.item.href}>{props.item.title}</a>}
-								description={props.item.description}
+								avatar={<Avatar src={props.item.file} />}
+								title={props.item.name}
+								description={props.item.Description}
 							/>
-							{props.item.content}
+							{props.item.Description}
 						</List.Item>
 						<Space>
 							<h5>Nhập số lượng: </h5>
@@ -152,16 +194,16 @@ const CommonModal = (props: inputProps): JSX.Element => {
 								}
 								options={[
 									{
-										value: 'Not Identified',
-										label: 'Not Identified',
+										value: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
+										label: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
 									},
 									{
-										value: 'Closed',
-										label: 'Closed',
+										value: 'Trường chinh, tân bình',
+										label: 'Trường chinh, tân bình',
 									},
 									{
-										value: 'Communicated',
-										label: 'Communicated',
+										value: 'Hóc môn quận 12',
+										label: 'Hóc môn quận 12',
 									},
 								]}
 							/>

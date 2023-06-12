@@ -14,6 +14,11 @@ export const fetchCreateProduct = createAsyncThunk<any, string>(
 	}
 )
 
+export const fetchAllProduct = createAsyncThunk<any, string>('api/fetchAllProduct', async () => {
+	let response = await axiosConfig.get('/products')
+	return response.data
+})
+
 const productSlice = createSlice({
 	name: 'products',
 	initialState: {
@@ -31,9 +36,19 @@ const productSlice = createSlice({
 			})
 			.addCase(fetchCreateProduct.fulfilled, (state, action) => {
 				state.products.loading = false
-				state.products.data = action.payload
 			})
 			.addCase(fetchCreateProduct.rejected, (state, action) => {
+				state.products.loading = false
+				state.products.error = action.error.message || ''
+			})
+			.addCase(fetchAllProduct.pending, (state) => {
+				state.products.loading = true
+			})
+			.addCase(fetchAllProduct.fulfilled, (state, action) => {
+				state.products.loading = false
+				state.products.data = action.payload
+			})
+			.addCase(fetchAllProduct.rejected, (state, action) => {
 				state.products.loading = false
 				state.products.error = action.error.message || ''
 			})

@@ -141,8 +141,6 @@ const AvatarComponent: React.FC = () => {
 		})()
 	}, [])
 
-	console.log(dataLocal, 'dataLocal')
-
 	useEffect(() => {
 		// let dataNoti
 		// if (typeof window !== 'undefined') {
