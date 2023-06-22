@@ -16,12 +16,13 @@ const Products: React.FC = () => {
 	const onRequiredTypeChange = ({ requiredMarkValue }: { requiredMarkValue: RequiredMark }) => {
 		setRequiredMarkType(requiredMarkValue)
 	}
+
 	const onFinish = async (values: any) => {
 		const formData = new FormData()
 		formData.append('name', values.name)
 		formData.append('price', values.price)
 		formData.append('quantity', values.quantity)
-		formData.append('file', UploadImg.image)
+		formData.append('file', UploadImg.image.file.originFileObj)
 		formData.append('Description', values.Description)
 		formData.append('EndDate', values.EndDate)
 		const { payload } = await dispatch(fetchCreateProduct(formData))
@@ -34,7 +35,7 @@ const Products: React.FC = () => {
 			return
 		}
 		Toasty.error(payload?.message)
-		console.log('Received values of form: ', values.EndDate.format('YYYY-MM-DD HH:mm:ss'))
+		// console.log('Received values of form: ', values.EndDate.format('YYYY-MM-DD HH:mm:ss'))
 	}
 
 	return (
@@ -110,9 +111,7 @@ const Products: React.FC = () => {
 					<Form.Item
 						label={<strong>Hình ảnh</strong>}
 						name="file"
-						required
 						tooltip="This is a required field"
-						rules={[{ required: true, message: 'Vui lòng nhập Hình ảnh!' }]}
 					>
 						<FileUpload setUpload={setUpload} />
 					</Form.Item>

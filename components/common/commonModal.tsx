@@ -77,6 +77,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 					tableNumber: idTable,
 					productId: props.item.id,
 					location: dataInput.location,
+					quantity: dataInput.quantity,
 				})
 			)
 			if (payload?.success) {
@@ -85,10 +86,6 @@ const CommonModal = (props: inputProps): JSX.Element => {
 					socket.emit('getProductOrder', {
 						message: 'Gửi sự kiện lấy sản phẩm',
 						location: dataInput.location,
-					})
-					socket.on('resProductOrder', async (response) => {
-						await dispatch(setOrder(response))
-						console.log('Received resProductOrder:', response)
 					})
 				}
 			}
@@ -125,6 +122,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		tableNumber: idTable,
 		productId: props.item.id,
 		location: dataInput.location,
+		quantity: dataInput.quantity,
 	})
 	return (
 		<>

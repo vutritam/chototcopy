@@ -22,14 +22,17 @@ const ListItem: React.FC = () => {
 		// setLoading(true)
 		;(async () => {
 			const { payload } = await dispatch(fetchAllProduct())
-			if (payload.success) {
+			if (payload?.success) {
 				setTimeout(() => {
 					setLoading(false)
 					setDataList(payload.data)
 				}, 1000)
+			} else {
+				setLoading(false)
 			}
 		})()
 	}, [])
+	// console.log(dataList, 'dataList')
 
 	return (
 		<>
@@ -85,10 +88,12 @@ const ListItem: React.FC = () => {
 									''
 								),
 							]}
-							extra={<img width={172} alt="logo" src={item.file} />}
+							extra={
+								<img width={172} alt="logo" src={`http://localhost:3000/images/${item.file}`} />
+							}
 						>
 							<List.Item.Meta
-								avatar={<Avatar src={item.file} />}
+								avatar={<Avatar src={`http://localhost:3000/images/${item.file}`} />}
 								title={item.name}
 								description={item.Description}
 							/>

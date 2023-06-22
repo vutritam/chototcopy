@@ -6,11 +6,11 @@ import type { UploadFile } from 'antd/es/upload/interface'
 const fileList: UploadFile[] = []
 
 const FileUpload: React.FC = ({ setUpload }) => {
-	console.log(fileList, 'file list')
 	const [upImage, setUpImage] = useState<UploadFile[]>([])
 	// const onChangeList = (value: any) => {
 	// 	// console.log({ ...value, file: { ...value.file, status: 'done' } })
 	// }
+	console.log(upImage, 'file list')
 
 	const handleUpload = (value: any) => {
 		// let data = {

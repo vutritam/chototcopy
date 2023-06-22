@@ -6,6 +6,9 @@ import { RollbackOutlined } from '@ant-design/icons'
 import PaginationCustom from '../common/pagination'
 import { io } from 'socket.io-client'
 import { setMessage } from '@/redux/componentSlice/messageSocketSlice'
+import Toasty from '../common/toasty'
+import { fetchAllOrder, fetchOrderByNumberTable } from '@/redux/componentSlice/orderSlice'
+import { useDispatch } from 'react-redux'
 
 interface DataType {
 	gender?: string
@@ -26,14 +29,17 @@ interface DataType {
 const count = 3
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`
 const DetailOrder: React.FC = () => {
+	const dispatch = useDispatch()
 	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
+
 	const [openModal, setOpenModal] = useState(false)
 	const [initLoading, setInitLoading] = useState(true)
 	const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
+
 	useEffect(() => {
 		const newSocket = io('http://localhost:3500')
 		setSocket(newSocket)
@@ -45,13 +51,21 @@ const DetailOrder: React.FC = () => {
 				console.log('Received response:', response)
 			})
 		}
-		fetch(fakeDataUrl)
-			.then((res) => res.json())
-			.then((res) => {
+
+		// Fetch dữ liệu ban đầu và cập nhật state
+		const fetchData = async () => {
+			console.log(idTable, 'idTable')
+			const { payload } = await dispatch(fetchOrderByNumberTable({ tableNumber: idTable }))
+			if (payload?.success) {
 				setInitLoading(false)
-				setData(res.results)
-				setList(res.results)
-			})
+				setData(payload.data)
+				setList(payload.data)
+			}
+			Toasty.error(payload?.message)
+			setInitLoading(false)
+		}
+
+		fetchData()
 
 		setTimeout(() => {
 			setLoading(false)
@@ -59,11 +73,14 @@ const DetailOrder: React.FC = () => {
 		return () => {
 			newSocket.disconnect()
 		}
-	}, [])
+	}, [idTable])
 
 	useEffect(() => {
 		// setLoading(true)
-		let num = router?.query?.order || null // c0
+		const { orderDetail } = router.query
+		// Giải mã chuỗi JSON
+		const order = JSON.parse(orderDetail)
+		let num = order.order || null // c0
 		let convert
 		if (isNaN(num)) {
 			const [decoded, originalNum] = decodeNumber(num)
@@ -71,6 +88,7 @@ const DetailOrder: React.FC = () => {
 		} else {
 			convert = encodeNumber(Number(num))
 		}
+
 		setIdTable(convert)
 	}, [router?.query])
 
@@ -119,11 +137,16 @@ const DetailOrder: React.FC = () => {
 					<List.Item actions={[<Button type="dashed">Hủy bỏ</Button>]}>
 						<Skeleton avatar title={false} loading={item.loading} active>
 							<List.Item.Meta
-								avatar={<Avatar src={item.picture.large} />}
-								title={<a href="https://ant.design">{item.name?.last}</a>}
-								description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+								avatar={
+									<Avatar
+										src={'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'}
+									/>
+								}
+								title={`Bàn số ${item.tableNumber}`}
+								description={item.location}
 							/>
-							<div>16-12-2023</div>
+							<div>{item.productId?.name || 'no data'}</div>
+							<div style={{ marginLeft: '40px' }}>{item.quantity || '0'}</div>
 						</Skeleton>
 					</List.Item>
 				)}

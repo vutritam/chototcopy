@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { Affix, Avatar, Button, List, Skeleton } from 'antd'
 import PaginationCustom from '@/components/common/pagination'
 import { io } from 'socket.io-client'
-import { useDispatch } from 'react-redux'
-import { setOrder } from '@/redux/componentSlice/orderSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchAllOrder, setOrder } from '@/redux/componentSlice/orderSlice'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
+import Toasty from '@/components/common/toasty'
 
 interface DataType {
 	gender?: string
@@ -27,48 +28,49 @@ const count = 3
 
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
+	const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
 	const dispatch = useDispatch()
 	const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
-
+	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
 	// useEffect(() => {}, [])
 	useEffect(() => {
-		;(async () => {
-			const newSocket = io('http://localhost:3500')
-			setSocket(newSocket)
-			const { payload } = await dispatch(fetchAllProduct())
-			if (payload.success) {
+		const newSocket = io('http://localhost:3500')
+		setSocket(newSocket)
+
+		// Fetch dữ liệu ban đầu và cập nhật state
+		const fetchData = async () => {
+			const { payload } = await dispatch(fetchAllOrder({ location: getLocationEmployee.location }))
+			console.log(payload, 'pa')
+
+			if (payload?.success) {
 				setInitLoading(false)
 				setData(payload.data)
 				setList(payload.data)
 			}
-		})()
-		// if (socket) {
-		// 	// Gửi sự kiện tới Socket.IO server
-		// 	socket.on('response', async (response) => {
-		// 		await dispatch(setMessage(response))
-		// 		// localStorage.setItem('notification', JSON.stringify(response))
-		// 		console.log('Received response:', response)
-		// 	})
-		// }
+			Toasty.error(payload?.message)
+			setInitLoading(false)
+		}
+
+		fetchData()
+
+		return () => {
+			newSocket.disconnect()
+		}
 	}, [])
 
 	useEffect(() => {
-		console.log('listening socket', socket)
-		if (socket && socket.connected) {
-			socket.on('resProductOrder', async (response) => {
-				// await dispatch(setOrder(response))
-				// localStorage.setItem('notification', JSON.stringify(response))
-				console.log('Received resProductOrder:', response)
+		if (socket) {
+			socket.emit('joinRoom', 'room')
+			socket.on('resProductOrder', (response) => {
+				let item = response.data?.find((item) => item?.location)
+				if (item?.location === getLocationEmployee?.location) {
+					setList(response.data)
+					setData(response.data)
+				}
 			})
-			// setInitLoading(false)
-			// 	setData(res.results)
-			// 	setList(res.results)
-			return () => {
-				socket.disconnect()
-			}
 		}
 	}, [socket])
 
@@ -103,6 +105,7 @@ const OrderByUser: React.FC = () => {
 				className="demo-loadmore-list showScroll"
 				loading={initLoading}
 				itemLayout="horizontal"
+				header={['name', 'quantity']}
 				// loadMore={loadMore}
 				dataSource={list}
 				renderItem={(item) => (
@@ -114,11 +117,16 @@ const OrderByUser: React.FC = () => {
 					>
 						<Skeleton avatar title={false} loading={item.loading} active>
 							<List.Item.Meta
-								avatar={<Avatar src={item.file} />}
-								title={item.name}
-								description={item.Description}
+								avatar={
+									<Avatar
+										src={'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'}
+									/>
+								}
+								title={`Bàn số ${item.tableNumber}`}
+								description={item.location}
 							/>
-							<div>{item.EndDate}</div>
+							<div>{item.productId?.name || 'no data'}</div>
+							<div style={{ marginLeft: '40px' }}>{item.quantity || '0'}</div>
 						</Skeleton>
 					</List.Item>
 				)}

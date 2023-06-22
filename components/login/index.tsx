@@ -19,12 +19,11 @@ const LoginForm: React.FC = () => {
 		setLoadings(true)
 		if (keyTab === 1) {
 			const { payload } = await dispatch(fetchCreatePost(options))
-			console.log(payload, 'pay')
 			if (payload?.success) {
 				setTimeout(() => {
 					setLoadings(false)
 					Toasty.success(payload?.message)
-					if (user && user.roles.includes('admin')) {
+					if (user && user?.roles?.includes('admin')) {
 						router.push('/admin')
 					} else {
 						router.push('/employee')
@@ -50,7 +49,6 @@ const LoginForm: React.FC = () => {
 			}, 1800)
 		}
 		const { payload } = await dispatch(fetchRegisterUser(options))
-		console.log(payload, 'pay register')
 		if (payload?.success) {
 			setTimeout(() => {
 				setLoadings(false)
@@ -182,8 +180,11 @@ const LoginForm: React.FC = () => {
 								suffixIcon={<LockOutlined className="site-form-item-icon" />}
 								placeholder="Nhập địa điểm làm việc"
 							>
-								<Select.Option value="địa điểm 2">Demo</Select.Option>
-								<Select.Option value="địa điểm 1">Demo</Select.Option>
+								<Select.Option value="409/99 Tân chánh hiệp 12 quận 12 TP.HCM">
+									409/99 Tân chánh hiệp 12 quận 12 TP.HCM
+								</Select.Option>
+								<Select.Option value="Trường chinh, tân bình">Trường chinh, tân bình</Select.Option>
+								<Select.Option value="Hóc môn quận 12">Hóc môn quận 12</Select.Option>
 							</Select>
 						</Form.Item>
 						<Form.Item>

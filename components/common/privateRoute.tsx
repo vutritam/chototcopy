@@ -18,7 +18,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }: PrivateRoutePro
 			} else {
 				// Kiểm tra quyền truy cập của người dùng
 				const parsedUser = JSON.parse(user)
-				const isAdmin = parsedUser.roles.includes('admin')
+				const isAdmin = parsedUser?.roles?.includes('admin')
 
 				// Chuyển hướng đến trang tương ứng với quyền truy cập của người dùng
 				if (isAdmin) {
