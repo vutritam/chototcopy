@@ -44,17 +44,15 @@ export default function App({ Component, pageProps }: AppProps) {
 
 	const itemsAdmin: MenuItem[] = [
 		getItem(<div>Quản lý ca</div>, '1', <PieChartOutlined />),
-		getItem('Quản lý kết nối', '2', <DesktopOutlined />),
+		getItem(<Link href="/admin/manage_work">Quản lí kết nối</Link>, '2', <DesktopOutlined />),
 		getItem(<Link href="/admin/products">Nhập sản phẩm</Link>, '3', <PieChartOutlined />),
 		getItem('Quản lý nhân viên', '4', <DesktopOutlined />),
 		getItem('Quản lý đặt bàn', 'sub1', <UserOutlined />, [
-			getItem('Tom', '5'),
-			getItem('Bill', '6'),
-			getItem('Alex', '7'),
+			getItem(<Link href="/admin/orders">Đơn các bàn</Link>, '5', <PieChartOutlined />),
 		]),
-		getItem('Căn tin', 'sub2', <TeamOutlined />, [getItem('Team 1', '8'), getItem('Team 2', '9')]),
+		getItem('Căn tin', 'sub2', <TeamOutlined />, [getItem('Team 1', '9'), getItem('Team 2', '10')]),
 		getItem('Thực đơn', '10', <FileOutlined />),
-		getItem(<div>Bán hàng</div>, '10', <PieChartOutlined />),
+		getItem(<div>Bán hàng</div>, '11', <PieChartOutlined />),
 	]
 
 	const itemsEmployee: MenuItem[] = [
@@ -82,19 +80,19 @@ export default function App({ Component, pageProps }: AppProps) {
 	const renderPage = () => {
 		if (isAdminPage) {
 			return (
-				<PrivateRoute>
-					<MasterLayout itemsSiderBar={itemsAdmin}>
-						<Component {...pageProps} />
-					</MasterLayout>
-				</PrivateRoute>
+				// <PrivateRoute>
+				<MasterLayout itemsSiderBar={itemsAdmin}>
+					<Component {...pageProps} />
+				</MasterLayout>
+				// </PrivateRoute>
 			)
 		} else if (isEmployeePage) {
 			return (
-				<PrivateRoute>
-					<MasterLayout itemsSiderBar={itemsEmployee}>
-						<Component {...pageProps} />
-					</MasterLayout>
-				</PrivateRoute>
+				// <PrivateRoute>
+				<MasterLayout itemsSiderBar={itemsEmployee}>
+					<Component {...pageProps} />
+				</MasterLayout>
+				// </PrivateRoute>
 			)
 		} else if (isOrderPage) {
 			return (

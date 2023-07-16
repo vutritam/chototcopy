@@ -101,8 +101,9 @@ const AvatarComponent: React.FC = () => {
 				userInfo: {},
 				dataNoti: [],
 			}
+			let getDataUserInfo = JSON.parse(localStorage.getItem('user'))
 			if (typeof window !== 'undefined') {
-				obj.userInfo = JSON.parse(localStorage.getItem('user'))
+				obj.userInfo = getDataUserInfo?.data
 				obj.dataNoti = message
 				onSetDataLocal(obj, async ({ userInfo, dataNoti }: propsData) => {
 					if (userInfo) {
@@ -110,7 +111,7 @@ const AvatarComponent: React.FC = () => {
 							if (!isOrderPage) {
 								const { payload } = await dispatch(fetchUserById(userInfo.userId))
 								if (payload?.success) {
-									setUserRequest(payload.data.username)
+									setUserRequest(payload.username)
 									return
 								}
 								toast('user not found', {
@@ -241,7 +242,7 @@ const AvatarComponent: React.FC = () => {
 							<a onClick={(e) => e.preventDefault()} style={{ color: '#050354' }}>
 								<Space>
 									<Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
-									{user?.username || userRequest}
+									{user?.data?.username || userRequest}
 									<DownOutlined />
 								</Space>
 							</a>

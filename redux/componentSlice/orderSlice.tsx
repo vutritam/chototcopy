@@ -20,11 +20,22 @@ export const fetchOrderByNumberTable = createAsyncThunk(
 	}
 )
 
+export const fetchAllOrderByUser = createAsyncThunk('api/fetchAllOrderByUser', async () => {
+	let response = await axiosConfig.get('/order/getAllOrderByUser')
+	return response.data
+})
+
+export const deleteOrder = createAsyncThunk('api/deleteOrder', async (options) => {
+	let response = await axiosConfig.post('/order/deleteOrder', options)
+	return response.data
+})
+
 const orderSlice = createSlice({
 	name: 'dataOrder',
 	initialState: {
 		dataOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataOrderByNumberTable: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
+		dataAllOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 	},
 	reducers: {
 		setOrder: (state, action) => {
@@ -57,6 +68,17 @@ const orderSlice = createSlice({
 			.addCase(fetchOrderByNumberTable.rejected, (state, action) => {
 				state.dataOrderByNumberTable.loading = false
 				state.dataOrderByNumberTable.error = action.error.message || ''
+			})
+			.addCase(fetchAllOrderByUser.pending, (state) => {
+				state.dataAllOrder.loading = true
+			})
+			.addCase(fetchAllOrderByUser.fulfilled, (state, action) => {
+				state.dataAllOrder.loading = false
+				state.dataAllOrder.data = action.payload
+			})
+			.addCase(fetchAllOrderByUser.rejected, (state, action) => {
+				state.dataAllOrder.loading = false
+				state.dataAllOrder.error = action.error.message || ''
 			})
 	},
 })

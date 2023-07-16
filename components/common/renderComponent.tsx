@@ -5,6 +5,7 @@ import ListItem from '@/components/main/listItem'
 import ManageWork from '@/components/main/manageWork'
 import Products from '@/components/main/products'
 import DetailOrder from '../main/detailOrder'
+import OrderByAllUser from '@/pages/admin/orders'
 
 const RenderedComponent: React.FC = () => {
 	const router = useRouter()
@@ -58,6 +59,8 @@ const RenderedComponent: React.FC = () => {
 
 			case '/admin/products':
 				return <Products />
+			case '/admin/orders':
+				return <OrderByAllUser />
 
 			// Xử lý cho các component khác tùy theo số lượng và tên của chúng
 			default:
@@ -83,7 +86,8 @@ const RenderedComponent: React.FC = () => {
 					</Space>
 				</div>
 			) : (
-				<>{handleBeginRoute()}</>
+				// <>{handleBeginRoute()}</>
+				<p>aaa</p>
 			)}
 		</>
 	)

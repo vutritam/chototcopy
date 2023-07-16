@@ -1,18 +1,37 @@
 import { Button, Dropdown, Space } from 'antd'
-import React from 'react'
+import React, { useState } from 'react'
 import type { MenuProps } from 'antd'
 import ModalConfirm from '@/components/common/modalConfirm'
 type Props = {}
 
 export default function ManageMoney({}: Props) {
+	const [openThu, setOpenThu] = useState(false)
+
 	const items: MenuProps['items'] = [
 		{
 			key: '1',
-			label: <ModalConfirm label="Tạo trình thu" title="Tạo phiếu thu" />,
+			label: (
+				<ModalConfirm
+					label="Tạo trình thu"
+					title="Tạo phiếu thu"
+					position="renderComfirmThu"
+					open={openThu}
+					setOpen={setOpenThu}
+					size={1000}
+				/>
+			),
 		},
 		{
 			key: '2',
-			label: <ModalConfirm label="Tạo trình chi" title="Tạo phiếu chi" />,
+			label: (
+				<ModalConfirm
+					label="Tạo trình chi"
+					title="Tạo phiếu chi"
+					// open={open}
+					// setOpen={setOpen}
+					size={1000}
+				/>
+			),
 		},
 	]
 	return (

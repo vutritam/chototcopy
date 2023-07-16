@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Form, Input, Select, Space, Spin, Tabs } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchRegisterUser, fetchCreatePost } from '../../redux/componentSlice/userSlice'
+import { fetchRegisterUser, fetchCreatePost, setUser } from '../../redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { useRouter } from 'next/router'
 import { toast } from 'react-toastify'
@@ -13,7 +13,7 @@ const LoginForm: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [loadings, setLoadings] = useState<boolean>(false)
 	const [keyTab, setKeyTab] = useState<number>(1)
-	const user = useSelector((state: any) => state.user.account.user)
+	// const user = JSON.parse(localStorage.getItem('user'))
 	let router = useRouter()
 	const onFinish = async (options: any) => {
 		setLoadings(true)
@@ -23,13 +23,18 @@ const LoginForm: React.FC = () => {
 				setTimeout(() => {
 					setLoadings(false)
 					Toasty.success(payload?.message)
-					if (user && user?.roles?.includes('admin')) {
+					if (payload.data?.roles?.includes('admin')) {
+						localStorage.setItem('role_access', '/admin')
 						router.push('/admin')
 					} else {
+						localStorage.setItem('role_access', '/employee')
 						router.push('/employee')
 					}
 					// dispatch(setUser(payload))
 				}, 1000)
+				// console.log(payload, 'pay')
+
+				dispatch(setUser(payload))
 				localStorage.setItem('user', JSON.stringify(payload))
 				return
 			}
@@ -79,8 +84,10 @@ const LoginForm: React.FC = () => {
 	}
 	const [loading, setLoading] = useState(true)
 	useEffect(() => {
+		// localStorage.removeItem('user')
 		// setLoading(true)
 		setTimeout(() => {
+			// localStorage.removeItem('user')
 			setLoading(false)
 		}, 1000)
 	}, [])

@@ -1,13 +1,18 @@
-import React, { useState } from 'react'
-import { Button, Form, Input, Modal, Select, TreeSelect } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Button, Form, Input, Modal, Select, Space, Spin, TreeSelect } from 'antd'
 import { SizeType } from 'antd/es/config-provider/SizeContext'
 
 interface inputProps {
 	label: string
 	title: string
+	position?: string
+	open?: boolean
+	setOpen?: React.Dispatch<React.SetStateAction<boolean>>
+	handleSubmit?: () => void
+	size?: number
 }
 const ModalConfirm = (props: inputProps): JSX.Element => {
-	const [open, setOpen] = useState(false)
+	// const [open, setOpen] = useState(false)
 	const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default')
 
 	const onFormLayoutChange = ({ size }: { size: SizeType }) => {
@@ -17,6 +22,21 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		console.log('Change:', e.target.value)
+	}
+
+	const renderDeleteItemOrder = () => {
+		return (
+			<Space direction="vertical" style={{ width: '100%' }}>
+				<Space style={{ justifyContent: 'center', height: '100px', width: '100%' }}>
+					<Spin tip="Xác nhận xóa?"></Spin>
+				</Space>
+			</Space>
+		)
+	}
+
+	const handleOk = (isShow) => {
+		props.handleSubmit()
+		props.setOpen(isShow)
 	}
 
 	const renderThu = () => {
@@ -53,18 +73,38 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 		)
 	}
 
+	const handleRender = () => {
+		return renderItem(props.position)
+	}
+
+	const renderItem = (position) => {
+		switch (position) {
+			case 'renderComfirmThu':
+				return renderThu()
+			case 'renderConfirmDeleteItemOrder':
+				return renderDeleteItemOrder()
+			default:
+				break
+		}
+	}
+
+	useEffect(() => {
+		handleRender()
+		// renderItem()
+	}, [])
+
 	return (
 		<>
-			<p onClick={() => setOpen(true)}>{props.label}</p>
+			<p onClick={() => props.setOpen(true)}>{props.label}</p>
 			<Modal
 				title={props.title}
 				centered
-				open={open}
-				onOk={() => setOpen(false)}
-				onCancel={() => setOpen(false)}
-				width={1000}
+				open={props.open}
+				onOk={() => handleOk(false)}
+				onCancel={() => props.setOpen(false)}
+				width={props.size}
 			>
-				{renderThu()}
+				{handleRender()}
 			</Modal>
 		</>
 	)

@@ -1,5 +1,6 @@
 import React from 'react'
 import RenderedComponent from '@/components/common/renderComponent'
+import withAuthorization from '@/components/common/privateRoute'
 
 const Employee: React.FC = () => {
 	return (
@@ -9,4 +10,4 @@ const Employee: React.FC = () => {
 	)
 }
 
-export default Employee
+export default withAuthorization(Employee, ['client'])

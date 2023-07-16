@@ -166,7 +166,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 							]}
 						>
 							<List.Item.Meta
-								avatar={<Avatar src={props.item.file} />}
+								avatar={<Avatar src={`http://localhost:3000/images/${props.item.file}`} />}
 								title={props.item.name}
 								description={props.item.Description}
 							/>

@@ -1,37 +1,49 @@
 import { useRouter } from 'next/router'
-import { ReactNode, useEffect } from 'react'
-import Toasty from './toasty'
+import { useEffect } from 'react'
 
-interface PrivateRouteProps {
-	children: ReactNode
+interface Props {
+	// Các props của component
 }
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }: PrivateRouteProps) => {
-	const router = useRouter()
 
-	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			const user = localStorage.getItem('user')
-			// Kiểm tra xem người dùng đã đăng nhập hay chưa
-			if (!user) {
-				// Chuyển hướng đến trang đăng nhập nếu không có thông tin người dùng trong localStorage
+const withAuthorization = (
+	WrappedComponent: React.ComponentType<Props>,
+	allowedRoles: string[]
+) => {
+	const RequiresAuthorization: React.FC<Props> = (props) => {
+		const router = useRouter()
+		let userRoles = localStorage.getItem('user')
+
+		useEffect(() => {
+			// Kiểm tra xem người dùng có quyền truy cập hay không
+			// Sử dụng thông tin về vai trò (roles) lưu trữ trong cookie hoặc bộ nhớ
+			// Hoặc gửi yêu cầu đến máy chủ để kiểm tra vai trò của người dùng
+
+			if (!userRoles) {
 				router.push('/login')
 			} else {
-				// Kiểm tra quyền truy cập của người dùng
-				const parsedUser = JSON.parse(user)
-				const isAdmin = parsedUser?.roles?.includes('admin')
+				// Ví dụ: Vai trò của người dùng lấy từ thông tin xác thực
 
-				// Chuyển hướng đến trang tương ứng với quyền truy cập của người dùng
-				if (isAdmin) {
-					router.push('/admin')
-				} else {
-					router.push('/employee')
+				const parsedUser = userRoles && JSON.parse(userRoles || '')
+				const isAuthen = parsedUser?.data?.roles
+
+				// Kiểm tra xem người dùng có vai trò phù hợp hay không
+				const hasAccess = allowedRoles.some((role) => isAuthen.includes(role))
+
+				if (!hasAccess) {
+					// Không có quyền truy cập, chuyển hướng đến trang báo lỗi hoặc trang chính khác
+					router.back() // Ví dụ: Chuyển hướng đến trang báo lỗi
 				}
 			}
-		}
-	}, [])
+		}, [router])
 
-	// Hiển thị children (nội dung) nếu người dùng được xác thực
-	return <>{children}</>
+		if (allowedRoles.length === 0) {
+			return <WrappedComponent {...props} />
+		}
+
+		return null
+	}
+
+	return RequiresAuthorization
 }
 
-export default PrivateRoute
+export default withAuthorization

@@ -60,6 +60,7 @@ const DetailOrder: React.FC = () => {
 				setInitLoading(false)
 				setData(payload.data)
 				setList(payload.data)
+				return
 			}
 			Toasty.error(payload?.message)
 			setInitLoading(false)

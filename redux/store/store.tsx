@@ -13,9 +13,13 @@ const persistConfigDataOrder = {
 	key: 'dataOrder',
 	storage,
 }
+const persistConfigUser = {
+	key: 'user',
+	storage,
+}
 
 const rootReducer = combineReducers({
-	user: userSlice,
+	user: persistReducer(persistConfigUser, userSlice),
 	message: persistReducer(persistConfig, messageSocketSlice),
 	dataOrder: persistReducer(persistConfigDataOrder, orderSlice),
 	// login: loginSlice,

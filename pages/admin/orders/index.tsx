@@ -3,10 +3,9 @@ import { Affix, Avatar, Button, List, Skeleton } from 'antd'
 import PaginationCustom from '@/components/common/pagination'
 import { io } from 'socket.io-client'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteOrder, fetchAllOrder, setOrder } from '@/redux/componentSlice/orderSlice'
+import { fetchAllOrder, fetchAllOrderByUser, setOrder } from '@/redux/componentSlice/orderSlice'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
-import ModalConfirm from '@/components/common/modalConfirm'
 
 interface DataType {
 	gender?: string
@@ -27,31 +26,19 @@ interface DataType {
 
 const count = 3
 
-const OrderByUser: React.FC = () => {
+const OrderByAllUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
-	const [open, setOpen] = useState(false)
 	const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
 	const dispatch = useDispatch()
 	const [loading, setLoading] = useState(false)
-	const [idOrder, setIdOrder] = useState(null)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
-	const [socket, setSocket] = useState(null)
 	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
-	const [currentPage, setCurrentPage] = useState(1)
-	let pageSize = 5
-	const [startIndex, setStartIndex] = useState(0)
-	const [endIndex, setEndIndex] = useState(pageSize - 1)
 	// useEffect(() => {}, [])
 	useEffect(() => {
-		const newSocket = io('http://localhost:3500')
-		setSocket(newSocket)
-
 		// Fetch dữ liệu ban đầu và cập nhật state
 		const fetchData = async () => {
-			const { payload } = await dispatch(
-				fetchAllOrder({ location: getLocationEmployee?.data?.location })
-			)
+			const { payload } = await dispatch(fetchAllOrderByUser())
 			console.log(payload, 'pa')
 
 			if (payload?.success) {
@@ -64,58 +51,26 @@ const OrderByUser: React.FC = () => {
 		}
 
 		fetchData()
-
-		return () => {
-			newSocket.disconnect()
-		}
 	}, [])
 
-	useEffect(() => {
-		if (socket) {
-			socket.emit('joinRoom', 'room')
-			socket.on('resProductOrder', (response) => {
-				let item = response.data?.find((item) => item?.location)
-				if (item?.location === getLocationEmployee?.location) {
-					setList(response.data)
-					setData(response.data)
-				}
-			})
-		}
-	}, [socket])
+	// useEffect(() => {
+	// 	if (socket) {
+	// 		socket.emit('joinRoom', 'room')
+	// 		socket.on('resProductOrder', (response) => {
+	// 			let item = response.data?.find((item) => item?.location)
+	// 			if (item?.location === getLocationEmployee?.location) {
+	// 				setList(response.data)
+	// 				setData(response.data)
+	// 			}
+	// 		})
+	// 	}
+	// }, [socket])
 
 	const onLoadMore = (page) => {
-		console.log(page, 'page')
-
 		setLoading(true)
-		setCurrentPage(page)
-		const newStartIndex = (page - 1) * pageSize
-		const newEndIndex = newStartIndex + pageSize - 1
-		const items = list.slice(startIndex, endIndex + 1)
-		// const dataInit = [...list]
-		setStartIndex(newStartIndex)
-		setEndIndex(newEndIndex)
-		if (page !== 1) {
-			setList(items)
-			return
-		}
-		setList(data)
-	}
-
-	const handleDeleteItem = async () => {
-		const { payload } = await dispatch(
-			deleteOrder({ id: idOrder, location: getLocationEmployee?.location })
+		setList(
+			data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
 		)
-		if (payload?.data?.length > 0) {
-			setList(payload.data)
-			setData(payload.data)
-		}
-		Toasty.success(payload?.message)
-	}
-
-	const handleConfirmDelete = (id, showModal) => {
-		// handleDeleteItem()
-		setOpen(showModal)
-		setIdOrder(id)
 	}
 
 	const loadMore =
@@ -138,15 +93,6 @@ const OrderByUser: React.FC = () => {
 
 	return (
 		<>
-			<ModalConfirm
-				label=""
-				title="Xác nhận xóa item này ?"
-				position="renderConfirmDeleteItemOrder"
-				open={open}
-				setOpen={setOpen}
-				handleSubmit={handleDeleteItem}
-				size={500}
-			/>
 			<List
 				className="demo-loadmore-list showScroll"
 				loading={initLoading}
@@ -157,9 +103,7 @@ const OrderByUser: React.FC = () => {
 				renderItem={(item) => (
 					<List.Item
 						actions={[
-							<Button type="dashed" onClick={() => handleConfirmDelete(item._id, true)}>
-								Hủy bỏ
-							</Button>,
+							<Button type="dashed">Hủy bỏ</Button>,
 							<Button type="primary">Xác nhận</Button>,
 						]}
 					>
@@ -184,4 +128,4 @@ const OrderByUser: React.FC = () => {
 	)
 }
 
-export default OrderByUser
+export default OrderByAllUser
