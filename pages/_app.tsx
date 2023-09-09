@@ -19,6 +19,7 @@ import Link from 'next/link'
 import PrivateRoute from '@/components/common/privateRoute'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, store } from '@/redux/store/store'
+import { useEffect, useState } from 'react'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -41,12 +42,32 @@ export default function App({ Component, pageProps }: AppProps) {
 	const isAdminPage = router.pathname.startsWith('/admin')
 	const isEmployeePage = router.pathname.startsWith('/employee')
 	const isOrderPage = router.pathname.startsWith('/order')
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
 
+	// const handleMenuClick = (item) => {
+	// 	setSelectedItemKey(item.key)
+
+	// 	// Cập nhật query string và thay đổi URL khi người dùng click vào item
+	// 	router.push({
+	// 		pathname: item.path, // Sử dụng đường dẫn từ item
+	// 		query: { item: item.key },
+	// 	})
+	// }
+
+	// // Lấy giá trị item từ query string và cập nhật trạng thái cho menu item
+	// useEffect(() => {
+	// 	const { item } = router.query
+	// 	console.log(item, 'useEffect')
+
+	// 	if (item) {
+	// 		setSelectedItemKey(item) // Lưu key của item từ query string vào state
+	// 	}
+	// }, [])
 	const itemsAdmin: MenuItem[] = [
 		getItem(<div>Quản lý ca</div>, '1', <PieChartOutlined />),
 		getItem(<Link href="/admin/manage_work">Quản lí kết nối</Link>, '2', <DesktopOutlined />),
 		getItem(<Link href="/admin/products">Nhập sản phẩm</Link>, '3', <PieChartOutlined />),
-		getItem('Quản lý nhân viên', '4', <DesktopOutlined />),
+		getItem(<Link href="/admin/manage_employee">Quản lý nhân viên</Link>, '4', <DesktopOutlined />),
 		getItem('Quản lý đặt bàn', 'sub1', <UserOutlined />, [
 			getItem(<Link href="/admin/orders">Đơn các bàn</Link>, '5', <PieChartOutlined />),
 		]),
@@ -81,7 +102,11 @@ export default function App({ Component, pageProps }: AppProps) {
 		if (isAdminPage) {
 			return (
 				// <PrivateRoute>
-				<MasterLayout itemsSiderBar={itemsAdmin}>
+				<MasterLayout
+					itemsSiderBar={itemsAdmin}
+					selectedItemKey={selectedItemKey}
+					// handleMenuClick={handleMenuClick}
+				>
 					<Component {...pageProps} />
 				</MasterLayout>
 				// </PrivateRoute>
@@ -89,14 +114,22 @@ export default function App({ Component, pageProps }: AppProps) {
 		} else if (isEmployeePage) {
 			return (
 				// <PrivateRoute>
-				<MasterLayout itemsSiderBar={itemsEmployee}>
+				<MasterLayout
+					itemsSiderBar={itemsEmployee}
+					selectedItemKey={selectedItemKey}
+					// handleMenuClick={handleMenuClick}
+				>
 					<Component {...pageProps} />
 				</MasterLayout>
 				// </PrivateRoute>
 			)
 		} else if (isOrderPage) {
 			return (
-				<MasterLayout itemsSiderBar={itemsOrder}>
+				<MasterLayout
+					itemsSiderBar={itemsOrder}
+					selectedItemKey={selectedItemKey}
+					// handleMenuClick={handleMenuClick}
+				>
 					<Component {...pageProps} />
 				</MasterLayout>
 			)

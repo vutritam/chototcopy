@@ -86,8 +86,8 @@ const RenderedComponent: React.FC = () => {
 					</Space>
 				</div>
 			) : (
-				// <>{handleBeginRoute()}</>
-				<p>aaa</p>
+				<>{handleBeginRoute()}</>
+				// <p>aaa</p>
 			)}
 		</>
 	)

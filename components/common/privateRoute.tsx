@@ -17,17 +17,19 @@ const withAuthorization = (
 			// Kiểm tra xem người dùng có quyền truy cập hay không
 			// Sử dụng thông tin về vai trò (roles) lưu trữ trong cookie hoặc bộ nhớ
 			// Hoặc gửi yêu cầu đến máy chủ để kiểm tra vai trò của người dùng
-
+			const parsedUser = userRoles && JSON.parse(userRoles || '')
 			if (!userRoles) {
+				router.push('/login')
+			} else if (!parsedUser?.data) {
+				localStorage.removeItem('user')
 				router.push('/login')
 			} else {
 				// Ví dụ: Vai trò của người dùng lấy từ thông tin xác thực
 
-				const parsedUser = userRoles && JSON.parse(userRoles || '')
 				const isAuthen = parsedUser?.data?.roles
 
 				// Kiểm tra xem người dùng có vai trò phù hợp hay không
-				const hasAccess = allowedRoles.some((role) => isAuthen.includes(role))
+				const hasAccess = allowedRoles?.some((role) => isAuthen?.includes(role))
 
 				if (!hasAccess) {
 					// Không có quyền truy cập, chuyển hướng đến trang báo lỗi hoặc trang chính khác

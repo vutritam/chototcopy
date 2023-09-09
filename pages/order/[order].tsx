@@ -3,27 +3,41 @@ import { useRouter } from 'next/router'
 import Products from '@/components/main/products'
 import { decodeNumber, encodeNumber } from '@/components/common/hashCode'
 import RenderedComponent from '@/components/common/renderComponent'
+import ComfirmLocationOrder from '@/components/common/confirmLocation'
+import { processRouterQuery } from '@/components/common/parseNumber'
 
 const App: React.FC = () => {
 	const [idTable, setIdTable] = useState<any>(0)
-
+	const [show, setShow] = useState(true)
 	const router = useRouter()
+	const handleShow = () => {
+		setShow(false)
+	}
 
 	useEffect(() => {
-		// setLoading(true)
-		let num = router?.query?.order || null // c0
-		let convert
-		if (isNaN(num)) {
-			const [decoded, originalNum] = decodeNumber(num)
-			convert = decoded
-		} else {
-			convert = encodeNumber(Number(num))
+		const getLocationOrder = JSON.parse(localStorage.getItem('location_user'))
+		if (getLocationOrder && getLocationOrder.location) {
+			setShow(false)
 		}
-		setIdTable(convert)
+	}, [])
+	useEffect(() => {
+		// setLoading(true)
+
+		const convertedValue = processRouterQuery(router?.query)
+		setIdTable(convertedValue)
 	}, [router?.query])
 
 	return (
 		<>
+			{show ? (
+				<ComfirmLocationOrder
+					label="Xác nhận nơi đặt"
+					tittle="Xác nhận nơi đặt"
+					open={show}
+					handleShow={handleShow}
+				/>
+			) : null}
+
 			<RenderedComponent />
 		</>
 	)

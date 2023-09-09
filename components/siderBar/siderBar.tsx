@@ -1,16 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Layout, Menu, Image } from 'antd'
 const { Sider } = Layout
+import { useRouter } from 'next/router'
 
 interface items {
 	collapsed: boolean
 	items: any
 	handleChangeComponent?: any
+	selectedItemKey?: any
+	handleMenuClick?: any
 }
 
 export function SideBar(props: items) {
 	const [collapsed, setCollapsed] = useState(false)
+	const [currentURL, setcurrentURL] = useState('/')
+	const router = useRouter()
+	useEffect(() => {
+		// Kiểm tra xem code đang chạy trên môi trường server (Node.js) hay client (trình duyệt)
+		if (typeof window !== 'undefined') {
+			// Lấy toàn bộ URL
+			const currentURLChange = window.location.href
+			setcurrentURL(currentURLChange)
+			console.log(currentURL, 'currentURL') // In ra URL trong console hoặc sử dụng URL theo nhu cầu của bạn
+		}
+	}, [router])
+	console.log(props.selectedItemKey, 'selectedItemKey')
+
 	return (
 		<Sider
 			collapsible
@@ -41,7 +57,14 @@ export function SideBar(props: items) {
 					''
 				)}
 			</div>
-			<Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={props.items} />
+			<Menu
+				onClick={props.handleMenuClick}
+				theme="dark"
+				// selectedKeys={[props.selectedItemKey]}
+				defaultSelectedKeys={[props.selectedItemKey]}
+				mode="inline"
+				items={props.items}
+			/>
 		</Sider>
 	)
 }

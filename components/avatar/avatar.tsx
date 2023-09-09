@@ -20,6 +20,9 @@ import _ from 'lodash'
 import Link from 'next/link'
 import { fetchUserById } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
+import { fetchMessageFromServer } from '@/redux/componentSlice/messageSocketSlice'
+import { decodeNumber, encodeNumber } from '../common/hashCode'
+import { processRouterQuery } from '../common/parseNumber'
 const itemsRender: MenuProps['items'] = [
 	{
 		label: (
@@ -40,28 +43,6 @@ const itemsRender: MenuProps['items'] = [
 		key: '1',
 	},
 ]
-const items: MenuProps['items'] = [
-	{
-		label: (
-			<Link className="style-menu" href="/login">
-				<LogoutOutlined />
-				Đăng xuất
-			</Link>
-		),
-		key: '0',
-	},
-	{
-		label: (
-			<Dropdown menu={{ items: itemsRender }} placement="topRight" arrow={{ pointAtCenter: true }}>
-				<Link className="style-menu" href="https://www.aliyun.com">
-					<SettingOutlined />
-					Quản lý tài khoản
-				</Link>
-			</Dropdown>
-		),
-		key: '1',
-	},
-]
 
 interface propsData {
 	userInfo: object
@@ -72,6 +53,7 @@ const onSearch = (value: string) => console.log(value)
 const AvatarComponent: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const router = useRouter()
+	const [idTable, setIdTable] = React.useState<any>(0)
 	const user = useSelector((state: any) => state.user.account.user)
 	const isOrderPage = router.pathname.startsWith('/order')
 	const message = useSelector((state: any) => state.message.message.data)
@@ -83,6 +65,37 @@ const AvatarComponent: React.FC = () => {
 			dataNoti: [],
 		},
 	])
+
+	const handleLogOut = () => {
+		localStorage.removeItem('user')
+		router.push('/login')
+	}
+	const items: MenuProps['items'] = [
+		{
+			label: (
+				<a className="style-menu" onClick={() => handleLogOut()}>
+					<LogoutOutlined />
+					Đăng xuất
+				</a>
+			),
+			key: '0',
+		},
+		{
+			label: (
+				<Dropdown
+					menu={{ items: itemsRender }}
+					placement="topRight"
+					arrow={{ pointAtCenter: true }}
+				>
+					<Link className="style-menu" href="https://www.aliyun.com">
+						<SettingOutlined />
+						Quản lý tài khoản
+					</Link>
+				</Dropdown>
+			),
+			key: '1',
+		},
+	]
 
 	const [showMenu, setShowMenu] = React.useState([])
 
@@ -101,10 +114,12 @@ const AvatarComponent: React.FC = () => {
 				userInfo: {},
 				dataNoti: [],
 			}
+
 			let getDataUserInfo = JSON.parse(localStorage.getItem('user'))
 			if (typeof window !== 'undefined') {
 				obj.userInfo = getDataUserInfo?.data
 				obj.dataNoti = message
+
 				onSetDataLocal(obj, async ({ userInfo, dataNoti }: propsData) => {
 					if (userInfo) {
 						try {
@@ -130,23 +145,36 @@ const AvatarComponent: React.FC = () => {
 							console.error(error)
 						}
 					}
-					if (dataNoti && dataNoti.length > 0 && message !== null) {
-						setShowMessage(true)
-						setShowMenu(dataNoti)
-						setTimeout(() => {
-							setShowMessage(false)
-						}, 2000)
-					}
 				})
 			}
 		})()
 	}, [])
 
 	useEffect(() => {
+		const convertedValue = processRouterQuery(router?.query)
+		;(async () => {
+			if (localStorage.getItem('location_user') !== null) {
+				let getLocationOrderUser = JSON.parse(localStorage.getItem('location_user'))
+				const { payload } = await dispatch(
+					fetchMessageFromServer({
+						tableNumber: convertedValue,
+						location: getLocationOrderUser.location,
+					})
+				)
+				if (payload) {
+					setShowMenu(payload.data)
+				}
+			}
+		})()
+		setIdTable(convertedValue)
+	}, [router?.query])
+
+	useEffect(() => {
 		// let dataNoti
 		// if (typeof window !== 'undefined') {
 		// dataNoti = JSON.parse(localStorage.getItem('notification'))
 		// }
+
 		if (message !== null) {
 			setShowMessage(true)
 			setShowMenu(message)
@@ -170,10 +198,10 @@ const AvatarComponent: React.FC = () => {
 					}}
 				>
 					<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
-					<a style={{ marginLeft: '5px', fontWeight: '600' }}>{ele.noti}</a>
+					<a style={{ marginLeft: '5px', fontWeight: '600' }}>{ele.message}</a>
 					<div style={{ fontSize: '12px' }}>
 						<span>Thời gian: </span>
-						<span>{ele.time}</span>
+						<span>{ele.dateTime}</span>
 					</div>
 					<Link
 						style={{ fontSize: '12px', color: 'blue' }}
@@ -214,21 +242,25 @@ const AvatarComponent: React.FC = () => {
 						)}
 						trigger={['click']}
 					>
-						<a onClick={(e) => e.preventDefault()}>
-							<Space>
-								<Tooltip
-									placement="bottomLeft"
-									title={'Bạn có thông báo mới'}
-									color={'red'}
-									key={'red'}
-									open={showMessage}
-								>
-									<Badge dot={message !== null ? 'show' : ''} style={{ display: 'flex' }}>
-										<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
-									</Badge>
-								</Tooltip>
-							</Space>
-						</a>
+						{showMenu?.length > 0 ? (
+							<a onClick={(e) => e.preventDefault()}>
+								<Space>
+									<Tooltip
+										placement="bottomLeft"
+										title={'Bạn có thông báo mới'}
+										color={'red'}
+										key={'red'}
+										open={showMessage}
+									>
+										<Badge dot={message !== null ? 'show' : ''} style={{ display: 'flex' }}>
+											<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
+										</Badge>
+									</Tooltip>
+								</Space>
+							</a>
+						) : (
+							<></>
+						)}
 					</Dropdown>
 				</Space>
 				<Space wrap>

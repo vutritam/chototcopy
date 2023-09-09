@@ -2,17 +2,28 @@ import { AnyAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 // import { asyncGetList, asyncWrapper } from '../../helper/asyncHelper'
 import axiosConfig from '../../pages/api/axiosConfigs'
 
-export const fetchCreateOrder = createAsyncThunk('api/fetchCreateOrder', async (options) => {
-	let response = await axiosConfig.post('/order/createOrder', options)
-	return response.data
-})
+export const fetchCreateOrder = createAsyncThunk<any, any, any>(
+	'api/fetchCreateOrder',
+	async (options) => {
+		let response = await axiosConfig.post('/order/createOrder', options)
+		return response.data
+	}
+)
 
-export const fetchAllOrder = createAsyncThunk('api/fetchAllOrder', async (options) => {
+export const updateStatusOrder = createAsyncThunk<any, any, any>(
+	'api/updateStatusOrder',
+	async (options) => {
+		let response = await axiosConfig.post(`/order/update/status/${options.id}`, options)
+		return response.data
+	}
+)
+
+export const fetchAllOrder = createAsyncThunk<any, any>('api/fetchAllOrder', async (options) => {
 	let response = await axiosConfig.post('/order/getAllOrderByLocation', options)
 	return response.data
 })
 
-export const fetchOrderByNumberTable = createAsyncThunk(
+export const fetchOrderByNumberTable = createAsyncThunk<any, any>(
 	'api/fetchOrderByNumberTable',
 	async (options) => {
 		let response = await axiosConfig.post('/order/getAllOrderByNumberTable', options)
@@ -20,12 +31,15 @@ export const fetchOrderByNumberTable = createAsyncThunk(
 	}
 )
 
-export const fetchAllOrderByUser = createAsyncThunk('api/fetchAllOrderByUser', async () => {
-	let response = await axiosConfig.get('/order/getAllOrderByUser')
-	return response.data
-})
+export const fetchAllOrderByUser = createAsyncThunk<any, any>(
+	'api/fetchAllOrderByUser',
+	async () => {
+		let response = await axiosConfig.get('/order/getAllOrderByUser')
+		return response.data
+	}
+)
 
-export const deleteOrder = createAsyncThunk('api/deleteOrder', async (options) => {
+export const deleteOrder = createAsyncThunk<any, any>('api/deleteOrder', async (options) => {
 	let response = await axiosConfig.post('/order/deleteOrder', options)
 	return response.data
 })

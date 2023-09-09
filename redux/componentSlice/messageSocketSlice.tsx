@@ -2,14 +2,18 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 // import { asyncGetList, asyncWrapper } from '../../helper/asyncHelper'
 import axiosConfig from '../../pages/api/axiosConfigs'
 
-export const fetchMessageFromServer = createAsyncThunk<any, string>(
+export const fetchMessageFromServer = createAsyncThunk<any, any>(
 	'api/fetchMessageFromServer',
 	async (options) => {
-		let response = await axiosConfig.post('/notification', options, {
-			headers: {
-				'Content-Type': 'multipart/form-data',
-			},
-		})
+		let response = await axiosConfig.post('/messageData/getMessageByLocation', options)
+		return response.data
+	}
+)
+
+export const getMessageFromServer = createAsyncThunk<any, any>(
+	'api/getMessageFromServer',
+	async (options) => {
+		let response = await axiosConfig.get('/messageData', options)
 		return response.data
 	}
 )

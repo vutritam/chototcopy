@@ -3,10 +3,16 @@ import { Affix, Avatar, Button, List, Skeleton } from 'antd'
 import PaginationCustom from '@/components/common/pagination'
 import { io } from 'socket.io-client'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteOrder, fetchAllOrder, setOrder } from '@/redux/componentSlice/orderSlice'
+import {
+	deleteOrder,
+	fetchAllOrder,
+	setOrder,
+	updateStatusOrder,
+} from '@/redux/componentSlice/orderSlice'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/modalConfirm'
+import CommonTable from '@/components/common/commonTable'
 
 interface DataType {
 	gender?: string
@@ -37,6 +43,7 @@ const OrderByUser: React.FC = () => {
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
+	const [refreshPage, setRefresh] = useState(false)
 	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
 	const [currentPage, setCurrentPage] = useState(1)
 	let pageSize = 5
@@ -44,6 +51,7 @@ const OrderByUser: React.FC = () => {
 	const [endIndex, setEndIndex] = useState(pageSize - 1)
 	// useEffect(() => {}, [])
 	useEffect(() => {
+		// setInitLoading(true)
 		const newSocket = io('http://localhost:3500')
 		setSocket(newSocket)
 
@@ -52,14 +60,13 @@ const OrderByUser: React.FC = () => {
 			const { payload } = await dispatch(
 				fetchAllOrder({ location: getLocationEmployee?.data?.location })
 			)
-			console.log(payload, 'pa')
-
 			if (payload?.success) {
 				setInitLoading(false)
 				setData(payload.data)
 				setList(payload.data)
+				setRefresh(false)
 			}
-			Toasty.error(payload?.message)
+			// Toasty.error(payload?.message)
 			setInitLoading(false)
 		}
 
@@ -68,14 +75,14 @@ const OrderByUser: React.FC = () => {
 		return () => {
 			newSocket.disconnect()
 		}
-	}, [])
+	}, [refreshPage])
 
 	useEffect(() => {
 		if (socket) {
 			socket.emit('joinRoom', 'room')
 			socket.on('resProductOrder', (response) => {
 				let item = response.data?.find((item) => item?.location)
-				if (item?.location === getLocationEmployee?.location) {
+				if (item?.location === getLocationEmployee?.data?.location) {
 					setList(response.data)
 					setData(response.data)
 				}
@@ -101,9 +108,13 @@ const OrderByUser: React.FC = () => {
 		setList(data)
 	}
 
+	const handleConfirmOrder = async (id) => {
+		const { payload } = await dispatch(updateStatusOrder({ id: id, status: 'order_success' }))
+	}
+
 	const handleDeleteItem = async () => {
 		const { payload } = await dispatch(
-			deleteOrder({ id: idOrder, location: getLocationEmployee?.location })
+			deleteOrder({ id: idOrder, location: getLocationEmployee?.data?.location })
 		)
 		if (payload?.data?.length > 0) {
 			setList(payload.data)
@@ -113,7 +124,6 @@ const OrderByUser: React.FC = () => {
 	}
 
 	const handleConfirmDelete = (id, showModal) => {
-		// handleDeleteItem()
 		setOpen(showModal)
 		setIdOrder(id)
 	}
@@ -147,11 +157,24 @@ const OrderByUser: React.FC = () => {
 				handleSubmit={handleDeleteItem}
 				size={500}
 			/>
-			<List
+			<div
+				style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}
+			>
+				<Button type="primary" onClick={() => setRefresh(true)}>
+					Refresh
+				</Button>
+			</div>
+			<CommonTable
+				item={list}
+				handleSubmit={handleConfirmDelete}
+				handleConfirmOrder={handleConfirmOrder}
+			/>
+
+			{/* <List
 				className="demo-loadmore-list showScroll"
 				loading={initLoading}
 				itemLayout="horizontal"
-				header={['name', 'quantity']}
+				// header={['name', 'quantity']}
 				// loadMore={loadMore}
 				dataSource={list}
 				renderItem={(item) => (
@@ -178,8 +201,8 @@ const OrderByUser: React.FC = () => {
 						</Skeleton>
 					</List.Item>
 				)}
-			/>
-			<PaginationCustom data={list.length} pageSize={5} onChangeItem={onLoadMore} />
+			/> */}
+			{/* <PaginationCustom data={list.length} pageSize={5} onChangeItem={onLoadMore} /> */}
 		</>
 	)
 }

@@ -11,6 +11,7 @@ import { fetchCreateOrder, setOrder } from '@/redux/componentSlice/orderSlice'
 import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
 import { useRouter } from 'next/router'
 import { decodeNumber, encodeNumber } from './hashCode'
+import { processRouterQuery } from './parseNumber'
 
 interface inputProps {
 	label: string
@@ -27,7 +28,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		quantity: 1,
 		location: '',
 	})
-	const [modalText, setModalText] = useState('Content of the modal')
+
 	const dispatch = useDispatch()
 	const showModal = () => {
 		setOpen(true)
@@ -39,7 +40,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		</Space>
 	)
 	const [socket, setSocket] = useState(null)
-	// useEffect(() => {}, [])
+
 	useEffect(() => {
 		const newSocket = io('http://localhost:3500')
 		setSocket(newSocket)
@@ -51,19 +52,11 @@ const CommonModal = (props: inputProps): JSX.Element => {
 
 	useEffect(() => {
 		// setLoading(true)
-		let num = router?.query?.order || null // c0
-		let convert
-		if (isNaN(num)) {
-			const [decoded, originalNum] = decodeNumber(num)
-			convert = decoded
-		} else {
-			convert = encodeNumber(Number(num))
-		}
-		setIdTable(convert)
+		const convertedValue = processRouterQuery(router?.query)
+		setIdTable(convertedValue)
 	}, [router?.query])
 
 	const handleOk = () => {
-		setModalText('The modal will be closed after two seconds')
 		setConfirmLoading(true)
 		setTimeout(async () => {
 			setOpen(false)
@@ -92,11 +85,15 @@ const CommonModal = (props: inputProps): JSX.Element => {
 
 			if (socket) {
 				// Gửi sự kiện tới Socket.IO server
-				socket.emit('myEvent', { message: 'Hello from client' })
+				socket.emit('myEvent', {
+					message: 'Hello from client',
+					tableNumber: idTable,
+					location: dataInput.location,
+					productId: props.item.id,
+				})
 				socket.on('response', async (response) => {
 					await dispatch(setMessage(response))
 					localStorage.setItem('notification', JSON.stringify(response))
-					console.log('Received response:', response)
 				})
 			}
 			// Toasty.success('Đặt món thành công')
@@ -104,7 +101,6 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	}
 
 	const handleCancel = () => {
-		console.log('Clicked cancel button')
 		setOpen(false)
 		setDataInput({
 			quantity: 0,
@@ -118,12 +114,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	const onChangeLocation = (label: any) => {
 		setDataInput({ ...dataInput, location: label })
 	}
-	console.log('changed', {
-		tableNumber: idTable,
-		productId: props.item.id,
-		location: dataInput.location,
-		quantity: dataInput.quantity,
-	})
+
 	return (
 		<>
 			<Button type="primary" onClick={showModal}>
@@ -177,7 +168,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 							<InputNumber min={1} max={10} defaultValue={1} onChange={onChangeQuantity} />
 						</Space>
 						<Space style={{ marginTop: '5px' }}>
-							<h5>Nhập vị trí: </h5>
+							<h5>Nơi đặt: </h5>
 							<Select
 								showSearch
 								style={{ width: 200 }}

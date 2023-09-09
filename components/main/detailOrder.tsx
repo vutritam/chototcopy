@@ -33,7 +33,6 @@ const DetailOrder: React.FC = () => {
 	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
 
-	const [openModal, setOpenModal] = useState(false)
 	const [initLoading, setInitLoading] = useState(true)
 	const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
@@ -48,7 +47,6 @@ const DetailOrder: React.FC = () => {
 			socket.on('response', async (response) => {
 				await dispatch(setMessage(response))
 				localStorage.setItem('notification', JSON.stringify(response))
-				console.log('Received response:', response)
 			})
 		}
 

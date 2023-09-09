@@ -5,10 +5,6 @@ import orderSlice from '../componentSlice/orderSlice'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // sử dụng local storage
 
-const persistConfig = {
-	key: 'message',
-	storage,
-}
 const persistConfigDataOrder = {
 	key: 'dataOrder',
 	storage,
@@ -20,7 +16,7 @@ const persistConfigUser = {
 
 const rootReducer = combineReducers({
 	user: persistReducer(persistConfigUser, userSlice),
-	message: persistReducer(persistConfig, messageSocketSlice),
+	message: messageSocketSlice,
 	dataOrder: persistReducer(persistConfigDataOrder, orderSlice),
 	// login: loginSlice,
 })

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Avatar, Button, InputNumber, List, Modal, Space, Spin } from 'antd'
+import { Alert, Avatar, Button, InputNumber, List, Modal, Select, Space, Spin } from 'antd'
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
 import Toasty from './toasty'
 import { Label } from 'semantic-ui-react'
@@ -12,8 +12,19 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 	// console.log(props.item)
 
 	// useEffect(() => {}, [])
-
+	const [dataInput, setDataInput] = useState({
+		tableNumber: 0,
+		location: '',
+	})
 	const handleOk = () => {
+		props.handleShow()
+		localStorage.setItem(
+			'location_user',
+			JSON.stringify({
+				tableNumber: dataInput.tableNumber,
+				location: dataInput.location,
+			})
+		)
 		// setModalText('The modal will be closed after two seconds')
 		// setConfirmLoading(true)
 		// setTimeout(() => {
@@ -30,14 +41,16 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 		// 	}
 		// }, 2000)
 	}
-
+	const onChangeLocation = (label: any) => {
+		setDataInput({ ...dataInput, location: label })
+	}
 	const handleCancel = () => {
 		// console.log('Clicked cancel button')
 		// setOpen(false)
 	}
-	const onChange = (value: number) => {
-		console.log('changed', value)
-	}
+	// const onChange = (value: number) => {
+	// 	console.log('changed', value)
+	// }
 	return (
 		<>
 			<Modal
@@ -46,15 +59,41 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 				onOk={handleOk}
 				onCancel={handleCancel}
 				footer={[
-					<Button key="2" onClick={handleCancel}>
-						Hủy
-					</Button>,
 					<Button key="3" type="primary" onClick={handleOk}>
 						Xác nhận
 					</Button>,
 				]}
 			>
-				<p>Vị trí aaaa</p>
+				<Space style={{ marginTop: '5px' }}>
+					<h5>Nơi đặt: </h5>
+					<Select
+						showSearch
+						style={{ width: '100%' }}
+						placeholder="Search to Select"
+						optionFilterProp="children"
+						onChange={onChangeLocation}
+						filterOption={(input, option) => (option?.label ?? '').includes(input)}
+						filterSort={(optionA, optionB) =>
+							(optionA?.label ?? '')
+								.toLowerCase()
+								.localeCompare((optionB?.label ?? '').toLowerCase())
+						}
+						options={[
+							{
+								value: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
+								label: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
+							},
+							{
+								value: 'Trường chinh, tân bình',
+								label: 'Trường chinh, tân bình',
+							},
+							{
+								value: 'Hóc môn quận 12',
+								label: 'Hóc môn quận 12',
+							},
+						]}
+					/>
+				</Space>
 			</Modal>
 		</>
 	)

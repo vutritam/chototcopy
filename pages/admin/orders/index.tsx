@@ -3,9 +3,16 @@ import { Affix, Avatar, Button, List, Skeleton } from 'antd'
 import PaginationCustom from '@/components/common/pagination'
 import { io } from 'socket.io-client'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchAllOrder, fetchAllOrderByUser, setOrder } from '@/redux/componentSlice/orderSlice'
+import {
+	deleteOrder,
+	fetchAllOrder,
+	fetchAllOrderByUser,
+	setOrder,
+} from '@/redux/componentSlice/orderSlice'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
+import CommonTable from '@/components/common/commonTable'
+import ModalConfirm from '@/components/common/modalConfirm'
 
 interface DataType {
 	gender?: string
@@ -34,37 +41,24 @@ const OrderByAllUser: React.FC = () => {
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
+	const [open, setOpen] = useState(false)
+	const [idOrder, setIdOrder] = useState(null)
 	// useEffect(() => {}, [])
 	useEffect(() => {
 		// Fetch dữ liệu ban đầu và cập nhật state
 		const fetchData = async () => {
 			const { payload } = await dispatch(fetchAllOrderByUser())
-			console.log(payload, 'pa')
-
-			if (payload?.success) {
-				setInitLoading(false)
-				setData(payload.data)
-				setList(payload.data)
+			if (!payload?.success) {
+				Toasty.error(payload?.message)
 			}
-			Toasty.error(payload?.message)
+			setInitLoading(false)
+			setData(payload.data)
+			setList(payload.data)
 			setInitLoading(false)
 		}
 
 		fetchData()
 	}, [])
-
-	// useEffect(() => {
-	// 	if (socket) {
-	// 		socket.emit('joinRoom', 'room')
-	// 		socket.on('resProductOrder', (response) => {
-	// 			let item = response.data?.find((item) => item?.location)
-	// 			if (item?.location === getLocationEmployee?.location) {
-	// 				setList(response.data)
-	// 				setData(response.data)
-	// 			}
-	// 		})
-	// 	}
-	// }, [socket])
 
 	const onLoadMore = (page) => {
 		setLoading(true)
@@ -90,40 +84,33 @@ const OrderByAllUser: React.FC = () => {
 				{/* </Affix> */}
 			</div>
 		) : null
+	// const handleDeleteItem = async () => {
+	// 	const { payload } = await dispatch(
+	// 		deleteOrder({ id: idOrder, location: getLocationEmployee?.data?.location })
+	// 	)
+	// 	if (payload?.data?.length > 0) {
+	// 		setList(payload.data)
+	// 		setData(payload.data)
+	// 	}
+	// 	Toasty.success(payload?.message)
+	// }
+	const handleConfirmDelete = (id, showModal) => {
+		setOpen(showModal)
+		setIdOrder(id)
+	}
 
 	return (
 		<>
-			<List
-				className="demo-loadmore-list showScroll"
-				loading={initLoading}
-				itemLayout="horizontal"
-				header={['name', 'quantity']}
-				// loadMore={loadMore}
-				dataSource={list}
-				renderItem={(item) => (
-					<List.Item
-						actions={[
-							<Button type="dashed">Hủy bỏ</Button>,
-							<Button type="primary">Xác nhận</Button>,
-						]}
-					>
-						<Skeleton avatar title={false} loading={item.loading} active>
-							<List.Item.Meta
-								avatar={
-									<Avatar
-										src={'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'}
-									/>
-								}
-								title={`Bàn số ${item.tableNumber}`}
-								description={item.location}
-							/>
-							<div>{item.productId?.name || 'no data'}</div>
-							<div style={{ marginLeft: '40px' }}>{item.quantity || '0'}</div>
-						</Skeleton>
-					</List.Item>
-				)}
-			/>
-			<PaginationCustom data={list.length} pageSize={5} onChangeItem={onLoadMore} />
+			{/* <ModalConfirm
+				label=""
+				title="Xác nhận xóa item này ?"
+				position="renderConfirmDeleteItemOrder"
+				open={open}
+				setOpen={setOpen}
+				handleSubmit={handleDeleteItem}
+				size={500}
+			/> */}
+			<CommonTable item={list} handleSubmit={handleConfirmDelete} />
 		</>
 	)
 }
