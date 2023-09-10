@@ -21,7 +21,7 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 	const { TextArea } = Input
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		console.log('Change:', e.target.value)
+		// console.log('Change:', e.target.value)
 	}
 
 	const renderDeleteItemOrder = () => {
@@ -34,7 +34,7 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 		)
 	}
 
-	const handleOk = (isShow) => {
+	const handleOk = (isShow: Boolean) => {
 		props.handleSubmit()
 		props.setOpen(isShow)
 	}
@@ -74,10 +74,10 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 	}
 
 	const handleRender = () => {
-		return renderItem(props.position)
+		return renderItem(props.position || undefined)
 	}
 
-	const renderItem = (position) => {
+	const renderItem = (position: string) => {
 		switch (position) {
 			case 'renderComfirmThu':
 				return renderThu()

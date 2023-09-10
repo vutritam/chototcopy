@@ -1,6 +1,6 @@
-import ListItem from '@/components/main/listItem'
-import ManageMoney from '@/components/main/manageMoney'
-import { Button, Dropdown, Space, Table, Tabs } from 'antd'
+// import ListItem from '@/components/main/listItem'
+// import ManageMoney from '@/components/main/manageMoney'
+import { Dropdown, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
 import React, { useState } from 'react'
@@ -18,12 +18,12 @@ export default function ManageWork({}: Props) {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
 	const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-		console.log('selectedRowKeys changed: ', newSelectedRowKeys)
+		// console.log('selectedRowKeys changed: ', newSelectedRowKeys)
 		setSelectedRowKeys(newSelectedRowKeys)
 	}
-	const onChange = (key: string) => {
-		console.log(key)
-	}
+	// const onChange = (key: string) => {
+	// 	// console.log(key)
+	// }
 	const columns: ColumnsType<DataType> = [
 		{
 			title: 'Số bàn',

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Dropdown, Menu, Space, Switch, Table, Tag } from 'antd'
+import { Button, Dropdown, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import { FormOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
-import { DropdownItem } from 'semantic-ui-react'
-import { updateStatusOrder } from '@/redux/componentSlice/orderSlice'
-import { useDispatch } from 'react-redux'
+// import { DropdownItem } from 'semantic-ui-react'
+// import { updateStatusOrder } from '@/redux/componentSlice/orderSlice'
+// import { useDispatch } from 'react-redux'
 
 interface DataType {
 	key: React.Key
@@ -33,30 +33,26 @@ for (let i = 0; i < 46; i++) {
 
 const CommonTable = (props: inputProps): JSX.Element => {
 	const { item, handleSubmit, handleConfirmOrder } = props
-	const [fixedTop, setFixedTop] = useState(false)
+	// const [fixedTop, setFixedTop] = useState(false)
 	const [localData, setLocalData] = useState(item)
 	const [idItem, setIdItem] = useState(null)
-	const [confirmOrder, setConfirmOrder] = useState({ idItem: [], active: false })
-	const dispatch = useDispatch()
+	// const [confirmOrder, setConfirmOrder] = useState({ idItem: [], active: false })
+	// const dispatch = useDispatch()
 
 	useEffect(() => {
 		// Cập nhật localData khi data props thay đổi
 		setLocalData(item)
 	}, [item])
-	console.log(localData, 'locadata')
 
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
 	const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-		console.log('selectedRowKeys changed: ', newSelectedRowKeys)
 		setSelectedRowKeys(newSelectedRowKeys)
 	}
 
 	// const handleConfirmOrder = async (id) => {
 	// 	const { payload } = await dispatch(updateStatusOrder({ id: id, status: 'order_success' }))
 	// }
-
-	useEffect(() => {}, [idItem])
 
 	const items: MenuProps['items'] = [
 		{
@@ -76,22 +72,22 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			),
 		},
 	]
-	const menu = (
-		<Menu>
-			{confirmOrder.active && confirmOrder.idItem === item._id ? (
-				<CheckCircleOutlined color="red" />
-			) : (
-				<>
-					<Button type="dashed" onClick={() => handleSubmit(item._id, true)}>
-						Hủy bỏ
-					</Button>
-					<Button type="primary" onClick={() => handleConfirmOrder(item._id)}>
-						Xác nhận
-					</Button>
-				</>
-			)}
-		</Menu>
-	)
+	// const menu = (
+	// 	<Menu>
+	// 		{confirmOrder.active && confirmOrder.idItem === item._id ? (
+	// 			<CheckCircleOutlined color="red" />
+	// 		) : (
+	// 			<>
+	// 				<Button type="dashed" onClick={() => handleSubmit(item._id, true)}>
+	// 					Hủy bỏ
+	// 				</Button>
+	// 				<Button type="primary" onClick={() => handleConfirmOrder(item._id)}>
+	// 					Xác nhận
+	// 				</Button>
+	// 			</>
+	// 		)}
+	// 	</Menu>
+	// )
 
 	const handleStatus = (customData: any) => {
 		switch (customData.status) {
@@ -128,6 +124,22 @@ const CommonTable = (props: inputProps): JSX.Element => {
 						</Space>
 					</Space>
 				)
+			case 'order_deleted':
+				return (
+					<Space direction="vertical">
+						<Space
+							style={{
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+								textAlign: 'center',
+							}}
+						>
+							<IssuesCloseOutlined style={{ color: 'rgb(255 0 21)', fontSize: ' 18px' }} />
+							<p>Đã hủy</p>
+						</Space>
+					</Space>
+				)
 
 			default:
 				return (
@@ -158,30 +170,40 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		},
 		{
 			title: 'Địa điểm',
-			dataIndex: 'location',
+			dataIndex: 'customData',
 			key: 'location',
 			// fixed: 'left',
 			sorter: true,
+			render: (customData) => (
+				<div
+					className={`${customData?.status === 'order_deleted' ? 'text-error-message' : ''}`}
+					style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+				>
+					{customData?.location}
+				</div>
+			),
 			// responsive: ['sm'],
 		},
 		{
 			title: 'Tên món',
-			dataIndex: 'productId',
+			dataIndex: 'customData',
 			key: 'productId',
 			// fixed: 'left',
 			sorter: true,
-			render: (productId) => (
+			render: (customData) => (
 				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 					<div>
 						{' '}
-						<Tag color={'green'}>{productId.name.toUpperCase()}</Tag>
+						<Tag color={customData?.status === 'order_deleted' ? 'red' : 'green'}>
+							{customData.productId.name.toUpperCase()}
+						</Tag>
 					</div>
 					<img
 						width={40}
 						height={40}
 						style={{ borderRadius: '50px' }}
 						alt="logo"
-						src={`http://localhost:3000/images/${productId.file}`}
+						src={`http://localhost:3000/images/${customData.productId.file}`}
 					/>
 				</div>
 			),
@@ -244,9 +266,14 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		],
 	}
 
-	const localDataWithCustomData = localData.map((record) => ({
+	const localDataWithCustomData = localData.map((record: any) => ({
 		...record,
-		customData: { status: record.status, _id: record._id },
+		customData: {
+			status: record.status,
+			_id: record._id,
+			location: record.location,
+			productId: record.productId,
+		},
 	}))
 
 	return (

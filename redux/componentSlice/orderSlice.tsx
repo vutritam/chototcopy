@@ -1,4 +1,4 @@
-import { AnyAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 // import { asyncGetList, asyncWrapper } from '../../helper/asyncHelper'
 import axiosConfig from '../../pages/api/axiosConfigs'
 
@@ -10,10 +10,26 @@ export const fetchCreateOrder = createAsyncThunk<any, any, any>(
 	}
 )
 
+export const fetchAllOrderByUserRole = createAsyncThunk<any, any, any>(
+	'api/fetchAllOrderByUserRole',
+	async (options: any) => {
+		let response = await axiosConfig.post('/order/getAllOrderByUserRole', options)
+		return response.data
+	}
+)
+
 export const updateStatusOrder = createAsyncThunk<any, any, any>(
 	'api/updateStatusOrder',
 	async (options) => {
 		let response = await axiosConfig.post(`/order/update/status/${options.id}`, options)
+		return response.data
+	}
+)
+
+export const deleteAllRecordOrder = createAsyncThunk<any, any, any>(
+	'api/deleteAllRecordOrder',
+	async () => {
+		let response = await axiosConfig.post(`/order/deleteAllOrder`)
 		return response.data
 	}
 )

@@ -1,18 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Affix, Avatar, Button, List, Skeleton } from 'antd'
-import PaginationCustom from '@/components/common/pagination'
-import { io } from 'socket.io-client'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-	deleteOrder,
-	fetchAllOrder,
-	fetchAllOrderByUser,
-	setOrder,
-} from '@/redux/componentSlice/orderSlice'
-import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
+// import { Affix, Avatar, Button, List, Skeleton } from 'antd'
+// import PaginationCustom from '@/components/common/pagination'
+// import { io } from 'socket.io-client'
+import { useDispatch } from 'react-redux'
+import { fetchAllOrderByUserRole } from '@/redux/componentSlice/orderSlice'
+// import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
 import CommonTable from '@/components/common/commonTable'
-import ModalConfirm from '@/components/common/modalConfirm'
+// import ModalConfirm from '@/components/common/modalConfirm'
 
 interface DataType {
 	gender?: string
@@ -35,9 +30,9 @@ const count = 3
 
 const OrderByAllUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
-	const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
+	// const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
 	const dispatch = useDispatch()
-	const [loading, setLoading] = useState(false)
+	// const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
@@ -46,8 +41,12 @@ const OrderByAllUser: React.FC = () => {
 	// useEffect(() => {}, [])
 	useEffect(() => {
 		// Fetch dữ liệu ban đầu và cập nhật state
+		let obj = {
+			location: getLocationEmployee?.data?.location,
+			userRole: getLocationEmployee?.data?.roles[0],
+		}
 		const fetchData = async () => {
-			const { payload } = await dispatch(fetchAllOrderByUser())
+			const { payload } = await dispatch(fetchAllOrderByUserRole(obj))
 			if (!payload?.success) {
 				Toasty.error(payload?.message)
 			}
@@ -60,30 +59,30 @@ const OrderByAllUser: React.FC = () => {
 		fetchData()
 	}, [])
 
-	const onLoadMore = (page) => {
-		setLoading(true)
-		setList(
-			data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
-		)
-	}
+	// const onLoadMore = (page) => {
+	// 	setLoading(true)
+	// 	setList(
+	// 		data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
+	// 	)
+	// }
 
-	const loadMore =
-		!initLoading && !loading ? (
-			<div
-				style={{
-					textAlign: 'right',
-					marginTop: 12,
-					height: 32,
-					lineHeight: '32px',
-				}}
-			>
-				{/* <Affix offsetBottom={150}> */}
-				<Button onClick={onLoadMore} type="primary">
-					loading more
-				</Button>
-				{/* </Affix> */}
-			</div>
-		) : null
+	// const loadMore =
+	// 	!initLoading && !loading ? (
+	// 		<div
+	// 			style={{
+	// 				textAlign: 'right',
+	// 				marginTop: 12,
+	// 				height: 32,
+	// 				lineHeight: '32px',
+	// 			}}
+	// 		>
+	// 			{/* <Affix offsetBottom={150}> */}
+	// 			<Button onClick={onLoadMore} type="primary">
+	// 				loading more
+	// 			</Button>
+	// 			{/* </Affix> */}
+	// 		</div>
+	// 	) : null
 	// const handleDeleteItem = async () => {
 	// 	const { payload } = await dispatch(
 	// 		deleteOrder({ id: idOrder, location: getLocationEmployee?.data?.location })

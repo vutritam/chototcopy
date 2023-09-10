@@ -38,6 +38,9 @@
     justify-content: center;
 
 }
+.text-error-message {
+  color: red;
+}
 /* width */
 .showScroll::-webkit-scrollbar {
   width: 5px;

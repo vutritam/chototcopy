@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import { Alert, Avatar, Button, InputNumber, List, Modal, Select, Space, Spin } from 'antd'
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
-import Toasty from './toasty'
-import { Label } from 'semantic-ui-react'
+import React, { useCallback, useState } from 'react'
+import { Button, Modal, Select, Space } from 'antd'
+// import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
+// import Toasty from './toasty'
+// import { Label } from 'semantic-ui-react'
 interface inputProps {
 	label?: string
 	tittle?: string
 	open: any
 }
 const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
-	// console.log(props.item)
-
-	// useEffect(() => {}, [])
 	const [dataInput, setDataInput] = useState({
 		tableNumber: 0,
 		location: '',
 	})
+
 	const handleOk = () => {
 		props.handleShow()
 		localStorage.setItem(
@@ -41,16 +39,17 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 		// 	}
 		// }, 2000)
 	}
-	const onChangeLocation = (label: any) => {
-		setDataInput({ ...dataInput, location: label })
-	}
+	const onChangeLocation = useCallback(
+		(label: any) => {
+			setDataInput({ ...dataInput, location: label })
+		},
+		[dataInput]
+	)
 	const handleCancel = () => {
 		// console.log('Clicked cancel button')
 		// setOpen(false)
 	}
-	// const onChange = (value: number) => {
-	// 	console.log('changed', value)
-	// }
+
 	return (
 		<>
 			<Modal

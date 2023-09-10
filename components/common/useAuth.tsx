@@ -10,7 +10,7 @@ const UseAuthentication: React.FC = ({ children }) => {
 		// Kiểm tra trạng thái xác thực của người dùng (ví dụ: kiểm tra roles)
 		const parsedUser = JSON.parse(user)
 		const isAuthenticated = parsedUser.roles
-		console.log(typeof parsedUser)
+		// console.log(typeof parsedUser)
 		if (isAuthenticated.includes('admin')) {
 			router.push('/admin')
 			return

@@ -22,10 +22,9 @@ export function SideBar(props: items) {
 			// Lấy toàn bộ URL
 			const currentURLChange = window.location.href
 			setcurrentURL(currentURLChange)
-			console.log(currentURL, 'currentURL') // In ra URL trong console hoặc sử dụng URL theo nhu cầu của bạn
+			// console.log(currentURL, 'currentURL') // In ra URL trong console hoặc sử dụng URL theo nhu cầu của bạn
 		}
 	}, [router])
-	console.log(props.selectedItemKey, 'selectedItemKey')
 
 	return (
 		<Sider

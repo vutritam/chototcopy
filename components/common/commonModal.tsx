@@ -12,6 +12,7 @@ import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
 import { useRouter } from 'next/router'
 import { decodeNumber, encodeNumber } from './hashCode'
 import { processRouterQuery } from './parseNumber'
+import L10N from '../L10N/en.json'
 
 interface inputProps {
 	label: string
@@ -19,7 +20,6 @@ interface inputProps {
 	item: any
 }
 const CommonModal = (props: inputProps): JSX.Element => {
-	// console.log(props.item)
 	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
 	const [open, setOpen] = useState(false)
@@ -144,7 +144,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 				{confirmLoading ? (
 					<Space direction="vertical" style={{ width: '100%' }}>
 						<Space style={{ justifyContent: 'center', height: '200px', width: '100%' }}>
-							<Spin tip="Vui lòng giữ màn hình đến khi nhân viên xác nhận"></Spin>
+							<Spin tip={L10N['commonTable.confirmModal.title']}></Spin>
 						</Space>
 					</Space>
 				) : (
@@ -165,7 +165,13 @@ const CommonModal = (props: inputProps): JSX.Element => {
 						</List.Item>
 						<Space>
 							<h5>Nhập số lượng: </h5>
-							<InputNumber min={1} max={10} defaultValue={1} onChange={onChangeQuantity} />
+							<InputNumber
+								min={1}
+								max={10}
+								defaultValue={1}
+								value={dataInput.quantity}
+								onChange={onChangeQuantity}
+							/>
 						</Space>
 						<Space style={{ marginTop: '5px' }}>
 							<h5>Nơi đặt: </h5>
@@ -174,6 +180,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 								style={{ width: 200 }}
 								placeholder="Search to Select"
 								optionFilterProp="children"
+								value={dataInput.location || 'Chọn nơi đặt'}
 								onChange={onChangeLocation}
 								filterOption={(input, option) => (option?.label ?? '').includes(input)}
 								filterSort={(optionA, optionB) =>

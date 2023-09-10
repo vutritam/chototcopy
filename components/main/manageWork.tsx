@@ -7,7 +7,7 @@ type Props = {}
 
 export default function ManageWork({}: Props) {
 	const onChange = (key: string) => {
-		console.log(key)
+		// console.log(key)
 	}
 	const items = [
 		{

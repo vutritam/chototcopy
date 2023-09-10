@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Affix, Avatar, Button, List, Skeleton } from 'antd'
-import PaginationCustom from '@/components/common/pagination'
+import { Button } from 'antd'
 import { io } from 'socket.io-client'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import {
+	deleteAllRecordOrder,
 	deleteOrder,
-	fetchAllOrder,
-	setOrder,
+	fetchAllOrderByUserRole,
 	updateStatusOrder,
 } from '@/redux/componentSlice/orderSlice'
-import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/modalConfirm'
 import CommonTable from '@/components/common/commonTable'
@@ -31,24 +29,24 @@ interface DataType {
 	loading: boolean
 }
 
-const count = 3
+// const count = 3
 
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
 	const [open, setOpen] = useState(false)
-	const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
+	// const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
 	const dispatch = useDispatch()
-	const [loading, setLoading] = useState(false)
+	// const [loading, setLoading] = useState(false)
 	const [idOrder, setIdOrder] = useState(null)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
 	const [refreshPage, setRefresh] = useState(false)
 	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
-	const [currentPage, setCurrentPage] = useState(1)
+	// const [currentPage, setCurrentPage] = useState(1)
 	let pageSize = 5
-	const [startIndex, setStartIndex] = useState(0)
-	const [endIndex, setEndIndex] = useState(pageSize - 1)
+	// const [startIndex, setStartIndex] = useState(0)
+	// const [endIndex, setEndIndex] = useState(pageSize - 1)
 	// useEffect(() => {}, [])
 	useEffect(() => {
 		// setInitLoading(true)
@@ -58,7 +56,10 @@ const OrderByUser: React.FC = () => {
 		// Fetch dữ liệu ban đầu và cập nhật state
 		const fetchData = async () => {
 			const { payload } = await dispatch(
-				fetchAllOrder({ location: getLocationEmployee?.data?.location })
+				fetchAllOrderByUserRole({
+					location: getLocationEmployee?.data?.location,
+					userRole: getLocationEmployee?.data?.roles[0],
+				})
 			)
 			if (payload?.success) {
 				setInitLoading(false)
@@ -90,31 +91,35 @@ const OrderByUser: React.FC = () => {
 		}
 	}, [socket])
 
-	const onLoadMore = (page) => {
-		console.log(page, 'page')
+	// const onLoadMore = (page) => {
+	// 	// console.log(page, 'page')
 
-		setLoading(true)
-		setCurrentPage(page)
-		const newStartIndex = (page - 1) * pageSize
-		const newEndIndex = newStartIndex + pageSize - 1
-		const items = list.slice(startIndex, endIndex + 1)
-		// const dataInit = [...list]
-		setStartIndex(newStartIndex)
-		setEndIndex(newEndIndex)
-		if (page !== 1) {
-			setList(items)
-			return
-		}
-		setList(data)
-	}
+	// 	setLoading(true)
+	// 	setCurrentPage(page)
+	// 	const newStartIndex = (page - 1) * pageSize
+	// 	const newEndIndex = newStartIndex + pageSize - 1
+	// 	const items = list.slice(startIndex, endIndex + 1)
+	// 	// const dataInit = [...list]
+	// 	setStartIndex(newStartIndex)
+	// 	setEndIndex(newEndIndex)
+	// 	if (page !== 1) {
+	// 		setList(items)
+	// 		return
+	// 	}
+	// 	setList(data)
+	// }
 
 	const handleConfirmOrder = async (id) => {
-		const { payload } = await dispatch(updateStatusOrder({ id: id, status: 'order_success' }))
+		await dispatch(updateStatusOrder({ id: id, status: 'order_success' }))
 	}
 
 	const handleDeleteItem = async () => {
 		const { payload } = await dispatch(
-			deleteOrder({ id: idOrder, location: getLocationEmployee?.data?.location })
+			deleteOrder({
+				id: idOrder,
+				location: getLocationEmployee?.data?.location,
+				status: 'order_deleted',
+			})
 		)
 		if (payload?.data?.length > 0) {
 			setList(payload.data)
@@ -123,28 +128,33 @@ const OrderByUser: React.FC = () => {
 		Toasty.success(payload?.message)
 	}
 
+	const handleDeleteAllRecord = async () => {
+		const { payload } = await dispatch(deleteAllRecordOrder())
+		Toasty.success(payload?.message)
+	}
+
 	const handleConfirmDelete = (id, showModal) => {
 		setOpen(showModal)
 		setIdOrder(id)
 	}
 
-	const loadMore =
-		!initLoading && !loading ? (
-			<div
-				style={{
-					textAlign: 'right',
-					marginTop: 12,
-					height: 32,
-					lineHeight: '32px',
-				}}
-			>
-				{/* <Affix offsetBottom={150}> */}
-				<Button onClick={onLoadMore} type="primary">
-					loading more
-				</Button>
-				{/* </Affix> */}
-			</div>
-		) : null
+	// const loadMore =
+	// 	!initLoading && !loading ? (
+	// 		<div
+	// 			style={{
+	// 				textAlign: 'right',
+	// 				marginTop: 12,
+	// 				height: 32,
+	// 				lineHeight: '32px',
+	// 			}}
+	// 		>
+	// 			{/* <Affix offsetBottom={150}> */}
+	// 			<Button onClick={onLoadMore} type="primary">
+	// 				loading more
+	// 			</Button>
+	// 			{/* </Affix> */}
+	// 		</div>
+	// 	) : null
 
 	return (
 		<>
@@ -158,10 +168,19 @@ const OrderByUser: React.FC = () => {
 				size={500}
 			/>
 			<div
-				style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}
+				style={{
+					width: '100%',
+					display: 'flex',
+					gap: '10px',
+					justifyContent: 'flex-end',
+					marginBottom: '30px',
+				}}
 			>
 				<Button type="primary" onClick={() => setRefresh(true)}>
 					Refresh
+				</Button>
+				<Button type="default" onClick={() => handleDeleteAllRecord()}>
+					Delete All
 				</Button>
 			</div>
 			<CommonTable

@@ -10,7 +10,7 @@ const FileUpload: React.FC = ({ setUpload }) => {
 	// const onChangeList = (value: any) => {
 	// 	// console.log({ ...value, file: { ...value.file, status: 'done' } })
 	// }
-	console.log(upImage, 'file list')
+	// console.log(upImage, 'file list')
 
 	const handleUpload = (value: any) => {
 		// let data = {

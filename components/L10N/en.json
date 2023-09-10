@@ -1,0 +1,8 @@
+{
+    "commonTable.confirmModal.title": "Vui lòng giữ màn hình đến khi nhân viên xác nhận",
+    "commonTable.confirmModal.delete": "Xác nhận xóa?",
+    "commonTable.confirmModal.button.ok": "Xác nhận",
+    "commonTable.confirmModal.button.cancel": "Đã hủy",
+    "commonTable.confirmModal.button.text.ok": "Đã xác nhận",
+    "commonTable.confirmModal.button.text.fail": "Thất bại"
+}

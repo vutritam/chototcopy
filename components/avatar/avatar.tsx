@@ -242,9 +242,9 @@ const AvatarComponent: React.FC = () => {
 						)}
 						trigger={['click']}
 					>
-						{showMenu?.length > 0 ? (
-							<a onClick={(e) => e.preventDefault()}>
-								<Space>
+						<a onClick={(e) => e.preventDefault()}>
+							<Space>
+								{showMenu?.length > 0 ? (
 									<Tooltip
 										placement="bottomLeft"
 										title={'Bạn có thông báo mới'}
@@ -256,11 +256,13 @@ const AvatarComponent: React.FC = () => {
 											<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
 										</Badge>
 									</Tooltip>
-								</Space>
-							</a>
-						) : (
-							<></>
-						)}
+								) : (
+									<Badge style={{ display: 'flex' }}>
+										<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
+									</Badge>
+								)}
+							</Space>
+						</a>
 					</Dropdown>
 				</Space>
 				<Space wrap>

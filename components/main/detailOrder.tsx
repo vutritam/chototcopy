@@ -52,7 +52,7 @@ const DetailOrder: React.FC = () => {
 
 		// Fetch dữ liệu ban đầu và cập nhật state
 		const fetchData = async () => {
-			console.log(idTable, 'idTable')
+			// console.log(idTable, 'idTable')
 			const { payload } = await dispatch(fetchOrderByNumberTable({ tableNumber: idTable }))
 			if (payload?.success) {
 				setInitLoading(false)

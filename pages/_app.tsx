@@ -16,10 +16,10 @@ import {
 } from '@ant-design/icons'
 import { MenuProps } from 'antd'
 import Link from 'next/link'
-import PrivateRoute from '@/components/common/privateRoute'
+// import PrivateRoute from '@/components/common/privateRoute'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, store } from '@/redux/store/store'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
