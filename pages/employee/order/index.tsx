@@ -11,6 +11,7 @@ import {
 import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/modalConfirm'
 import CommonTable from '@/components/common/commonTable'
+import { deleteAllRecordNotification } from '@/redux/componentSlice/messageSocketSlice'
 
 interface DataType {
 	gender?: string
@@ -133,6 +134,11 @@ const OrderByUser: React.FC = () => {
 		Toasty.success(payload?.message)
 	}
 
+	const handleDeleteAllRecordNotification = async () => {
+		const { payload } = await dispatch(deleteAllRecordNotification())
+		Toasty.success(payload?.message)
+	}
+
 	const handleConfirmDelete = (id, showModal) => {
 		setOpen(showModal)
 		setIdOrder(id)
@@ -181,6 +187,9 @@ const OrderByUser: React.FC = () => {
 				</Button>
 				<Button type="default" onClick={() => handleDeleteAllRecord()}>
 					Delete All
+				</Button>
+				<Button type="default" onClick={() => handleDeleteAllRecordNotification()}>
+					Delete All Notification
 				</Button>
 			</div>
 			<CommonTable

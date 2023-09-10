@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Avatar, Button, InputNumber, List, Modal, Select, Space, Spin } from 'antd'
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
+import { Avatar, Button, InputNumber, List, Modal, Select, Space, Spin } from 'antd'
+import { LikeOutlined, MessageOutlined } from '@ant-design/icons'
 import Toasty from './toasty'
 import { Label } from 'semantic-ui-react'
 import SocketClient from './socketIoConnect'
@@ -22,13 +22,14 @@ interface inputProps {
 const CommonModal = (props: inputProps): JSX.Element => {
 	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
+	const isOrderPage = router.pathname.startsWith('/order')
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const [dataInput, setDataInput] = useState({
 		quantity: 1,
 		location: '',
 	})
-
+	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
 	const dispatch = useDispatch()
 	const showModal = () => {
 		setOpen(true)
@@ -84,15 +85,20 @@ const CommonModal = (props: inputProps): JSX.Element => {
 			}
 
 			if (socket) {
+				let getUserId = isOrderPage ? null : getLocationEmployee?.data?.userId
 				// Gửi sự kiện tới Socket.IO server
 				socket.emit('myEvent', {
 					message: 'Hello from client',
 					tableNumber: idTable,
 					location: dataInput.location,
 					productId: props.item.id,
+					userId: getUserId,
+					// isPage: 'user_order',
 				})
 				socket.on('response', async (response) => {
 					await dispatch(setMessage(response))
+					// console.log(response, 'response123')
+
 					localStorage.setItem('notification', JSON.stringify(response))
 				})
 			}

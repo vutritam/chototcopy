@@ -20,9 +20,15 @@ import _ from 'lodash'
 import Link from 'next/link'
 import { fetchUserById } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
-import { fetchMessageFromServer } from '@/redux/componentSlice/messageSocketSlice'
+import {
+	fetchMessageByUserRole,
+	fetchMessageFromServer,
+	setMessageEmployee,
+} from '@/redux/componentSlice/messageSocketSlice'
 import { decodeNumber, encodeNumber } from '../common/hashCode'
 import { processRouterQuery } from '../common/parseNumber'
+import moment from 'moment'
+import { io } from 'socket.io-client'
 const itemsRender: MenuProps['items'] = [
 	{
 		label: (
@@ -57,15 +63,18 @@ const AvatarComponent: React.FC = () => {
 	const user = useSelector((state: any) => state.user.account.user)
 	const isOrderPage = router.pathname.startsWith('/order')
 	const message = useSelector((state: any) => state.message.message.data)
+	const messageEmployee = useSelector((state: any) => state.message.messageEmployee.data)
 	const [userRequest, setUserRequest] = React.useState('')
 	const [showMessage, setShowMessage] = React.useState<Boolean>(false)
+	const [showMessageEmployee, setShowMessageEmployee] = React.useState<Boolean>(false)
 	const [dataLocal, setDataLocal] = React.useState<Object>([
 		{
 			userInfo: {},
 			dataNoti: [],
 		},
 	])
-
+	const [socket, setSocket] = React.useState<any>(null)
+	let getInforUser = JSON.parse(localStorage.getItem('user'))
 	const handleLogOut = () => {
 		localStorage.removeItem('user')
 		router.push('/login')
@@ -98,6 +107,7 @@ const AvatarComponent: React.FC = () => {
 	]
 
 	const [showMenu, setShowMenu] = React.useState([])
+	const [showMenuEmployee, setShowMenuEmployee] = React.useState([])
 
 	const onSetDataLocal = (data: propsData, callback: Function) => {
 		const { userInfo, dataNoti } = data
@@ -110,6 +120,9 @@ const AvatarComponent: React.FC = () => {
 	}
 	useEffect(() => {
 		;(async () => {
+			const newSocket = io('http://localhost:3500')
+			setSocket(newSocket)
+
 			let obj = {
 				userInfo: {},
 				dataNoti: [],
@@ -147,6 +160,10 @@ const AvatarComponent: React.FC = () => {
 					}
 				})
 			}
+
+			return () => {
+				newSocket.disconnect()
+			}
 		})()
 	}, [])
 
@@ -155,14 +172,30 @@ const AvatarComponent: React.FC = () => {
 		;(async () => {
 			if (localStorage.getItem('location_user') !== null) {
 				let getLocationOrderUser = JSON.parse(localStorage.getItem('location_user'))
-				const { payload } = await dispatch(
-					fetchMessageFromServer({
-						tableNumber: convertedValue,
-						location: getLocationOrderUser.location,
-					})
-				)
-				if (payload) {
-					setShowMenu(payload.data)
+				let getInforUser = JSON.parse(localStorage.getItem('user'))
+				// if(getLocationOrderUser?.user)
+				if (isOrderPage) {
+					const { payload } = await dispatch(
+						fetchMessageFromServer({
+							tableNumber: convertedValue,
+							location: getLocationOrderUser.location,
+							isPage: 'user_order',
+						})
+					)
+					if (payload) {
+						setShowMenu(payload.data)
+					}
+				} else {
+					const { payload } = await dispatch(
+						fetchMessageByUserRole({
+							userId: getInforUser?.data?.userId,
+							location: getLocationOrderUser.location,
+							isPage: 'employee_active',
+						})
+					)
+					if (payload) {
+						setShowMenuEmployee(payload.data)
+					}
 				}
 			}
 		})()
@@ -170,19 +203,40 @@ const AvatarComponent: React.FC = () => {
 	}, [router?.query])
 
 	useEffect(() => {
+		if (socket) {
+			socket.emit('joinRoom', 'room')
+			socket.on('responseEmployee', async (response) => {
+				const itemWithLocation = response?.find(
+					(item) => item?.location === getInforUser?.data?.location
+				)
+				if (itemWithLocation) {
+					await dispatch(setMessageEmployee(response))
+				}
+			})
+		}
+	}, [socket])
+
+	useEffect(() => {
 		// let dataNoti
 		// if (typeof window !== 'undefined') {
 		// dataNoti = JSON.parse(localStorage.getItem('notification'))
 		// }
 
-		if (message !== null) {
+		if (message !== null && isOrderPage) {
 			setShowMessage(true)
 			setShowMenu(message)
 			setTimeout(() => {
 				setShowMessage(false)
 			}, 2000)
 		}
-	}, [message])
+		if (messageEmployee !== null && !isOrderPage) {
+			setShowMessageEmployee(true)
+			setShowMenuEmployee(messageEmployee)
+			setTimeout(() => {
+				setShowMessageEmployee(false)
+			}, 2000)
+		}
+	}, [message, messageEmployee])
 
 	const handleShowOptionMenu = () => {
 		return showMenu?.length > 0 ? (
@@ -201,8 +255,43 @@ const AvatarComponent: React.FC = () => {
 					<a style={{ marginLeft: '5px', fontWeight: '600' }}>{ele.message}</a>
 					<div style={{ fontSize: '12px' }}>
 						<span>Thời gian: </span>
-						<span>{ele.dateTime}</span>
+						<span>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
 					</div>
+					<Link
+						style={{ fontSize: '12px', color: 'blue' }}
+						href={`/order/detail/${JSON.stringify(router.query)}`}
+					>
+						xem chi tiết
+					</Link>
+				</Menu.Item>
+			))
+		) : (
+			<Menu.Item>No data</Menu.Item>
+		)
+	}
+	const handleShowOptionMenuEmployee = () => {
+		return showMenuEmployee?.length > 0 ? (
+			showMenuEmployee.map((ele, index) => (
+				<Menu.Item
+					key={index}
+					style={{
+						background: '#efeffd',
+						marginBottom: '5px',
+						display: 'flex',
+						gap: '5px',
+						alignItems: 'center',
+					}}
+				>
+					<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
+					<a style={{ marginLeft: '5px', fontWeight: '600' }}>{ele.message}</a>
+					<div style={{ fontSize: '12px' }}>
+						<span>Thời gian: </span>
+						<span>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
+						{/* <span>{ele.dateTime}</span> */}
+					</div>
+					<p>
+						Tại<b>{ele.location}</b>
+					</p>
 					<Link
 						style={{ fontSize: '12px', color: 'blue' }}
 						href={`/order/detail/${JSON.stringify(router.query)}`}
@@ -231,39 +320,79 @@ const AvatarComponent: React.FC = () => {
 			>
 				<SelectSearch />
 				<Space wrap>
-					<Dropdown
-						dropdownRender={(menu) => (
-							<Menu className="showScroll">
-								<Menu.Item>
-									<h5>Thông báo của bạn</h5>
-								</Menu.Item>
-								{handleShowOptionMenu()}
-							</Menu>
-						)}
-						trigger={['click']}
-					>
-						<a onClick={(e) => e.preventDefault()}>
-							<Space>
-								{showMenu?.length > 0 ? (
-									<Tooltip
-										placement="bottomLeft"
-										title={'Bạn có thông báo mới'}
-										color={'red'}
-										key={'red'}
-										open={showMessage}
-									>
-										<Badge dot={message !== null ? 'show' : ''} style={{ display: 'flex' }}>
+					{isOrderPage ? (
+						<Dropdown
+							dropdownRender={(menu) => (
+								<Menu className="showScroll">
+									<Menu.Item>
+										<h5>Thông báo của bạn</h5>
+									</Menu.Item>
+									{handleShowOptionMenu()}
+								</Menu>
+							)}
+							trigger={['click']}
+						>
+							<a onClick={(e) => e.preventDefault()}>
+								{/* {isOrderPage ? ( */}
+								<Space>
+									{showMenu?.length > 0 ? (
+										<Tooltip
+											placement="bottomLeft"
+											title={'Bạn có thông báo mới'}
+											color={'red'}
+											key={'red'}
+											open={showMessage}
+										>
+											<Badge dot={message !== null ? 'show' : ''} style={{ display: 'flex' }}>
+												<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
+											</Badge>
+										</Tooltip>
+									) : (
+										<Badge style={{ display: 'flex' }}>
 											<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
 										</Badge>
-									</Tooltip>
-								) : (
-									<Badge style={{ display: 'flex' }}>
-										<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
-									</Badge>
-								)}
-							</Space>
-						</a>
-					</Dropdown>
+									)}
+								</Space>
+							</a>
+						</Dropdown>
+					) : (
+						<Dropdown
+							dropdownRender={(menu) => (
+								<Menu className="showScroll">
+									<Menu.Item>
+										<h5>Thông báo của bạn</h5>
+									</Menu.Item>
+									{handleShowOptionMenuEmployee()}
+								</Menu>
+							)}
+							trigger={['click']}
+						>
+							<a onClick={(e) => e.preventDefault()}>
+								<Space>
+									{showMenuEmployee?.length > 0 ? (
+										<Tooltip
+											placement="bottomLeft"
+											title={'Bạn có thông báo mới'}
+											color={'red'}
+											key={'red'}
+											open={showMessageEmployee}
+										>
+											<Badge
+												dot={messageEmployee !== null ? 'show' : ''}
+												style={{ display: 'flex' }}
+											>
+												<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
+											</Badge>
+										</Tooltip>
+									) : (
+										<Badge style={{ display: 'flex' }}>
+											<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
+										</Badge>
+									)}
+								</Space>
+							</a>
+						</Dropdown>
+					)}
 				</Space>
 				<Space wrap>
 					<CartItem />
