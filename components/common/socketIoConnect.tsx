@@ -3,7 +3,8 @@ import io from 'socket.io-client'
 
 const SocketClient: React.FC = ({ setSocket }) => {
 	useEffect(() => {
-		const newSocket = io('http://localhost:3500')
+		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+		const newSocket = io(ENV_HOST)
 		setSocket(newSocket)
 
 		return () => {

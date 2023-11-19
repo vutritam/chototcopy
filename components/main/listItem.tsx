@@ -3,8 +3,9 @@ import { Avatar, Button, List, Space, Spin } from 'antd'
 import React, { useState, useEffect } from 'react'
 import CommonModal from '../common/commonModal'
 import { useRouter } from 'next/router'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
+import Toasty from '../common/toasty'
 
 const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
 	<Space>
@@ -17,21 +18,38 @@ const ListItem: React.FC = () => {
 	let router = useRouter()
 	const [loading, setLoading] = useState(true)
 	const [dataList, setDataList] = useState([])
+	const dataStore = useSelector((state) => state.products.products.data)
+	console.log(dataStore, 'counter')
+
 	const dispatch = useDispatch()
 	useEffect(() => {
 		// setLoading(true)
 		;(async () => {
 			const { payload } = await dispatch(fetchAllProduct())
-			if (payload?.success) {
-				setTimeout(() => {
-					setLoading(false)
-					setDataList(payload.data)
-				}, 1000)
-			} else {
+			if (!payload?.success) {
 				setLoading(false)
+				// Toasty.error('Network and proplem when call data from server')
+				return
 			}
+			setTimeout(() => {
+				setLoading(false)
+				setDataList(payload.data)
+			}, 1000)
 		})()
 	}, [])
+
+	useEffect(() => {
+		if (!dataStore?.status) {
+			setLoading(false)
+			// Toasty.error('Network and proplem when call data from server')
+			return
+		}
+		setLoading(true)
+		setTimeout(() => {
+			setLoading(false)
+			setDataList(dataStore.data)
+		}, 1000)
+	}, [dataStore])
 	// console.log(dataList, 'dataList')
 
 	return (
@@ -89,13 +107,24 @@ const ListItem: React.FC = () => {
 								),
 							]}
 							extra={
-								<img width={172} alt="logo" src={`http://localhost:3000/images/${item.file}`} />
+								<img
+									width={172}
+									alt="logo"
+									src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`}
+								/>
 							}
 						>
 							<List.Item.Meta
-								avatar={<Avatar src={`http://localhost:3000/images/${item.file}`} />}
+								avatar={
+									<Avatar src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`} />
+								}
 								title={item.name}
-								description={item.Description}
+								description={
+									<span>
+										Giá:
+										<b style={{ color: 'blue', marginLeft: '10px' }}>{item.price}</b>
+									</span>
+								}
 							/>
 							{item.Description}
 						</List.Item>
@@ -106,4 +135,4 @@ const ListItem: React.FC = () => {
 	)
 }
 
-export default ListItem
+export default React.memo(ListItem)

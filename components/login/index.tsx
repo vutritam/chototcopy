@@ -8,18 +8,30 @@ import { useRouter } from 'next/router'
 import { toast } from 'react-toastify'
 import Toasty from '@/components/common/toasty'
 import UseAuthentication from '../common/useAuth'
-
+import { io } from 'socket.io-client'
 const LoginForm: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [loadings, setLoadings] = useState<boolean>(false)
 	const [keyTab, setKeyTab] = useState<number>(1)
-	// const user = JSON.parse(localStorage.getItem('user'))
+	const [socket, setSocket] = useState(null)
+	// const user = JSON.parse(sessionStorage.getItem('user'))
 	let router = useRouter()
+	useEffect(() => {
+		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+		const newSocket = io(ENV_HOST)
+		setSocket(newSocket)
+
+		return () => {
+			newSocket.disconnect()
+		}
+	}, [])
 	const onFinish = async (options: any) => {
 		setLoadings(true)
 		if (keyTab === 1) {
 			const { payload } = await dispatch(fetchCreatePost(options))
 			if (payload?.success) {
+				sessionStorage.setItem('user', JSON.stringify(payload))
+
 				setTimeout(() => {
 					setLoadings(false)
 					Toasty.success(payload?.message)
@@ -27,15 +39,27 @@ const LoginForm: React.FC = () => {
 						localStorage.setItem('role_access', '/admin')
 						router.push('/admin')
 					} else {
-						localStorage.setItem('role_access', '/employee')
-						router.push('/employee')
+						if (socket && sessionStorage.getItem('user') !== null) {
+							let getUserId = JSON.parse(sessionStorage.getItem('user'))
+							// Gửi sự kiện tới Socket.IO server
+							socket.emit('afterUserLogin', {
+								message: 'Hello from client',
+								location: getUserId?.data?.location,
+								time: new Date(),
+								productId: null,
+								userId: getUserId?.data?.userId,
+								isPage: 'admin_page',
+							})
+							localStorage.setItem('role_access', '/employee')
+							router.push('/employee')
+						}
 					}
 					// dispatch(setUser(payload))
 				}, 1000)
 				// console.log(payload, 'pay')
 
 				dispatch(setUser(payload))
-				localStorage.setItem('user', JSON.stringify(payload))
+
 				return
 			}
 			setTimeout(() => {

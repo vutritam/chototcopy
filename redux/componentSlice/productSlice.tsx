@@ -13,6 +13,13 @@ export const fetchCreateProduct = createAsyncThunk<any, string>(
 		return response.data
 	}
 )
+export const fetchProductByFilterCondition = createAsyncThunk<any, string>(
+	'api/fetchProductByFilterCondition',
+	async (options) => {
+		let response = await axiosConfig.post('/products/filterByCondition', options)
+		return response.data
+	}
+)
 
 export const fetchAllProduct = createAsyncThunk<any, string>('api/fetchAllProduct', async () => {
 	let response = await axiosConfig.get('/products')
@@ -49,6 +56,17 @@ const productSlice = createSlice({
 				state.products.data = action.payload
 			})
 			.addCase(fetchAllProduct.rejected, (state, action) => {
+				state.products.loading = false
+				state.products.error = action.error.message || ''
+			})
+			.addCase(fetchProductByFilterCondition.pending, (state) => {
+				state.products.loading = true
+			})
+			.addCase(fetchProductByFilterCondition.fulfilled, (state, action) => {
+				state.products.loading = false
+				state.products.data = action.payload
+			})
+			.addCase(fetchProductByFilterCondition.rejected, (state, action) => {
 				state.products.loading = false
 				state.products.error = action.error.message || ''
 			})

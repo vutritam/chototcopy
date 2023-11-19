@@ -15,7 +15,7 @@ const App: React.FC = () => {
 	}
 
 	useEffect(() => {
-		const getLocationOrder = JSON.parse(localStorage.getItem('location_user'))
+		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
 		if (getLocationOrder && getLocationOrder.location) {
 			setShow(false)
 		}

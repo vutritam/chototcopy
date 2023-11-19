@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react'
 // import PaginationCustom from '@/components/common/pagination'
 // import { io } from 'socket.io-client'
 import { useDispatch } from 'react-redux'
-import { fetchAllOrderByUserRole } from '@/redux/componentSlice/orderSlice'
+import { deleteAllRecordOrder, fetchAllOrderByUserRole } from '@/redux/componentSlice/orderSlice'
 // import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
 import CommonTable from '@/components/common/commonTable'
+import { Button } from 'antd'
 // import ModalConfirm from '@/components/common/modalConfirm'
 
 interface DataType {
@@ -35,9 +36,11 @@ const OrderByAllUser: React.FC = () => {
 	// const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
-	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
+	let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
 	const [open, setOpen] = useState(false)
 	const [idOrder, setIdOrder] = useState(null)
+	const [refreshPage, setRefresh] = useState(false)
+	// const [page, setPage] = useState(1)
 	// useEffect(() => {}, [])
 	useEffect(() => {
 		// Fetch dữ liệu ban đầu và cập nhật state
@@ -57,7 +60,7 @@ const OrderByAllUser: React.FC = () => {
 		}
 
 		fetchData()
-	}, [])
+	}, [refreshPage])
 
 	// const onLoadMore = (page) => {
 	// 	setLoading(true)
@@ -97,6 +100,16 @@ const OrderByAllUser: React.FC = () => {
 		setOpen(showModal)
 		setIdOrder(id)
 	}
+	const handleDeleteAllRecord = async () => {
+		const { payload } = await dispatch(deleteAllRecordOrder())
+		Toasty.success(payload?.message)
+	}
+
+	// const removeData = () => {
+	// 	// Xóa dữ liệu khỏi mảng data
+	// 	const newData = data.slice(0, 10); // Giả định xóa 10 dòng đầu tiên
+	// 	setData(newData);
+	//   };
 
 	return (
 		<>
@@ -109,6 +122,25 @@ const OrderByAllUser: React.FC = () => {
 				handleSubmit={handleDeleteItem}
 				size={500}
 			/> */}
+			<div
+				style={{
+					width: '100%',
+					display: 'flex',
+					gap: '10px',
+					justifyContent: 'flex-end',
+					marginBottom: '30px',
+				}}
+			>
+				<Button type="primary" onClick={() => setRefresh(true)}>
+					Refresh
+				</Button>
+				<Button type="default" onClick={() => handleDeleteAllRecord()}>
+					Delete All
+				</Button>
+				{/* <Button type="default" onClick={() => handleDeleteAllRecordNotification()}>
+					Delete All Notification
+				</Button> */}
+			</div>
 			<CommonTable item={list} handleSubmit={handleConfirmDelete} />
 		</>
 	)

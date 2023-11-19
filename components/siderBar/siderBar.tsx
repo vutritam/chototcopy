@@ -10,12 +10,17 @@ interface items {
 	handleChangeComponent?: any
 	selectedItemKey?: any
 	handleMenuClick?: any
+	handleClickCollapse: any
+	isPage: string
 }
 
 export function SideBar(props: items) {
-	const [collapsed, setCollapsed] = useState(false)
+	const { collapsed, handleClickCollapse, isPage } = props
+	// const [collapsed, setCollapsed] = useState(false)
 	const [currentURL, setcurrentURL] = useState('/')
 	const router = useRouter()
+	const getKeyActived = sessionStorage.getItem('clickItemChecked')
+
 	useEffect(() => {
 		// Kiểm tra xem code đang chạy trên môi trường server (Node.js) hay client (trình duyệt)
 		if (typeof window !== 'undefined') {
@@ -30,11 +35,16 @@ export function SideBar(props: items) {
 		<Sider
 			collapsible
 			collapsed={collapsed}
-			onCollapse={(value) => setCollapsed(value)}
+			onCollapse={(value) => handleClickCollapse(value)}
+			mode={'inline'}
+			theme={'light'}
 			style={{
-				position: 'sticky',
+				overflow: 'auto',
+				height: '100vh',
+				position: 'fixed',
+				left: 0,
 				top: 0,
-				zIndex: 10,
+				bottom: 0,
 			}}
 		>
 			<div
@@ -49,19 +59,19 @@ export function SideBar(props: items) {
 			>
 				<Image src="/images/Logo.png" width={collapsed ? 40 : 20} height={collapsed ? 40 : 20} />
 				{!collapsed ? (
-					<Link href="/admin" style={{ color: 'white' }}>
-						GOLD COFFE
+					<Link href={window.location.pathname} style={{ color: 'blue' }}>
+						<b>GOLD COFFE</b>
 					</Link>
 				) : (
 					''
 				)}
 			</div>
 			<Menu
+				mode={'inline'}
+				theme={'light'}
 				onClick={props.handleMenuClick}
-				theme="dark"
 				// selectedKeys={[props.selectedItemKey]}
-				defaultSelectedKeys={[props.selectedItemKey]}
-				mode="inline"
+				defaultSelectedKeys={[getKeyActived]}
 				items={props.items}
 			/>
 		</Sider>

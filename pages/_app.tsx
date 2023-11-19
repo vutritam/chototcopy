@@ -44,15 +44,13 @@ export default function App({ Component, pageProps }: AppProps) {
 	const isOrderPage = router.pathname.startsWith('/order')
 	const [selectedItemKey, setSelectedItemKey] = useState(null)
 
-	// const handleMenuClick = (item) => {
-	// 	setSelectedItemKey(item.key)
+	const handleMenuClick = (item) => {
+		console.log(item.key, 'item')
 
-	// 	// Cập nhật query string và thay đổi URL khi người dùng click vào item
-	// 	router.push({
-	// 		pathname: item.path, // Sử dụng đường dẫn từ item
-	// 		query: { item: item.key },
-	// 	})
-	// }
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
 
 	// // Lấy giá trị item từ query string và cập nhật trạng thái cho menu item
 	// useEffect(() => {
@@ -78,7 +76,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
 	const itemsEmployee: MenuItem[] = [
 		getItem(<div>Quản lý ca</div>, '1', <PieChartOutlined />),
-		getItem('Quản lý kết nối', '2', <DesktopOutlined />),
+		getItem(<Link href="/employee/contact">Quản lý kết nối</Link>, '2', <DesktopOutlined />),
 		getItem('Quản lý đặt bàn', 'sub1', <UserOutlined />, [
 			getItem(<Link href="/employee/order">Đơn tại bàn</Link>, '3', <PieChartOutlined />),
 			getItem('Bill', '4'),
@@ -90,7 +88,11 @@ export default function App({ Component, pageProps }: AppProps) {
 	]
 
 	const itemsOrder: MenuItem[] = [
-		getItem('Thực đơn', '1', <DesktopOutlined />),
+		getItem(
+			<Link href={typeof window !== 'undefined' && window.location.pathname}>Thực đơn</Link>,
+			'1',
+			<DesktopOutlined />
+		),
 		getItem('Khuyến mãi', 'sub2', <TeamOutlined />, [
 			getItem('Team 1', '6'),
 			getItem('Team 2', '8'),
@@ -104,8 +106,9 @@ export default function App({ Component, pageProps }: AppProps) {
 				// <PrivateRoute>
 				<MasterLayout
 					itemsSiderBar={itemsAdmin}
+					isPage="admin"
 					selectedItemKey={selectedItemKey}
-					// handleMenuClick={handleMenuClick}
+					handleMenuClick={handleMenuClick}
 				>
 					<Component {...pageProps} />
 				</MasterLayout>
@@ -116,8 +119,9 @@ export default function App({ Component, pageProps }: AppProps) {
 				// <PrivateRoute>
 				<MasterLayout
 					itemsSiderBar={itemsEmployee}
+					isPage="employee"
 					selectedItemKey={selectedItemKey}
-					// handleMenuClick={handleMenuClick}
+					handleMenuClick={handleMenuClick}
 				>
 					<Component {...pageProps} />
 				</MasterLayout>
@@ -127,8 +131,9 @@ export default function App({ Component, pageProps }: AppProps) {
 			return (
 				<MasterLayout
 					itemsSiderBar={itemsOrder}
+					isPage="order"
 					selectedItemKey={selectedItemKey}
-					// handleMenuClick={handleMenuClick}
+					handleMenuClick={handleMenuClick}
 				>
 					<Component {...pageProps} />
 				</MasterLayout>

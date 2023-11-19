@@ -11,7 +11,8 @@ const withAuthorization = (
 ) => {
 	const RequiresAuthorization: React.FC<Props> = (props) => {
 		const router = useRouter()
-		let userRoles = localStorage.getItem('user')
+		let userRoles = sessionStorage.getItem('user')
+		console.log(userRoles, 'user')
 
 		useEffect(() => {
 			// Kiểm tra xem người dùng có quyền truy cập hay không

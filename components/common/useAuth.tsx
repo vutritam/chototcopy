@@ -6,7 +6,7 @@ const UseAuthentication: React.FC = ({ children }) => {
 
 	let router = useRouter()
 	useEffect(() => {
-		const user = localStorage.getItem('user')
+		const user = sessionStorage.getItem('user')
 		// Kiểm tra trạng thái xác thực của người dùng (ví dụ: kiểm tra roles)
 		const parsedUser = JSON.parse(user)
 		const isAuthenticated = parsedUser.roles

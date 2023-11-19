@@ -20,6 +20,16 @@ export const fetchMessageByUserRole = createAsyncThunk<any, any>(
 		return response.data
 	}
 )
+// export const fetchMessageConfirmOrderByUser = createAsyncThunk<any, any>(
+// 	'api/fetchMessageConfirmOrderByUser',
+// 	async (options) => {
+// 		let response = await axiosConfig.post(
+// 			`/messageData/updateRecordConfirmOrderNotification/${options?.id}`,
+// 			options
+// 		)
+// 		return response.data
+// 	}
+// )
 
 export const deleteAllRecordNotification = createAsyncThunk<any, any>(
 	'api/deleteAllRecordNotification',
@@ -37,11 +47,20 @@ export const getMessageFromServer = createAsyncThunk<any, any>(
 	}
 )
 
+export const updateMessageNotification = createAsyncThunk<any, any>(
+	'api/updateMessageNotification',
+	async (options) => {
+		let response = await axiosConfig.post('/messageData/updateRecordNoti', options)
+		return response.data
+	}
+)
+
 const messageSocketSlice = createSlice({
 	name: 'messageSocket',
 	initialState: {
-		message: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
-		messageEmployee: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
+		message: { data: [], loading: false, error: '', checkSeen: false }, // 0: options 0 trong menu dropdown client, 1: ...
+		messageEmployee: { data: [], loading: false, error: '', checkSeen: false }, // 0: options 0 trong menu dropdown client, 1: ...
+		messageAdmin: { data: [], loading: false, error: '', checkSeen: false }, // 0: options 0 trong menu dropdown client, 1: ...
 	},
 	reducers: {
 		setMessage: (state, action) => {
@@ -49,6 +68,9 @@ const messageSocketSlice = createSlice({
 		},
 		setMessageEmployee: (state, action) => {
 			state.messageEmployee.data = action.payload
+		},
+		setMessageAdmin: (state, action) => {
+			state.messageAdmin.data = action.payload
 		},
 	},
 	extraReducers: (builder) => {
@@ -68,18 +90,51 @@ const messageSocketSlice = createSlice({
 				state.messageEmployee.loading = true
 			})
 			.addCase(fetchMessageByUserRole.fulfilled, (state, action) => {
+				const filterActionAdmin = action.payload.data.filter(
+					(element) => element.isPage === 'admin_page'
+				)
+				const filterActionEmployee = action.payload.data.filter(
+					(element) => element.isPage !== 'admin_page'
+				)
+
+				state.messageAdmin.loading = false
+				state.messageAdmin.data = filterActionAdmin
 				state.messageEmployee.loading = false
-				state.messageEmployee.data = action.payload
+				state.messageEmployee.data = filterActionEmployee
 			})
 			.addCase(fetchMessageByUserRole.rejected, (state, action) => {
-				state.messageEmployee.loading = false
-				state.messageEmployee.error = action.error.message || ''
+				const filterActionAdmin = action.payload.data.filter(
+					(element) => element.isPage === 'admin_page'
+				)
+				const filterActionEmployee = action.payload.data.filter(
+					(element) => element.isPage !== 'admin_page'
+				)
+				console.log('vô đây k', filterActionAdmin, filterActionEmployee)
+
+				if (filterActionAdmin) {
+					state.messageAdmin.loading = false
+					state.messageAdmin.error = action.error.message || ''
+				} else if (filterActionEmployee) {
+					state.messageEmployee.loading = false
+					state.messageEmployee.error = action.error.message || ''
+				}
+			})
+			.addCase(updateMessageNotification.pending, (state) => {
+				state.message.loading = true
+			})
+			.addCase(updateMessageNotification.fulfilled, (state, action) => {
+				state.message.loading = false
+				state.message.checkSeen = true
+			})
+			.addCase(updateMessageNotification.rejected, (state, action) => {
+				state.message.loading = false
+				state.message.error = action.error.message || ''
 			})
 	},
 })
 
 const { reducer, actions } = messageSocketSlice
 
-export const { setMessage, setMessageEmployee } = actions
+export const { setMessage, setMessageEmployee, setMessageAdmin } = actions
 
 export default reducer

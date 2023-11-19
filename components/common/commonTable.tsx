@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button, Dropdown, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
@@ -38,10 +38,16 @@ const CommonTable = (props: inputProps): JSX.Element => {
 	const [idItem, setIdItem] = useState(null)
 	// const [confirmOrder, setConfirmOrder] = useState({ idItem: [], active: false })
 	// const dispatch = useDispatch()
-
+	const [checkHeighTd, setCheckHeighTd] = useState(0)
+	// const tableRef = useRef()
 	useEffect(() => {
 		// Cập nhật localData khi data props thay đổi
+		const checkTd = localData.reduce((count, item) => {
+			return count + 1
+		}, 0)
+		const countPx = checkTd * 73
 		setLocalData(item)
+		setCheckHeighTd(countPx)
 	}, [item])
 
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
@@ -213,6 +219,15 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			title: 'Số lượng',
 			dataIndex: 'quantity',
 			key: 'quantity',
+			width: 120,
+			// fixed: 'left',
+			sorter: true,
+		},
+
+		{
+			title: 'Mô tả',
+			dataIndex: 'description',
+			key: 'description',
 			width: 150,
 			// fixed: 'left',
 			sorter: true,
@@ -276,15 +291,39 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		},
 	}))
 
+	// useEffect(() => {
+	// 	function handleScrollEvent() {
+	// 		if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+	// 			console.log("you're at the bottom of the page")
+	// 			// here add more items in the 'filteredData' state from the 'allData' state source.
+	// 		}
+	// 	}
+
+	// 	window.addEventListener('scroll', handleScrollEvent)
+
+	// 	return () => {
+	// 		window.removeEventListener('scroll', handleScrollEvent)
+	// 	}
+	// }, [])
+	// useEffect(() => {
+
+	// },[])
+	// console.log(checkHeighTd > 365 ? checkHeighTd : 365, 'check')
+
 	return (
-		<Table
-			columns={columns}
-			dataSource={localDataWithCustomData}
-			scroll={{ x: 1000 }}
-			rowSelection={{ ...rowSelection }}
-			sticky
-		/>
+		<div>
+			<Table
+				columns={columns}
+				rowKey="_id"
+				virtual={true}
+				dataSource={localDataWithCustomData}
+				scroll={{ x: 1000, y: 300 }}
+				rowSelection={{ ...rowSelection }}
+				pagination={false}
+				sticky
+			/>
+		</div>
 	)
 }
 
-export default CommonTable
+export default React.memo(CommonTable)

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Avatar, Button, InputNumber, List, Modal, Select, Space, Spin } from 'antd'
+import { Avatar, Button, InputNumber, List, Modal, Select, Space, Spin, Tooltip } from 'antd'
 import { LikeOutlined, MessageOutlined } from '@ant-design/icons'
 import Toasty from './toasty'
-import { Label } from 'semantic-ui-react'
+import { Label, TextArea } from 'semantic-ui-react'
 import SocketClient from './socketIoConnect'
 import io from 'socket.io-client'
-import { setMessage } from '@/redux/componentSlice/messageSocketSlice'
+import { setMessage, setMessageEmployee } from '@/redux/componentSlice/messageSocketSlice'
 import { useDispatch } from 'react-redux'
 import { fetchCreateOrder, setOrder } from '@/redux/componentSlice/orderSlice'
 import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import { decodeNumber, encodeNumber } from './hashCode'
 import { processRouterQuery } from './parseNumber'
 import L10N from '../L10N/en.json'
+import { ThunkDispatch } from '@reduxjs/toolkit'
 
 interface inputProps {
 	label: string
@@ -22,15 +23,16 @@ interface inputProps {
 const CommonModal = (props: inputProps): JSX.Element => {
 	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const isOrderPage = router.pathname.startsWith('/order')
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
+	const [getLocationOrderUser, setGetLocationOrderUser] = useState(null)
 	const [dataInput, setDataInput] = useState({
 		quantity: 1,
-		location: '',
+		description: '',
 	})
-	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
-	const dispatch = useDispatch()
+
 	const showModal = () => {
 		setOpen(true)
 	}
@@ -43,7 +45,16 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	const [socket, setSocket] = useState(null)
 
 	useEffect(() => {
-		const newSocket = io('http://localhost:3500')
+		if (
+			sessionStorage.getItem('location_user') !== null ||
+			sessionStorage.getItem('user') !== null
+		) {
+			setGetLocationOrderUser(JSON.parse(sessionStorage.getItem('location_user')))
+		}
+	}, [open])
+	useEffect(() => {
+		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+		const newSocket = io(ENV_HOST)
 		setSocket(newSocket)
 
 		return () => {
@@ -63,15 +74,16 @@ const CommonModal = (props: inputProps): JSX.Element => {
 			setOpen(false)
 			setDataInput({
 				quantity: 0,
-				location: '',
+				description: '',
 			})
 			setConfirmLoading(false)
 			const { payload } = await dispatch(
 				fetchCreateOrder({
 					tableNumber: idTable,
 					productId: props.item.id,
-					location: dataInput.location,
+					location: getLocationOrderUser?.location,
 					quantity: dataInput.quantity,
+					description: dataInput.description,
 				})
 			)
 			if (payload?.success) {
@@ -79,25 +91,24 @@ const CommonModal = (props: inputProps): JSX.Element => {
 					// gửi sự kiện get sản phẩm
 					socket.emit('getProductOrder', {
 						message: 'Gửi sự kiện lấy sản phẩm',
-						location: dataInput.location,
+						location: getLocationOrderUser?.location,
 					})
 				}
 			}
 
 			if (socket) {
-				let getUserId = isOrderPage ? null : getLocationEmployee?.data?.userId
+				// let getUserId = isOrderPage ? null : getLocationEmployee?.data?.userId
 				// Gửi sự kiện tới Socket.IO server
 				socket.emit('myEvent', {
 					message: 'Hello from client',
 					tableNumber: idTable,
-					location: dataInput.location,
+					location: getLocationOrderUser?.location,
 					productId: props.item.id,
-					userId: getUserId,
-					// isPage: 'user_order',
+					userId: null,
+					isPage: 'user_order',
 				})
 				socket.on('response', async (response) => {
 					await dispatch(setMessage(response))
-					// console.log(response, 'response123')
 
 					localStorage.setItem('notification', JSON.stringify(response))
 				})
@@ -110,20 +121,21 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		setOpen(false)
 		setDataInput({
 			quantity: 0,
-			location: '',
+			description: '',
 		})
 	}
 
 	const onChangeQuantity = (value: any) => {
 		setDataInput({ ...dataInput, quantity: value })
 	}
-	const onChangeLocation = (label: any) => {
-		setDataInput({ ...dataInput, location: label })
+
+	const onChangeDescription = (event: any) => {
+		setDataInput({ ...dataInput, description: event?.target?.value })
 	}
 
 	return (
 		<>
-			<Button type="primary" onClick={showModal}>
+			<Button type="primary" className="button-styles" onClick={showModal}>
 				{props.label}
 			</Button>
 			<Modal
@@ -141,7 +153,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 						type="primary"
 						loading={confirmLoading}
 						onClick={handleOk}
-						disabled={!dataInput.location || dataInput.quantity <= 0}
+						disabled={!getLocationOrderUser?.location || dataInput.quantity <= 0}
 					>
 						Đặt ngay
 					</Button>,
@@ -165,9 +177,16 @@ const CommonModal = (props: inputProps): JSX.Element => {
 							<List.Item.Meta
 								avatar={<Avatar src={`http://localhost:3000/images/${props.item.file}`} />}
 								title={props.item.name}
-								description={props.item.Description}
+								description={
+									<div
+										style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
+									>
+										<Tooltip placement="top" title={props.item.Description}>
+											{props.item.Description}
+										</Tooltip>
+									</div>
+								}
 							/>
-							{props.item.Description}
 						</List.Item>
 						<Space>
 							<h5>Nhập số lượng: </h5>
@@ -179,37 +198,53 @@ const CommonModal = (props: inputProps): JSX.Element => {
 								onChange={onChangeQuantity}
 							/>
 						</Space>
-						<Space style={{ marginTop: '5px' }}>
-							<h5>Nơi đặt: </h5>
+						<div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: '5px' }}>
+							<h5 style={{ margin: 0 }}>Nơi đặt: </h5>
 							<Select
 								showSearch
 								style={{ width: 200 }}
 								placeholder="Search to Select"
 								optionFilterProp="children"
-								value={dataInput.location || 'Chọn nơi đặt'}
-								onChange={onChangeLocation}
+								disabled
+								value={getLocationOrderUser?.location}
 								filterOption={(input, option) => (option?.label ?? '').includes(input)}
 								filterSort={(optionA, optionB) =>
 									(optionA?.label ?? '')
 										.toLowerCase()
 										.localeCompare((optionB?.label ?? '').toLowerCase())
 								}
-								options={[
-									{
-										value: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
-										label: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
-									},
-									{
-										value: 'Trường chinh, tân bình',
-										label: 'Trường chinh, tân bình',
-									},
-									{
-										value: 'Hóc môn quận 12',
-										label: 'Hóc môn quận 12',
-									},
-								]}
+								// options={[
+								// 	{
+								// 		value: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
+								// 		label: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
+								// 	},
+								// 	{
+								// 		value: 'Trường chinh, tân bình',
+								// 		label: 'Trường chinh, tân bình',
+								// 	},
+								// 	{
+								// 		value: 'Hóc môn quận 12',
+								// 		label: 'Hóc môn quận 12',
+								// 	},
+								// ]}
 							/>
-						</Space>
+						</div>
+						<div style={{ marginTop: 10 }}>
+							<h5>Ghi chú (Không bắt buộc): </h5>
+							<TextArea
+								showCount
+								maxLength={100}
+								style={{
+									height: 120,
+									marginBottom: 24,
+									width: '100%',
+									border: '1px solid #dfdada',
+									padding: 5,
+								}}
+								onChange={onChangeDescription}
+								placeholder="Ghi chú cho nhân viên"
+							/>
+						</div>
 					</List>
 				)}
 			</Modal>

@@ -40,7 +40,8 @@ const DetailOrder: React.FC = () => {
 	const [socket, setSocket] = useState(null)
 
 	useEffect(() => {
-		const newSocket = io('http://localhost:3500')
+		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+		const newSocket = io(ENV_HOST)
 		setSocket(newSocket)
 		if (socket) {
 			// Gửi sự kiện tới Socket.IO server

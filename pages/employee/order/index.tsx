@@ -43,7 +43,11 @@ const OrderByUser: React.FC = () => {
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
 	const [refreshPage, setRefresh] = useState(false)
-	let getLocationEmployee = JSON.parse(localStorage.getItem('user') || '')
+
+	const getLocationEmployee =
+		sessionStorage.getItem('user') && JSON.parse(sessionStorage.getItem('user'))
+
+	// let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
 	// const [currentPage, setCurrentPage] = useState(1)
 	let pageSize = 5
 	// const [startIndex, setStartIndex] = useState(0)
@@ -51,7 +55,8 @@ const OrderByUser: React.FC = () => {
 	// useEffect(() => {}, [])
 	useEffect(() => {
 		// setInitLoading(true)
-		const newSocket = io('http://localhost:3500')
+		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+		const newSocket = io(ENV_HOST)
 		setSocket(newSocket)
 
 		// Fetch dữ liệu ban đầu và cập nhật state
@@ -84,6 +89,8 @@ const OrderByUser: React.FC = () => {
 			socket.emit('joinRoom', 'room')
 			socket.on('resProductOrder', (response) => {
 				let item = response.data?.find((item) => item?.location)
+				console.log(response, 'resProductOrder')
+
 				if (item?.location === getLocationEmployee?.data?.location) {
 					setList(response.data)
 					setData(response.data)
@@ -122,9 +129,10 @@ const OrderByUser: React.FC = () => {
 				status: 'order_deleted',
 			})
 		)
-		if (payload?.data?.length > 0) {
+		if (payload?.success) {
 			setList(payload.data)
 			setData(payload.data)
+			// setRefresh(false)
 		}
 		Toasty.success(payload?.message)
 	}

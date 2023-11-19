@@ -16,7 +16,7 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 
 	const handleOk = () => {
 		props.handleShow()
-		localStorage.setItem(
+		sessionStorage.setItem(
 			'location_user',
 			JSON.stringify({
 				tableNumber: dataInput.tableNumber,
@@ -58,7 +58,7 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 				onOk={handleOk}
 				onCancel={handleCancel}
 				footer={[
-					<Button key="3" type="primary" onClick={handleOk}>
+					<Button key="3" type="primary" disabled={!dataInput.location} onClick={handleOk}>
 						Xác nhận
 					</Button>,
 				]}

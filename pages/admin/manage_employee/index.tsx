@@ -1,5 +1,6 @@
 // import ListItem from '@/components/main/listItem'
 // import ManageMoney from '@/components/main/manageMoney'
+import List_manage_employee from '@/components/main/listManage_Employee'
 import { Dropdown, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
@@ -136,13 +137,14 @@ export default function ManageWork({}: Props) {
 	}
 	return (
 		<div>
-			<Table
+			<List_manage_employee />
+			{/* <Table
 				columns={columns}
 				// dataSource={localData}
 				scroll={{ x: 1000 }}
 				rowSelection={{ ...rowSelection }}
 				sticky
-			/>
+			/> */}
 		</div>
 	)
 }

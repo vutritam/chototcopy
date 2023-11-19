@@ -1,8 +1,9 @@
 import axios from 'axios'
 
 const token = 'your-auth-token'
+const ENV_HOST = process.env.NEXT_PUBLIC_HOST
 const api = axios.create({
-	baseURL: 'http://localhost:3500',
+	baseURL: ENV_HOST,
 	timeout: 5000,
 	headers: {
 		Authorization: `Bearer ${token}`,
