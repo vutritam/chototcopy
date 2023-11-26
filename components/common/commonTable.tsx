@@ -3,6 +3,7 @@ import { Button, Dropdown, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import { FormOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
+import { sortByLatestDate } from '../helper/helper'
 // import { DropdownItem } from 'semantic-ui-react'
 // import { updateStatusOrder } from '@/redux/componentSlice/orderSlice'
 // import { useDispatch } from 'react-redux'
@@ -39,6 +40,8 @@ const CommonTable = (props: inputProps): JSX.Element => {
 	// const [confirmOrder, setConfirmOrder] = useState({ idItem: [], active: false })
 	// const dispatch = useDispatch()
 	const [checkHeighTd, setCheckHeighTd] = useState(0)
+	const [showRedBackground, setShowRedBackground] = useState(false)
+	// const [latestDateRecordId, setLatestDateRecordId] = useState(null)
 	// const tableRef = useRef()
 	useEffect(() => {
 		// Cập nhật localData khi data props thay đổi
@@ -46,9 +49,41 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			return count + 1
 		}, 0)
 		const countPx = checkTd * 73
-		setLocalData(item)
+		const localDataWithCustomData = sortByLatestDate(item, 'date').map((record: any) => ({
+			...record,
+			customData: {
+				status: record.status,
+				_id: record._id,
+				location: record.location,
+				productId: record.productId,
+			},
+		}))
+		setLocalData(localDataWithCustomData)
 		setCheckHeighTd(countPx)
+		console.log('iiiiiii')
+		setShowRedBackground(true)
+		const timer = setTimeout(() => {
+			setShowRedBackground(false)
+		}, 2000)
+
+		return () => clearTimeout(timer) // Hủy bỏ timer khi component unmounts hoặc timer được clear
 	}, [item])
+	console.log(localData, 'localData')
+
+	useEffect(() => {
+		const localDataWithCustomData = sortByLatestDate(item, 'date').map((record: any) => ({
+			...record,
+			customData: {
+				status: record.status,
+				_id: record._id,
+				location: record.location,
+				productId: record.productId,
+			},
+		}))
+
+		// Cập nhật state để giữ record có ngày mới nhất
+		setLocalData(localDataWithCustomData)
+	}, [])
 
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
@@ -281,16 +316,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		],
 	}
 
-	const localDataWithCustomData = localData.map((record: any) => ({
-		...record,
-		customData: {
-			status: record.status,
-			_id: record._id,
-			location: record.location,
-			productId: record.productId,
-		},
-	}))
-
 	// useEffect(() => {
 	// 	function handleScrollEvent() {
 	// 		if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
@@ -309,6 +334,40 @@ const CommonTable = (props: inputProps): JSX.Element => {
 
 	// },[])
 	// console.log(checkHeighTd > 365 ? checkHeighTd : 365, 'check')
+	// console.log(localDataWithCustomData.length, 'ô')
+	// const handleRowInit = (record, index) => {
+	// 	// Nếu ô được khởi tạo là ô đầu tiên
+	// 	console.log('vào', index)
+
+	// 	if (index === 0) {
+	// 		// Thay đổi màu background ô
+	// 		record.style.backgroundColor = 'red'
+	// 	}
+	// }
+	// const rowRender = (record, index) => {
+	// 	console.log(record, 'record')
+
+	// 	// Nếu ô là ô đầu tiên
+	// 	if (index === 0) {
+	// 		// Thay đổi màu background ô
+	// 		return (
+	// 			<tr style={{ backgroundColor: 'red' }}>
+	// 				<td>{record.tableNumber}</td>
+	// 				<td>{record.location}</td>
+	// 				<td>{record.customData.productId && record.customData.productId.name}</td>
+	// 				{/* <td>{record.customData.productId && record.customData.productId.name}</td> */}
+	// 			</tr>
+	// 		)
+	// 	}
+	// 	return (
+	// 		<tr>
+	// 			<td>{record.id}</td>
+	// 			<td>{record.name}</td>
+	// 			<td>{record.age}</td>
+	// 		</tr>
+	// 	)
+	// }
+	// console.log(latestDateRecordId, 'latestDateRecordId')
 
 	return (
 		<div>
@@ -316,11 +375,19 @@ const CommonTable = (props: inputProps): JSX.Element => {
 				columns={columns}
 				rowKey="_id"
 				virtual={true}
-				dataSource={localDataWithCustomData}
+				dataSource={localData}
+				// loading={localDataWithCustomData?.length > 0 ? false : true}
 				scroll={{ x: 1000, y: 300 }}
 				rowSelection={{ ...rowSelection }}
 				pagination={false}
 				sticky
+				onRow={(record, index) => ({
+					style: {
+						background: showRedBackground && index === 0 ? '#92d7e7' : '',
+					},
+				})}
+
+				// onRow={rowRender}
 			/>
 		</div>
 	)

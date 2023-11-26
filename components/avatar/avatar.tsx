@@ -38,7 +38,7 @@ import moment from 'moment'
 import { io } from 'socket.io-client'
 import { fetchOrderByNumberTableAndLocation } from '@/redux/componentSlice/orderSlice'
 import Toasty from '../common/toasty'
-import { handleTextL10N } from '../helper/helper'
+import { handleTextL10N, sortByStatus } from '../helper/helper'
 const itemsRender: MenuProps['items'] = [
 	{
 		label: (
@@ -292,7 +292,7 @@ const AvatarComponent: React.FC = () => {
 			}
 		})()
 		setIdTable(convertedValue)
-	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length])
+	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length, convertedValue])
 
 	useEffect(() => {
 		if (
@@ -345,7 +345,7 @@ const AvatarComponent: React.FC = () => {
 
 	const handleShowOptionMenu = () => {
 		return message?.data?.length > 0 ? (
-			message?.data?.map((ele, index) => (
+			sortByStatus(message?.data, 'order_pending')?.map((ele, index) => (
 				<Menu.Item key={index} className={`${showMessage ? '' : 'show-readed-message'}`}>
 					<div className="box-message">
 						{ele.status === 'order_pending' ? (
@@ -376,12 +376,24 @@ const AvatarComponent: React.FC = () => {
 	}
 	const handleShowOptionMenuEmployee = () => {
 		return messageEmployee?.length > 0 ? (
-			messageEmployee.map((ele, index) => (
+			sortByStatus(messageEmployee, 'order_pending').map((ele, index) => (
 				<Menu.Item key={index} className={`${showMessageEmployee ? '' : 'show-readed-message'}`}>
-					<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
+					<div className="box-message">
+						{ele.status === 'order_pending' ? (
+							<div className="moving-shadow-dot" />
+						) : (
+							<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
+						)}
+						<a style={{ marginLeft: '5px', fontWeight: '600' }}>
+							{ele.status === 'order_pending'
+								? handleTextL10N(L10N['message.avatar.menuItem.text'], [ele.tableNumber])
+								: 'Bạn đã xác nhận'}
+						</a>
+					</div>
+					{/* <DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
 					<a style={{ marginLeft: '5px', fontWeight: '600' }}>
 						{handleTextL10N(L10N['message.avatar.menuItem.text'], [ele.tableNumber])}
-					</a>
+					</a> */}
 					<div style={{ fontSize: '12px' }}>
 						<span>Thời gian: </span>
 						<span>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
@@ -397,15 +409,18 @@ const AvatarComponent: React.FC = () => {
 						xem chi tiết
 					</Link>
 					{ele.status !== 'order_success' ? (
-						<Button
-							icon={<PoweroffOutlined />}
-							loading={loadingConfirmOrder && idCheckConfirm === ele._id ? true : false}
-							style={{ fontSize: '12px', color: 'blue', marginLeft: '10px' }}
-							onClick={(event) => handleConfirmOrder(event, ele._id)}
-						>
-							Xác nhận
-						</Button>
+						<span style={{ fontSize: '12px', color: 'red', marginLeft: '10px' }}>
+							Chưa xác nhận
+						</span>
 					) : (
+						// <Button
+						// 	icon={<PoweroffOutlined />}
+						// 	loading={loadingConfirmOrder && idCheckConfirm === ele._id ? true : false}
+						// 	style={{ fontSize: '12px', color: 'blue', marginLeft: '10px' }}
+						// 	onClick={(event) => handleConfirmOrder(event, ele._id)}
+						// >
+						// 	chưa Xác nhận
+						// </Button>
 						<span style={{ fontSize: '12px', color: 'green', marginLeft: '10px' }}>
 							Đã xác nhận
 						</span>
@@ -502,6 +517,7 @@ const AvatarComponent: React.FC = () => {
 		} else if (isEmployeePage) {
 			return (
 				<Dropdown
+					placement="bottomLeft"
 					dropdownRender={(menu) => (
 						<Menu className="showScroll">
 							<Menu.Item>
@@ -523,7 +539,7 @@ const AvatarComponent: React.FC = () => {
 									key={'red'}
 									open={showMessageEmployee}
 								>
-									<Badge count={countMessage > 10 ? `${10}+` : countMessage}>
+									<Badge count={messageEmployee?.length > 10 ? `${10}+` : messageEmployee?.length}>
 										<BellOutlined
 											ref={elementBellOrderEmployee}
 											className="bell"
@@ -616,9 +632,13 @@ const AvatarComponent: React.FC = () => {
 				</Tooltip>
 			</div>
 
-			<div
-				style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}
-			>
+			<Space wrap className="screen-mobile">
+				{renderMenuMessage()}
+			</Space>
+			<Space wrap className="screen-mobile">
+				<CartItem className="screen-mobile" />
+			</Space>
+			<div className="show-desktop-menu">
 				<SelectSearch />
 				<Space wrap>{renderMenuMessage()}</Space>
 				<Space wrap>

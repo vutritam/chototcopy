@@ -27,6 +27,58 @@
   width: 90%;
 
 }
+/* .show-cart {
+  display: none;
+} */
+.show-desktop-menu{
+  display: flex; 
+  gap: 10px;
+  justify-content:flex-end;
+  align-items:center;
+}
+.screen-mobile {
+  display: none;
+}
+.layout-container {
+  min-height: 100vh;
+  margin-left: 200px
+
+}
+
+.ant-layout.ant-layout-has-sider.active-collapse {
+  margin-left: 80px;
+}
+@media only screen and (max-width: 600px) {
+  .screen-mobile {
+    display: block;
+  }
+  .show-desktop-menu{
+    display: none;
+  }
+
+  .ant-layout.ant-layout-has-sider.layout-container {
+    min-height: 100vh;
+    margin-left: 0px
+  
+  }
+  .filter-mobile{
+   flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .ant-layout .ant-space .ant-space-item {
+    width: 100%;
+  }
+  .active-cell-red{
+    background: red!important;
+    width: 100%;
+    height: 100%;
+  }
+  /* .show-cart {
+    display: block;
+  } */
+}
+
 .custom-login{
   width: 100%;
     /* margin: 50px auto; */

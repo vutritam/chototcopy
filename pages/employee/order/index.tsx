@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button } from 'antd'
+import { Button, Spin } from 'antd'
 import { io } from 'socket.io-client'
 import { useDispatch } from 'react-redux'
 import {
@@ -11,6 +11,7 @@ import {
 import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/modalConfirm'
 import CommonTable from '@/components/common/commonTable'
+import { LoadingOutlined } from '@ant-design/icons'
 import { deleteAllRecordNotification } from '@/redux/componentSlice/messageSocketSlice'
 
 interface DataType {
@@ -43,6 +44,7 @@ const OrderByUser: React.FC = () => {
 	const [list, setList] = useState<DataType[]>([])
 	const [socket, setSocket] = useState(null)
 	const [refreshPage, setRefresh] = useState(false)
+	const [countOrderDoNotComfirm, setCountOrderDontConfirm] = useState(0)
 
 	const getLocationEmployee =
 		sessionStorage.getItem('user') && JSON.parse(sessionStorage.getItem('user'))
@@ -68,6 +70,17 @@ const OrderByUser: React.FC = () => {
 				})
 			)
 			if (payload?.success) {
+				let filterOrderDoNotComfirm = payload.data.reduce(
+					(accumulator, currentValue) => {
+						if (currentValue.status === 'order_success') {
+							return accumulator + 1
+						}
+						return accumulator
+					},
+
+					0
+				)
+				setCountOrderDontConfirm(filterOrderDoNotComfirm)
 				setInitLoading(false)
 				setData(payload.data)
 				setList(payload.data)
@@ -200,6 +213,14 @@ const OrderByUser: React.FC = () => {
 					Delete All Notification
 				</Button>
 			</div>
+			<h3>
+				Số đơn đã xác nhận:{' '}
+				{countOrderDoNotComfirm > 0 ? (
+					<span style={{ color: 'green' }}>{countOrderDoNotComfirm}</span>
+				) : (
+					<Spin indicator={<LoadingOutlined style={{ fontSize: 16, marginLeft: '10px' }} spin />} />
+				)}
+			</h3>
 			<CommonTable
 				item={list}
 				handleSubmit={handleConfirmDelete}

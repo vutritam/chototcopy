@@ -94,10 +94,10 @@ export default function App({ Component, pageProps }: AppProps) {
 			<DesktopOutlined />
 		),
 		getItem('Khuyến mãi', 'sub2', <TeamOutlined />, [
-			getItem('Team 1', '6'),
-			getItem('Team 2', '8'),
+			getItem('Team 1', '2'),
+			getItem('Team 2', '3'),
 		]),
-		getItem('Ăn vặt', 'sub3', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
+		getItem('Ăn vặt', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
 	]
 
 	const renderPage = () => {

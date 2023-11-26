@@ -7,7 +7,8 @@ import { deleteAllRecordOrder, fetchAllOrderByUserRole } from '@/redux/component
 // import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
 import CommonTable from '@/components/common/commonTable'
-import { Button } from 'antd'
+import { Button, Spin } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons'
 // import ModalConfirm from '@/components/common/modalConfirm'
 
 interface DataType {
@@ -39,6 +40,7 @@ const OrderByAllUser: React.FC = () => {
 	let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
 	const [open, setOpen] = useState(false)
 	const [idOrder, setIdOrder] = useState(null)
+	const [countOrderDoNotComfirm, setCountOrderDontConfirm] = useState(0)
 	const [refreshPage, setRefresh] = useState(false)
 	// const [page, setPage] = useState(1)
 	// useEffect(() => {}, [])
@@ -52,11 +54,25 @@ const OrderByAllUser: React.FC = () => {
 			const { payload } = await dispatch(fetchAllOrderByUserRole(obj))
 			if (!payload?.success) {
 				Toasty.error(payload?.message)
+			} else {
+				setInitLoading(false)
+				let filterOrderDoNotComfirm = payload.data.reduce(
+					(accumulator, currentValue) => {
+						if (currentValue.status === 'order_inprogess') {
+							return accumulator + 1
+						}
+						return accumulator
+					},
+
+					0
+				)
+				setCountOrderDontConfirm(filterOrderDoNotComfirm)
+				// console.log(filterOrderDoNotComfirm, 'filterOrderDoNotComfirm')
+
+				setData(payload.data)
+				setList(payload.data)
+				setInitLoading(false)
 			}
-			setInitLoading(false)
-			setData(payload.data)
-			setList(payload.data)
-			setInitLoading(false)
 		}
 
 		fetchData()
@@ -141,6 +157,14 @@ const OrderByAllUser: React.FC = () => {
 					Delete All Notification
 				</Button> */}
 			</div>
+			<h3>
+				Số đơn chưa xác nhận:{' '}
+				{countOrderDoNotComfirm > 0 ? (
+					<span style={{ color: 'red' }}>{countOrderDoNotComfirm}</span>
+				) : (
+					<Spin indicator={<LoadingOutlined style={{ fontSize: 16, marginLeft: '10px' }} spin />} />
+				)}
+			</h3>
 			<CommonTable item={list} handleSubmit={handleConfirmDelete} />
 		</>
 	)

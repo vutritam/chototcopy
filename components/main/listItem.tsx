@@ -1,5 +1,5 @@
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
-import { Avatar, Button, List, Space, Spin } from 'antd'
+import { Avatar, Button, Image, List, Space, Spin } from 'antd'
 import React, { useState, useEffect } from 'react'
 import CommonModal from '../common/commonModal'
 import { useRouter } from 'next/router'
@@ -23,18 +23,18 @@ const ListItem: React.FC = () => {
 
 	const dispatch = useDispatch()
 	useEffect(() => {
-		// setLoading(true)
+		setLoading(true)
 		;(async () => {
 			const { payload } = await dispatch(fetchAllProduct())
-			if (!payload?.success) {
+			if (payload?.success) {
 				setLoading(false)
+				// setTimeout(() => {
+				// 	setLoading(false)
+				setDataList(payload.data)
+				// }, 1000)
 				// Toasty.error('Network and proplem when call data from server')
 				return
 			}
-			setTimeout(() => {
-				setLoading(false)
-				setDataList(payload.data)
-			}, 1000)
 		})()
 	}, [])
 
@@ -64,6 +64,14 @@ const ListItem: React.FC = () => {
 				</div>
 			) : (
 				<List
+					responsive={{
+						xs: 1, // Giảm số cột trên mỗi hàng cho màn hình di động
+						sm: 2,
+						md: 3,
+						lg: 4,
+						xl: 4,
+						xxl: 4,
+					}}
 					itemLayout="vertical"
 					size="large"
 					pagination={{
@@ -90,7 +98,7 @@ const ListItem: React.FC = () => {
 					})}
 					footer={
 						<div>
-							<b>ant design</b> footer part
+							<b>Created by team gold coffee</b>
 						</div>
 					}
 					renderItem={(item) => (
@@ -101,22 +109,32 @@ const ListItem: React.FC = () => {
 								<IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
 								<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
 								router.pathname.includes('/order') ? (
-									<CommonModal tittle="Xác nhận chọn món này ?" label="chọn" item={item} />
+									<CommonModal tittle="Xác nhận chọn món này ?" label="chọn ngay" item={item} />
 								) : (
 									''
 								),
 							]}
 							extra={
-								<img
-									width={172}
-									alt="logo"
-									src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`}
-								/>
+								<div className="show-desktop-menu">
+									<Image
+										width={172}
+										height={172}
+										style={{ objectFit: 'contain' }}
+										alt="logo"
+										src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`}
+									/>
+								</div>
 							}
 						>
 							<List.Item.Meta
 								avatar={
-									<Avatar src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`} />
+									<Image
+										width={50}
+										height={50}
+										style={{ borderRadius: '50px', objectFit: 'cover' }}
+										alt="logo"
+										src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`}
+									/>
 								}
 								title={item.name}
 								description={

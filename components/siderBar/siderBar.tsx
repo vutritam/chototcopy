@@ -12,10 +12,11 @@ interface items {
 	handleMenuClick?: any
 	handleClickCollapse: any
 	isPage: string
+	className?: string
 }
 
 export function SideBar(props: items) {
-	const { collapsed, handleClickCollapse, isPage } = props
+	const { collapsed, handleClickCollapse, isPage, className } = props
 	// const [collapsed, setCollapsed] = useState(false)
 	const [currentURL, setcurrentURL] = useState('/')
 	const router = useRouter()
@@ -35,6 +36,7 @@ export function SideBar(props: items) {
 		<Sider
 			collapsible
 			collapsed={collapsed}
+			className={className}
 			onCollapse={(value) => handleClickCollapse(value)}
 			mode={'inline'}
 			theme={'light'}

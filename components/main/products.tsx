@@ -178,12 +178,14 @@ export default function Products(props: IAppProps) {
 	const renderItemSelected = (itemsFilter, state, fieldName) => {
 		// let itemValue = state === 'all' ? 'Tất cả' : state
 		return (
-			<CommonFilter
-				fieldName={fieldName}
-				items={itemsFilter}
-				state={state}
-				handleLocationChange={handleFilterItem}
-			/>
+			<div style={{ width: '100%' }}>
+				<CommonFilter
+					fieldName={fieldName}
+					items={itemsFilter}
+					state={state}
+					handleLocationChange={handleFilterItem}
+				/>
+			</div>
 		)
 	}
 	React.useEffect(() => {
@@ -278,7 +280,7 @@ export default function Products(props: IAppProps) {
 					<b style={{ fontSize: '17px' }}>Danh mục sản phẩm (100)</b>
 				</Space>
 			</div>
-			<Space>
+			<Space className="filter-mobile">
 				{itemFilterChecked ? (
 					<>
 						<h5>Lọc theo</h5>
@@ -295,7 +297,7 @@ export default function Products(props: IAppProps) {
 					</>
 				) : null}
 				{itemFilterChecked && (
-					<>
+					<Space>
 						<Button type="primary" icon={<FileSearchOutlined />} onClick={() => handleSubmit()}>
 							Tìm kiếm
 						</Button>
@@ -314,7 +316,7 @@ export default function Products(props: IAppProps) {
 								onClick={() => handleClearFilter()}
 							></Button>
 						</Tooltip>
-					</>
+					</Space>
 				)}
 			</Space>
 			<div>

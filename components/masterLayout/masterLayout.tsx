@@ -47,20 +47,25 @@ const MasterLayout: React.FC<MyComponentProps> = ({
 	}
 
 	return (
-		<Layout style={{ minHeight: '100vh', marginLeft: collapsed ? triggerWidthSiderBar : 200 }}>
+		<Layout className={`layout-container  ${collapsed ? 'active-collapse' : ''}`}>
 			{!openShowConfirmLocation ? (
 				<ComfirmLocationOrder open={openShowConfirmLocation} tittle="Xác nhận vị trí!" />
 			) : (
 				''
 			)}
-			<SideBar
-				collapsed={collapsed}
-				isPage={isPage}
-				handleClickCollapse={handleClickCollapse}
-				items={itemsSiderBar}
-				selectedItemKey={selectedItemKey}
-				handleMenuClick={handleMenuClick}
-			/>
+			{
+				<div className="show-desktop-menu">
+					<SideBar
+						collapsed={collapsed}
+						isPage={isPage}
+						handleClickCollapse={handleClickCollapse}
+						items={itemsSiderBar}
+						selectedItemKey={selectedItemKey}
+						handleMenuClick={handleMenuClick}
+					/>
+				</div>
+			}
+
 			<Layout className="site-layout">
 				<Header
 					style={{
@@ -70,8 +75,12 @@ const MasterLayout: React.FC<MyComponentProps> = ({
 						top: 0,
 						zIndex: 1,
 						width: '100%',
+						display: 'flex',
+						justifyContent: !collapsed ? 'flex-end' : 'space-between',
+						paddingInline: collapsed ? '0px' : '',
 					}}
 				>
+					{collapsed && <b style={{ color: 'blue' }}>GOLD COFFEE</b>}
 					<AvatarComponent />
 				</Header>
 				<Content style={{ margin: '0 16px' }}>

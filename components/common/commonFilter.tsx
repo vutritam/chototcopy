@@ -7,14 +7,16 @@ const CommonFilter: React.FC = ({ items, state, fieldName, handleLocationChange 
 
 	return (
 		<Dropdown
+			className="ok"
 			menu={{ items }}
 			placement="bottom"
 			dropdownRender={(menu) => {
 				return (
-					<Menu>
+					<Menu style={{ width: '100%' }}>
 						{items?.map((item) => (
 							<Menu.Item
 								key={item.key}
+								style={{ width: '100%' }}
 								value={state}
 								disabled={item.value === state}
 								onClick={() => handleLocationChange(fieldName, item.value)}
@@ -27,7 +29,7 @@ const CommonFilter: React.FC = ({ items, state, fieldName, handleLocationChange 
 				// )}
 			}}
 		>
-			<Button>{state !== 'all' ? state : 'Tất cả'}</Button>
+			<Button style={{ width: '100%' }}>{state !== 'all' ? state : 'Tất cả'}</Button>
 		</Dropdown>
 	)
 }

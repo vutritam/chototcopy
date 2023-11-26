@@ -5,7 +5,7 @@
     "commonTable.confirmModal.button.cancel": "Đã hủy",
     "commonTable.confirmModal.button.text.ok": "Đã xác nhận",
     "commonTable.confirmModal.button.text.fail": "Thất bại",
-    "message.avatar.menuItem.text": "Có một thông báo mới từ bàn số &n",
+    "message.avatar.menuItem.text": "Thông báo mới từ bàn số &n",
     "message.avatar.menuItem.nodata.text": "Không có dữ liệu",
     "message.avatar.menuItem.item.title": "Thông báo của bạn &n",
     "message.avatar.modal.tooltip.title": "Bạn có thông báo mới"

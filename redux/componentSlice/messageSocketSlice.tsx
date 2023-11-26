@@ -90,12 +90,10 @@ const messageSocketSlice = createSlice({
 				state.messageEmployee.loading = true
 			})
 			.addCase(fetchMessageByUserRole.fulfilled, (state, action) => {
-				const filterActionAdmin = action.payload.data.filter(
-					(element) => element.isPage === 'admin_page'
-				)
-				const filterActionEmployee = action.payload.data.filter(
-					(element) => element.isPage !== 'admin_page'
-				)
+				const filterActionAdmin =
+					action.payload && action.payload.data.filter((element) => element.isPage === 'admin_page')
+				const filterActionEmployee =
+					action.payload && action.payload.data.filter((element) => element.isPage !== 'admin_page')
 
 				state.messageAdmin.loading = false
 				state.messageAdmin.data = filterActionAdmin
@@ -103,12 +101,10 @@ const messageSocketSlice = createSlice({
 				state.messageEmployee.data = filterActionEmployee
 			})
 			.addCase(fetchMessageByUserRole.rejected, (state, action) => {
-				const filterActionAdmin = action.payload.data.filter(
-					(element) => element.isPage === 'admin_page'
-				)
-				const filterActionEmployee = action.payload.data.filter(
-					(element) => element.isPage !== 'admin_page'
-				)
+				const filterActionAdmin =
+					action.payload && action.payload.data.filter((element) => element.isPage === 'admin_page')
+				const filterActionEmployee =
+					action.payload && action.payload.data.filter((element) => element.isPage !== 'admin_page')
 				console.log('vô đây k', filterActionAdmin, filterActionEmployee)
 
 				if (filterActionAdmin) {
