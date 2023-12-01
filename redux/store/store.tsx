@@ -18,7 +18,7 @@ const persistConfigUser = {
 const rootReducer = combineReducers({
 	user: persistReducer(persistConfigUser, userSlice),
 	message: messageSocketSlice,
-	dataOrder: persistReducer(persistConfigDataOrder, orderSlice),
+	dataOrder: orderSlice,
 	products: productSlice,
 	// login: loginSlice,
 })

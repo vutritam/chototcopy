@@ -55,6 +55,14 @@ export const fetchAllOrderByUser = createAsyncThunk<any, any>(
 	}
 )
 
+export const fetchAllOrderByNumberTableAndLocationUser = createAsyncThunk<any, any>(
+	'api/fetchAllOrderByNumberTableAndLocationUser',
+	async (options) => {
+		let response = await axiosConfig.post('/order/getAllOrderByNumberTableAndLocationUser', options)
+		return response.data
+	}
+)
+
 export const deleteOrder = createAsyncThunk<any, any>('api/deleteOrder', async (options) => {
 	let response = await axiosConfig.post('/order/deleteOrder', options)
 	return response.data
@@ -66,6 +74,7 @@ const orderSlice = createSlice({
 		dataOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataOrderByNumberTable: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataAllOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
+		idNotiConfirm: [],
 	},
 	reducers: {
 		setOrder: (state, action) => {
@@ -73,6 +82,12 @@ const orderSlice = createSlice({
 		},
 		setOrderByNumberTable: (state, action) => {
 			state.dataOrderByNumberTable.data = action.payload
+		},
+		setIdNotiConfirm: (state, action) => {
+			const newId = action.payload
+			if (!state.idNotiConfirm.includes(newId)) {
+				state.idNotiConfirm.push(newId)
+			}
 		},
 	},
 	extraReducers: (builder) => {
@@ -92,6 +107,8 @@ const orderSlice = createSlice({
 				state.dataOrderByNumberTable.loading = true
 			})
 			.addCase(fetchOrderByNumberTable.fulfilled, (state, action) => {
+				console.log(action.payload, 'action.payload')
+
 				state.dataOrderByNumberTable.loading = false
 				state.dataOrderByNumberTable.data = action.payload
 			})
@@ -110,11 +127,22 @@ const orderSlice = createSlice({
 				state.dataAllOrder.loading = false
 				state.dataAllOrder.error = action.error.message || ''
 			})
+			.addCase(fetchAllOrderByNumberTableAndLocationUser.pending, (state) => {
+				state.dataOrderByNumberTable.loading = true
+			})
+			.addCase(fetchAllOrderByNumberTableAndLocationUser.fulfilled, (state, action) => {
+				state.dataOrderByNumberTable.loading = false
+				state.dataOrderByNumberTable.data = action.payload
+			})
+			.addCase(fetchAllOrderByNumberTableAndLocationUser.rejected, (state, action) => {
+				state.dataOrderByNumberTable.loading = false
+				state.dataOrderByNumberTable.error = action.error.message || ''
+			})
 	},
 })
 
 const { reducer, actions } = orderSlice
 
-export const { setOrder, setOrderByNumberTable } = actions
+export const { setOrder, setOrderByNumberTable, setIdNotiConfirm } = actions
 
 export default reducer

@@ -84,6 +84,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 					location: getLocationOrderUser?.location,
 					quantity: dataInput.quantity,
 					description: dataInput.description,
+					status: 'order_inprogess',
 				})
 			)
 			if (payload?.success) {

@@ -6,6 +6,7 @@ import {
 	deleteAllRecordOrder,
 	deleteOrder,
 	fetchAllOrderByUserRole,
+	setOrderByNumberTable,
 	updateStatusOrder,
 } from '@/redux/componentSlice/orderSlice'
 import Toasty from '@/components/common/toasty'
@@ -82,6 +83,7 @@ const OrderByUser: React.FC = () => {
 				)
 				setCountOrderDontConfirm(filterOrderDoNotComfirm)
 				setInitLoading(false)
+				await dispatch(setOrderByNumberTable(payload.data))
 				setData(payload.data)
 				setList(payload.data)
 				setRefresh(false)
@@ -100,15 +102,19 @@ const OrderByUser: React.FC = () => {
 	useEffect(() => {
 		if (socket) {
 			socket.emit('joinRoom', 'room')
-			socket.on('resProductOrder', (response) => {
+			socket.on('resProductOrder', async (response) => {
 				let item = response.data?.find((item) => item?.location)
 				console.log(response, 'resProductOrder')
 
 				if (item?.location === getLocationEmployee?.data?.location) {
 					setList(response.data)
+					await dispatch(setOrderByNumberTable(response.data))
 					setData(response.data)
 				}
 			})
+			// socket.on('resAllOrderByStatus', async (response) => {
+			// 	console.log(response, 'resAllOrderByStatus')
+			// })
 		}
 	}, [socket])
 
@@ -131,7 +137,11 @@ const OrderByUser: React.FC = () => {
 	// }
 
 	const handleConfirmOrder = async (id) => {
-		await dispatch(updateStatusOrder({ id: id, status: 'order_success' }))
+		if (socket) {
+			// gửi sự kiện get sản phẩm
+			socket.emit('getAllOrderByStatus', { tableNumber: id.tableNumber, location: id.location })
+		}
+		await dispatch(updateStatusOrder({ id: id._id, status: 'order_success' }))
 	}
 
 	const handleDeleteItem = async () => {
@@ -213,16 +223,16 @@ const OrderByUser: React.FC = () => {
 					Delete All Notification
 				</Button>
 			</div>
-			<h3>
+			{/* <h3>
 				Số đơn đã xác nhận:{' '}
 				{countOrderDoNotComfirm > 0 ? (
 					<span style={{ color: 'green' }}>{countOrderDoNotComfirm}</span>
 				) : (
 					<Spin indicator={<LoadingOutlined style={{ fontSize: 16, marginLeft: '10px' }} spin />} />
 				)}
-			</h3>
+			</h3> */}
 			<CommonTable
-				item={list}
+				// item={list}
 				handleSubmit={handleConfirmDelete}
 				handleConfirmOrder={handleConfirmOrder}
 			/>

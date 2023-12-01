@@ -4,6 +4,8 @@ import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import { FormOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
 import { sortByLatestDate } from '../helper/helper'
+import { useDispatch, useSelector } from 'react-redux'
+import { ThunkDispatch } from '@reduxjs/toolkit'
 // import { DropdownItem } from 'semantic-ui-react'
 // import { updateStatusOrder } from '@/redux/componentSlice/orderSlice'
 // import { useDispatch } from 'react-redux'
@@ -19,7 +21,7 @@ interface inputProps {
 	handleSubmit?: (itemId: string, flag: boolean) => void
 	handleConfirmOrder?: (Id: string) => void
 	tittle: string
-	item: any
+	// item: any
 }
 
 const data: DataType[] = []
@@ -33,9 +35,12 @@ for (let i = 0; i < 46; i++) {
 }
 
 const CommonTable = (props: inputProps): JSX.Element => {
-	const { item, handleSubmit, handleConfirmOrder } = props
+	const { handleSubmit, handleConfirmOrder } = props
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
+	const item = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
+
 	// const [fixedTop, setFixedTop] = useState(false)
-	const [localData, setLocalData] = useState(item)
+	const [localData, setLocalData] = useState(null)
 	const [idItem, setIdItem] = useState(null)
 	// const [confirmOrder, setConfirmOrder] = useState({ idItem: [], active: false })
 	// const dispatch = useDispatch()
@@ -45,22 +50,36 @@ const CommonTable = (props: inputProps): JSX.Element => {
 	// const tableRef = useRef()
 	useEffect(() => {
 		// Cập nhật localData khi data props thay đổi
-		const checkTd = localData.reduce((count, item) => {
-			return count + 1
-		}, 0)
-		const countPx = checkTd * 73
-		const localDataWithCustomData = sortByLatestDate(item, 'date').map((record: any) => ({
-			...record,
-			customData: {
-				status: record.status,
-				_id: record._id,
-				location: record.location,
-				productId: record.productId,
-			},
-		}))
+		// const checkTd = localData.reduce((count, item) => {
+		// 	return count + 1
+		// }, 0)
+		// const countPx = checkTd * 73
+
+		const localDataWithCustomData =
+			item !== null && typeof item === 'object' && !Array.isArray(item)
+				? item?.data?.map((record: any) => ({
+						...record,
+						customData: {
+							tableNumber: record.tableNumber,
+							status: record.status,
+							_id: record._id,
+							location: record.location,
+							productId: record.productId,
+						},
+				  }))
+				: item?.map((record: any) => ({
+						...record,
+						customData: {
+							tableNumber: record.tableNumber,
+							status: record.status,
+							_id: record._id,
+							location: record.location,
+							productId: record.productId,
+						},
+				  }))
 		setLocalData(localDataWithCustomData)
-		setCheckHeighTd(countPx)
-		console.log('iiiiiii')
+		// setCheckHeighTd(countPx)
+
 		setShowRedBackground(true)
 		const timer = setTimeout(() => {
 			setShowRedBackground(false)
@@ -68,18 +87,30 @@ const CommonTable = (props: inputProps): JSX.Element => {
 
 		return () => clearTimeout(timer) // Hủy bỏ timer khi component unmounts hoặc timer được clear
 	}, [item])
-	console.log(localData, 'localData')
-
+	// console.log(item, 'localData')
 	useEffect(() => {
-		const localDataWithCustomData = sortByLatestDate(item, 'date').map((record: any) => ({
-			...record,
-			customData: {
-				status: record.status,
-				_id: record._id,
-				location: record.location,
-				productId: record.productId,
-			},
-		}))
+		const localDataWithCustomData =
+			item !== null && typeof item === 'object' && !Array.isArray(item)
+				? item?.data?.map((record: any) => ({
+						...record,
+						customData: {
+							tableNumber: record.tableNumber,
+							status: record.status,
+							_id: record._id,
+							location: record.location,
+							productId: record.productId,
+						},
+				  }))
+				: item?.map((record: any) => ({
+						...record,
+						customData: {
+							tableNumber: record.tableNumber,
+							status: record.status,
+							_id: record._id,
+							location: record.location,
+							productId: record.productId,
+						},
+				  }))
 
 		// Cập nhật state để giữ record có ngày mới nhất
 		setLocalData(localDataWithCustomData)
@@ -191,7 +222,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 						icon={
 							<FormOutlined
 								style={{ fontSize: '20px', display: 'flex' }}
-								onClick={() => setIdItem(customData._id)}
+								onClick={() => setIdItem(customData)}
 							/>
 						}
 					></Dropdown.Button>
@@ -236,7 +267,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 					<div>
 						{' '}
 						<Tag color={customData?.status === 'order_deleted' ? 'red' : 'green'}>
-							{customData.productId.name.toUpperCase()}
+							{customData?.productId?.name.toUpperCase()}
 						</Tag>
 					</div>
 					<img
@@ -244,7 +275,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 						height={40}
 						style={{ borderRadius: '50px' }}
 						alt="logo"
-						src={`http://localhost:3000/images/${customData.productId.file}`}
+						src={`http://localhost:3000/images/${customData?.productId?.file}`}
 					/>
 				</div>
 			),
@@ -376,7 +407,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 				rowKey="_id"
 				virtual={true}
 				dataSource={localData}
-				// loading={localDataWithCustomData?.length > 0 ? false : true}
+				// loading={localData?.length > 0 ? false : true}
 				scroll={{ x: 1000, y: 300 }}
 				rowSelection={{ ...rowSelection }}
 				pagination={false}

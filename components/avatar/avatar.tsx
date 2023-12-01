@@ -36,9 +36,16 @@ import { decodeNumber, encodeNumber } from '../common/hashCode'
 import { processRouterQuery } from '../common/parseNumber'
 import moment from 'moment'
 import { io } from 'socket.io-client'
-import { fetchOrderByNumberTableAndLocation } from '@/redux/componentSlice/orderSlice'
+import {
+	fetchAllOrderByNumberTableAndLocationUser,
+	fetchOrderByNumberTable,
+	fetchOrderByNumberTableAndLocation,
+	setIdNotiConfirm,
+	setOrderByNumberTable,
+} from '@/redux/componentSlice/orderSlice'
 import Toasty from '../common/toasty'
 import { handleTextL10N, sortByStatus } from '../helper/helper'
+import ModalCommonOrderByNumberTable from '../common/modalConfirmOrderByMessage'
 const itemsRender: MenuProps['items'] = [
 	{
 		label: (
@@ -89,6 +96,9 @@ const AvatarComponent: React.FC = () => {
 	const [countMessageAdmin, setCountMessageAdmin] = React.useState<Boolean>(0)
 	const [loadingConfirmOrder, setLoadingConfirmOrder] = React.useState<Boolean>(false)
 	const [convertedValue, setConvertvalue] = React.useState(null)
+	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
+	const [orderSummary, setOrderSummary] = React.useState({})
+	const [dataOrderOrigin, setDataOrderOrigin] = React.useState<Boolean>(0)
 	// const [checkConfirmOrder, setCheckConfirmOrder] = React.useState<Boolean>(false)
 	const [dataLocal, setDataLocal] = React.useState<Object>([
 		{
@@ -149,6 +159,41 @@ const AvatarComponent: React.FC = () => {
 			callback(data)
 		}
 	}
+	console.log(convertedValue, 'convertedValue')
+
+	const handleGetQuantityByTableNumber = (itemOrder) => {
+		// Logic đếm giống như trong ví dụ trước đó
+		// Sử dụng Lodash để nhóm lại các đơn hàng theo bàn
+		const groupedOrders =
+			itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
+				? _.groupBy(itemOrder.data, 'tableNumber')
+				: _.groupBy(itemOrder, 'tableNumber')
+
+		// Tạo đối tượng tổng hợp thông tin
+		const summary = _.mapValues(groupedOrders, (tableOrders) => {
+			const totalOrderedItems = tableOrders.length
+			const confirmedItems = tableOrders.filter((order) => order.status === 'order_success').length
+
+			return { totalOrderedItems, confirmedItems }
+		})
+
+		return summary
+		// const totalOrderedItems =
+		// 	itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
+		// 		? itemOrder.data.filter((order) => order.tableNumber).length
+		// 		: itemOrder?.filter((order) => order.tableNumber).length
+
+		// const confirmedItems =
+		// 	itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
+		// 		? itemOrder.data.filter((order) => order.tableNumber && order.status === 'order_success')
+		// 				.length
+		// 		: itemOrder?.filter((order) => order.tableNumber && order.status === 'order_success').length
+
+		// return {
+		// 	totalOrderedItems,
+		// 	confirmedItems,
+		// }
+	}
 	useEffect(() => {
 		;(async () => {
 			const ENV_HOST = process.env.NEXT_PUBLIC_HOST
@@ -161,6 +206,7 @@ const AvatarComponent: React.FC = () => {
 			}
 
 			let getDataUserInfo = JSON.parse(sessionStorage.getItem('user'))
+			let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 			if (typeof window !== 'undefined') {
 				obj.userInfo = getDataUserInfo?.data
 				obj.dataNoti = message
@@ -192,12 +238,18 @@ const AvatarComponent: React.FC = () => {
 					}
 				})
 			}
+			await dispatch(
+				fetchAllOrderByNumberTableAndLocationUser({
+					tableNumber: convertedValue,
+					location: getLocationOrderUser?.location,
+				})
+			)
 
 			return () => {
 				newSocket.disconnect()
 			}
 		})()
-	}, [])
+	}, [convertedValue])
 
 	useEffect(() => {
 		const idTable = processRouterQuery(router?.query)
@@ -242,7 +294,6 @@ const AvatarComponent: React.FC = () => {
 							isPage: 'user_order',
 						})
 					)
-					console.log('vào nè', payload)
 
 					if (payload) {
 						setShowMessageEmployee(true)
@@ -271,28 +322,14 @@ const AvatarComponent: React.FC = () => {
 						}, 2000)
 					}
 				}
-
-				// } else {
-				// 	const { payload } = await dispatch(
-				// 		fetchMessageByUserRole({
-				// 			userId: getInforUser?.data?.userId,
-				// 			location: getInforUser.data.location,
-				// 			isPage: 'employee_active',
-				// 		})
-				// 	)
-				// 	if (payload) {
-				// 		setShowMessageEmployee(true)
-				// 		// setShowMenuEmployee(payload.data)
-				// 		setCountMessage(payload.data.length)
-				// 		setTimeout(() => {
-				// 			setShowMessageEmployee(false)
-				// 		}, 2000)
-				// 	}
-				// }
 			}
+			const summary = handleGetQuantityByTableNumber(itemOrder)
+
+			setOrderSummary(summary)
 		})()
 		setIdTable(convertedValue)
-	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length, convertedValue])
+	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length, itemOrder])
+	console.log(itemOrder, 'itemOrder')
 
 	useEffect(() => {
 		if (
@@ -326,21 +363,26 @@ const AvatarComponent: React.FC = () => {
 						await dispatch(setMessageAdmin(response))
 					}
 				})
+				socket.on('resAllOrderByStatus', async (response) => {
+					if (response) {
+						await dispatch(setOrderByNumberTable(response))
+					}
+					console.log(response, 'resAllOrderByStatus')
+				})
 			}
 		}
 	}, [socket])
 
-	const handleConfirmOrder = async (event, idItem: string) => {
+	const handleConfirmOrder = async (event, item: any) => {
 		event.stopPropagation()
 		setLoadingConfirmOrder(true)
-		setCheckConfirm(idItem)
-		if (socket) {
-			// gửi sự kiện get sản phẩm
-			socket.emit('getItemNotification', {
-				idItem: idItem,
-				status: 'order_success',
+		await dispatch(setIdNotiConfirm(item._id))
+		setCheckConfirm(item._id)
+		await dispatch(
+			fetchOrderByNumberTable({
+				tableNumber: item.tableNumber,
 			})
-		}
+		)
 	}
 
 	const handleShowOptionMenu = () => {
@@ -348,16 +390,33 @@ const AvatarComponent: React.FC = () => {
 			sortByStatus(message?.data, 'order_pending')?.map((ele, index) => (
 				<Menu.Item key={index} className={`${showMessage ? '' : 'show-readed-message'}`}>
 					<div className="box-message">
-						{ele.status === 'order_pending' ? (
+						{ele.status === 'order_pending' &&
+						orderSummary[ele.tableNumber]?.totalOrderedItems !==
+							orderSummary[ele.tableNumber]?.confirmedItems ? (
 							<div className="moving-shadow-dot" />
 						) : (
 							<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
 						)}
 						<a style={{ marginLeft: '5px', fontWeight: '600' }}>
-							{ele.status === 'order_pending' ? ele.message : 'Món của bạn đã được xác nhận'}
+							{ele.status === 'order_pending' &&
+							orderSummary[ele.tableNumber]?.totalOrderedItems !==
+								orderSummary[ele.tableNumber]?.confirmedItems
+								? ele.message
+								: 'Món của bạn đã được xác nhận'}
 						</a>
 					</div>
-
+					<div style={{ fontSize: '14px' }}>
+						<span>Số lượng món: </span>
+						<span style={{ fontWeight: 'bold', color: 'blue' }}>
+							{orderSummary[ele.tableNumber]?.totalOrderedItems}
+						</span>
+					</div>
+					<div style={{ fontSize: '14px' }}>
+						<span>Số lượng món đã xác nhận: </span>
+						<span style={{ fontWeight: 'bold', color: 'blue' }}>
+							{orderSummary[ele.tableNumber]?.confirmedItems}
+						</span>
+					</div>
 					<div style={{ fontSize: '12px' }}>
 						<span>Thời gian: </span>
 						<span>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
@@ -374,12 +433,15 @@ const AvatarComponent: React.FC = () => {
 			<Menu.Item>{handleTextL10N(L10N['message.avatar.menuItem.nodata.text'], null)}</Menu.Item>
 		)
 	}
+
 	const handleShowOptionMenuEmployee = () => {
 		return messageEmployee?.length > 0 ? (
 			sortByStatus(messageEmployee, 'order_pending').map((ele, index) => (
 				<Menu.Item key={index} className={`${showMessageEmployee ? '' : 'show-readed-message'}`}>
 					<div className="box-message">
-						{ele.status === 'order_pending' ? (
+						{ele.status === 'order_pending' &&
+						orderSummary[ele.tableNumber]?.totalOrderedItems !==
+							orderSummary[ele.tableNumber]?.confirmedItems ? (
 							<div className="moving-shadow-dot" />
 						) : (
 							<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
@@ -390,25 +452,31 @@ const AvatarComponent: React.FC = () => {
 								: 'Bạn đã xác nhận'}
 						</a>
 					</div>
-					{/* <DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
-					<a style={{ marginLeft: '5px', fontWeight: '600' }}>
-						{handleTextL10N(L10N['message.avatar.menuItem.text'], [ele.tableNumber])}
-					</a> */}
 					<div style={{ fontSize: '12px' }}>
 						<span>Thời gian: </span>
 						<span>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-						{/* <span>{ele.dateTime}</span> */}
 					</div>
+
+					<div style={{ fontSize: '14px' }}>
+						<span>Số lượng món: </span>
+						<span style={{ fontWeight: 'bold', color: 'blue' }}>
+							{orderSummary[ele.tableNumber]?.totalOrderedItems}
+						</span>
+					</div>
+					<div style={{ fontSize: '14px' }}>
+						<span>Số lượng món đã xác nhận: </span>
+						<span style={{ fontWeight: 'bold', color: 'blue' }}>
+							{orderSummary[ele.tableNumber]?.confirmedItems}
+						</span>
+					</div>
+
 					<p style={{ fontSize: '12px' }}>
-						<b>{ele.location}</b>
+						<b>Địa điểm: {ele.location}</b>
 					</p>
-					<Link
-						style={{ fontSize: '12px', color: 'blue' }}
-						href={`/order/detail/${JSON.stringify(router.query)}`}
-					>
-						xem chi tiết
-					</Link>
-					{ele.status !== 'order_success' ? (
+					<Button onClick={(event) => handleConfirmOrder(event, ele)}>Tìm kiếm nhanh</Button>
+					{ele.status !== 'order_success' &&
+					orderSummary[ele.tableNumber]?.totalOrderedItems !==
+						orderSummary[ele.tableNumber]?.confirmedItems ? (
 						<span style={{ fontSize: '12px', color: 'red', marginLeft: '10px' }}>
 							Chưa xác nhận
 						</span>

@@ -23,6 +23,8 @@ export const sortByStatus = (array, status) => {
 }
 
 export const sortByLatestDate = (data, datePropertyName) => {
+	console.log(data, 'data sort')
+
 	return data.sort((a, b) => {
 		const dateA = a[datePropertyName]
 		const dateB = b[datePropertyName]

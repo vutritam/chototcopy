@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { Button, Modal } from 'antd'
+import { Button, Image, Modal } from 'antd'
 
 interface inputProps {
 	label: string
-	tittle: string
-	item: any
+	title: string
+	item?: any
 }
-const App: React.FC = (props: inputProps) => {
+const ModalCommonOrderByNumberTable: React.FC = (props: inputProps) => {
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const [modalText, setModalText] = useState('Content of the modal')
@@ -16,7 +16,6 @@ const App: React.FC = (props: inputProps) => {
 	}
 
 	const handleOk = () => {
-		setModalText('The modal will be closed after two seconds')
 		setConfirmLoading(true)
 		setTimeout(() => {
 			setOpen(false)
@@ -32,19 +31,45 @@ const App: React.FC = (props: inputProps) => {
 	return (
 		<>
 			<Button type="primary" onClick={showModal}>
-				Open Modal with async logic
+				{props.label}
 			</Button>
 			<Modal
-				title="Title"
+				title={props.title}
 				open={open}
 				onOk={handleOk}
 				confirmLoading={confirmLoading}
 				onCancel={handleCancel}
+				footer={[
+					<Button
+						key="3"
+						type="primary"
+						loading={confirmLoading}
+						onClick={handleOk}
+						// disabled={!getLocationOrderUser?.location || dataInput.quantity <= 0}
+					>
+						Tìm kiếm nhanh
+					</Button>,
+				]}
 			>
-				<p>{modalText}</p>
+				<p>
+					{props.item?.map((ele, index) => (
+						<div key={index}>
+							<span>{ele.name}</span>
+							<span>
+								<Image
+									width={60}
+									height={60}
+									style={{ borderRadius: '50px' }}
+									alt="logo"
+									src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${ele.file}`}
+								/>
+							</span>
+						</div>
+					))}
+				</p>
 			</Modal>
 		</>
 	)
 }
 
-export default App
+export default ModalCommonOrderByNumberTable
