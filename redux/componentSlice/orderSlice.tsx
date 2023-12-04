@@ -83,6 +83,9 @@ const orderSlice = createSlice({
 		setOrderByNumberTable: (state, action) => {
 			state.dataOrderByNumberTable.data = action.payload
 		},
+		setAllOrder: (state, action) => {
+			state.dataAllOrder.data = action.payload
+		},
 		setIdNotiConfirm: (state, action) => {
 			const newId = action.payload
 			if (!state.idNotiConfirm.includes(newId)) {
@@ -138,11 +141,22 @@ const orderSlice = createSlice({
 				state.dataOrderByNumberTable.loading = false
 				state.dataOrderByNumberTable.error = action.error.message || ''
 			})
+			.addCase(fetchAllOrder.pending, (state) => {
+				state.dataAllOrder.loading = true
+			})
+			.addCase(fetchAllOrder.fulfilled, (state, action) => {
+				state.dataAllOrder.loading = false
+				state.dataAllOrder.data = action.payload
+			})
+			.addCase(fetchAllOrder.rejected, (state, action) => {
+				state.dataAllOrder.loading = false
+				state.dataAllOrder.error = action.error.message || ''
+			})
 	},
 })
 
 const { reducer, actions } = orderSlice
 
-export const { setOrder, setOrderByNumberTable, setIdNotiConfirm } = actions
+export const { setOrder, setOrderByNumberTable, setIdNotiConfirm, setAllOrder } = actions
 
 export default reducer

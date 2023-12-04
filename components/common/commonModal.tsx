@@ -113,6 +113,11 @@ const CommonModal = (props: inputProps): JSX.Element => {
 
 					localStorage.setItem('notification', JSON.stringify(response))
 				})
+
+				socket.emit('getAllOrderByStatus', {
+					tableNumber: idTable,
+					location: getLocationOrderUser?.location,
+				})
 			}
 			// Toasty.success('Đặt món thành công')
 		}, 2000)

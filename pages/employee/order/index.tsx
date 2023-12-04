@@ -137,11 +137,11 @@ const OrderByUser: React.FC = () => {
 	// }
 
 	const handleConfirmOrder = async (id) => {
+		await dispatch(updateStatusOrder({ id: id._id, status: 'order_success' }))
 		if (socket) {
 			// gửi sự kiện get sản phẩm
 			socket.emit('getAllOrderByStatus', { tableNumber: id.tableNumber, location: id.location })
 		}
-		await dispatch(updateStatusOrder({ id: id._id, status: 'order_success' }))
 	}
 
 	const handleDeleteItem = async () => {

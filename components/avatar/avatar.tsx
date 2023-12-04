@@ -42,6 +42,7 @@ import {
 	fetchOrderByNumberTableAndLocation,
 	setIdNotiConfirm,
 	setOrderByNumberTable,
+	fetchAllOrder,
 } from '@/redux/componentSlice/orderSlice'
 import Toasty from '../common/toasty'
 import { handleTextL10N, sortByStatus } from '../helper/helper'
@@ -97,6 +98,7 @@ const AvatarComponent: React.FC = () => {
 	const [loadingConfirmOrder, setLoadingConfirmOrder] = React.useState<Boolean>(false)
 	const [convertedValue, setConvertvalue] = React.useState(null)
 	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
+	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
 	const [orderSummary, setOrderSummary] = React.useState({})
 	const [dataOrderOrigin, setDataOrderOrigin] = React.useState<Boolean>(0)
 	// const [checkConfirmOrder, setCheckConfirmOrder] = React.useState<Boolean>(false)
@@ -159,7 +161,6 @@ const AvatarComponent: React.FC = () => {
 			callback(data)
 		}
 	}
-	console.log(convertedValue, 'convertedValue')
 
 	const handleGetQuantityByTableNumber = (itemOrder) => {
 		// Logic đếm giống như trong ví dụ trước đó
@@ -178,21 +179,6 @@ const AvatarComponent: React.FC = () => {
 		})
 
 		return summary
-		// const totalOrderedItems =
-		// 	itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
-		// 		? itemOrder.data.filter((order) => order.tableNumber).length
-		// 		: itemOrder?.filter((order) => order.tableNumber).length
-
-		// const confirmedItems =
-		// 	itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
-		// 		? itemOrder.data.filter((order) => order.tableNumber && order.status === 'order_success')
-		// 				.length
-		// 		: itemOrder?.filter((order) => order.tableNumber && order.status === 'order_success').length
-
-		// return {
-		// 	totalOrderedItems,
-		// 	confirmedItems,
-		// }
 	}
 	useEffect(() => {
 		;(async () => {
@@ -240,8 +226,13 @@ const AvatarComponent: React.FC = () => {
 			}
 			await dispatch(
 				fetchAllOrderByNumberTableAndLocationUser({
-					tableNumber: convertedValue,
+					tableNumber: idTable,
 					location: getLocationOrderUser?.location,
+				})
+			)
+			await dispatch(
+				fetchAllOrder({
+					location: getDataUserInfo?.data.location,
 				})
 			)
 
@@ -249,12 +240,12 @@ const AvatarComponent: React.FC = () => {
 				newSocket.disconnect()
 			}
 		})()
-	}, [convertedValue])
+	}, [idTable])
 
 	useEffect(() => {
 		const idTable = processRouterQuery(router?.query)
 		if (idTable) {
-			setConvertvalue(idTable)
+			setIdTable(idTable)
 		}
 	}, [router?.query])
 
@@ -272,7 +263,7 @@ const AvatarComponent: React.FC = () => {
 				if (isOrderPage) {
 					const { payload } = await dispatch(
 						fetchMessageFromServer({
-							tableNumber: convertedValue,
+							tableNumber: idTable,
 							location: getLocationOrderUser?.location,
 							isPage: 'user_order',
 						})
@@ -322,23 +313,39 @@ const AvatarComponent: React.FC = () => {
 						}, 2000)
 					}
 				}
+				await dispatch(
+					fetchAllOrder({
+						location: getInforUser?.data.location,
+					})
+				)
 			}
-			const summary = handleGetQuantityByTableNumber(itemOrder)
-
-			setOrderSummary(summary)
 		})()
-		setIdTable(convertedValue)
-	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length, itemOrder])
-	console.log(itemOrder, 'itemOrder')
+	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length, idTable, itemOrder])
+
+	useEffect(() => {
+		let summary
+		if (isOrderPage) {
+			summary = handleGetQuantityByTableNumber(itemOrder)
+		} else if (isEmployeePage) {
+			summary = handleGetQuantityByTableNumber(itemAllOrder)
+		}
+		setOrderSummary(summary)
+	}, [itemOrder, itemAllOrder])
 
 	useEffect(() => {
 		if (
 			sessionStorage.getItem('location_user') !== null ||
 			sessionStorage.getItem('user') !== null
 		) {
+			let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
+			let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 			// let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 			if (socket) {
-				socket.emit('joinRoom', 'room')
+				let roomName = `room-${idTable}-${
+					isOrderPage ? getLocationOrderUser.location : getInforUser.data.location
+				}`
+
+				socket.emit('joinRoom', roomName)
 				socket.on('responseEmployee', async (response) => {
 					if (response) {
 						await dispatch(setMessageEmployee(response))
@@ -346,8 +353,6 @@ const AvatarComponent: React.FC = () => {
 				})
 				socket.on('resAllItemNotification', async (response) => {
 					if (response) {
-						console.log(response, 'response')
-
 						setLoadingConfirmOrder(false)
 						setCheckConfirm('')
 						await dispatch(setMessage(response))
@@ -355,8 +360,6 @@ const AvatarComponent: React.FC = () => {
 					}
 				})
 				socket.on('ResponseAfterUserLogin', async (response) => {
-					console.log(response, 'adim')
-
 					if (response) {
 						setLoadingConfirmOrder(false)
 						setCheckConfirm('')
@@ -367,7 +370,6 @@ const AvatarComponent: React.FC = () => {
 					if (response) {
 						await dispatch(setOrderByNumberTable(response))
 					}
-					console.log(response, 'resAllOrderByStatus')
 				})
 			}
 		}
@@ -473,7 +475,11 @@ const AvatarComponent: React.FC = () => {
 					<p style={{ fontSize: '12px' }}>
 						<b>Địa điểm: {ele.location}</b>
 					</p>
-					<Button onClick={(event) => handleConfirmOrder(event, ele)}>Tìm kiếm nhanh</Button>
+					{orderSummary[ele.tableNumber]?.totalOrderedItems !==
+					orderSummary[ele.tableNumber]?.confirmedItems ? (
+						<Button onClick={(event) => handleConfirmOrder(event, ele)}>Tìm kiếm nhanh</Button>
+					) : null}
+
 					{ele.status !== 'order_success' &&
 					orderSummary[ele.tableNumber]?.totalOrderedItems !==
 						orderSummary[ele.tableNumber]?.confirmedItems ? (
@@ -667,7 +673,6 @@ const AvatarComponent: React.FC = () => {
 			)
 		}
 	}
-	console.log(showMessageEmployee, 'messageEmployee?.length')
 
 	// console.log(showMenuEmployee, 'showMenu?.length')
 	const handleUpdateSeenMessage = async (params) => {
