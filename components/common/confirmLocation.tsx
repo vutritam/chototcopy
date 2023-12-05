@@ -1,5 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import { Button, Modal, Select, Space } from 'antd'
+import { useDispatch } from 'react-redux'
+import { ThunkDispatch } from '@reduxjs/toolkit'
+import { fetchAllOrderByNumberTableAndLocationUser } from '@/redux/componentSlice/orderSlice'
 // import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
 // import Toasty from './toasty'
 // import { Label } from 'semantic-ui-react'
@@ -7,19 +10,26 @@ interface inputProps {
 	label?: string
 	tittle?: string
 	open: any
+	idTable?: any
 }
 const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 	const [dataInput, setDataInput] = useState({
-		tableNumber: 0,
 		location: '',
 	})
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
-	const handleOk = () => {
+	const handleOk = async () => {
 		props.handleShow()
 		sessionStorage.setItem(
 			'location_user',
 			JSON.stringify({
-				tableNumber: dataInput.tableNumber,
+				tableNumber: props.idTable,
+				location: dataInput.location,
+			})
+		)
+		await dispatch(
+			fetchAllOrderByNumberTableAndLocationUser({
+				tableNumber: props.idTable,
 				location: dataInput.location,
 			})
 		)

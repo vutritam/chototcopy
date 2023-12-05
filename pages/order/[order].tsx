@@ -35,6 +35,7 @@ const App: React.FC = () => {
 					tittle="Xác nhận nơi đặt"
 					open={show}
 					handleShow={handleShow}
+					idTable={idTable}
 				/>
 			) : null}
 

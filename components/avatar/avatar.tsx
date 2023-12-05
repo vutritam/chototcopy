@@ -47,6 +47,8 @@ import {
 import Toasty from '../common/toasty'
 import { handleTextL10N, sortByStatus } from '../helper/helper'
 import ModalCommonOrderByNumberTable from '../common/modalConfirmOrderByMessage'
+import HelperMessageForUser from './helper/avatarHelper'
+
 const itemsRender: MenuProps['items'] = [
 	{
 		label: (
@@ -257,9 +259,6 @@ const AvatarComponent: React.FC = () => {
 			) {
 				let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 				let getInforUser = JSON.parse(sessionStorage.getItem('user'))
-				// if(getLocationOrderUser?.user)
-				// if (isOrderPage) {
-
 				if (isOrderPage) {
 					const { payload } = await dispatch(
 						fetchMessageFromServer({
@@ -339,7 +338,6 @@ const AvatarComponent: React.FC = () => {
 		) {
 			let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 			let getInforUser = JSON.parse(sessionStorage.getItem('user'))
-			// let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 			if (socket) {
 				let roomName = `room-${idTable}-${
 					isOrderPage ? getLocationOrderUser.location : getInforUser.data.location
@@ -387,125 +385,6 @@ const AvatarComponent: React.FC = () => {
 		)
 	}
 
-	const handleShowOptionMenu = () => {
-		return message?.data?.length > 0 ? (
-			sortByStatus(message?.data, 'order_pending')?.map((ele, index) => (
-				<Menu.Item key={index} className={`${showMessage ? '' : 'show-readed-message'}`}>
-					<div className="box-message">
-						{ele.status === 'order_pending' &&
-						orderSummary[ele.tableNumber]?.totalOrderedItems !==
-							orderSummary[ele.tableNumber]?.confirmedItems ? (
-							<div className="moving-shadow-dot" />
-						) : (
-							<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
-						)}
-						<a style={{ marginLeft: '5px', fontWeight: '600' }}>
-							{ele.status === 'order_pending' &&
-							orderSummary[ele.tableNumber]?.totalOrderedItems !==
-								orderSummary[ele.tableNumber]?.confirmedItems
-								? ele.message
-								: 'Món của bạn đã được xác nhận'}
-						</a>
-					</div>
-					<div style={{ fontSize: '14px' }}>
-						<span>Số lượng món: </span>
-						<span style={{ fontWeight: 'bold', color: 'blue' }}>
-							{orderSummary[ele.tableNumber]?.totalOrderedItems}
-						</span>
-					</div>
-					<div style={{ fontSize: '14px' }}>
-						<span>Số lượng món đã xác nhận: </span>
-						<span style={{ fontWeight: 'bold', color: 'blue' }}>
-							{orderSummary[ele.tableNumber]?.confirmedItems}
-						</span>
-					</div>
-					<div style={{ fontSize: '12px' }}>
-						<span>Thời gian: </span>
-						<span>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-					</div>
-					<Link
-						style={{ fontSize: '12px', color: 'blue' }}
-						href={`/order/detail/${JSON.stringify(router.query)}`}
-					>
-						xem chi tiết
-					</Link>
-				</Menu.Item>
-			))
-		) : (
-			<Menu.Item>{handleTextL10N(L10N['message.avatar.menuItem.nodata.text'], null)}</Menu.Item>
-		)
-	}
-
-	const handleShowOptionMenuEmployee = () => {
-		return messageEmployee?.length > 0 ? (
-			sortByStatus(messageEmployee, 'order_pending').map((ele, index) => (
-				<Menu.Item key={index} className={`${showMessageEmployee ? '' : 'show-readed-message'}`}>
-					<div className="box-message">
-						{ele.status === 'order_pending' &&
-						orderSummary[ele.tableNumber]?.totalOrderedItems !==
-							orderSummary[ele.tableNumber]?.confirmedItems ? (
-							<div className="moving-shadow-dot" />
-						) : (
-							<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
-						)}
-						<a style={{ marginLeft: '5px', fontWeight: '600' }}>
-							{ele.status === 'order_pending'
-								? handleTextL10N(L10N['message.avatar.menuItem.text'], [ele.tableNumber])
-								: 'Bạn đã xác nhận'}
-						</a>
-					</div>
-					<div style={{ fontSize: '12px' }}>
-						<span>Thời gian: </span>
-						<span>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</span>
-					</div>
-
-					<div style={{ fontSize: '14px' }}>
-						<span>Số lượng món: </span>
-						<span style={{ fontWeight: 'bold', color: 'blue' }}>
-							{orderSummary[ele.tableNumber]?.totalOrderedItems}
-						</span>
-					</div>
-					<div style={{ fontSize: '14px' }}>
-						<span>Số lượng món đã xác nhận: </span>
-						<span style={{ fontWeight: 'bold', color: 'blue' }}>
-							{orderSummary[ele.tableNumber]?.confirmedItems}
-						</span>
-					</div>
-
-					<p style={{ fontSize: '12px' }}>
-						<b>Địa điểm: {ele.location}</b>
-					</p>
-					{orderSummary[ele.tableNumber]?.totalOrderedItems !==
-					orderSummary[ele.tableNumber]?.confirmedItems ? (
-						<Button onClick={(event) => handleConfirmOrder(event, ele)}>Tìm kiếm nhanh</Button>
-					) : null}
-
-					{ele.status !== 'order_success' &&
-					orderSummary[ele.tableNumber]?.totalOrderedItems !==
-						orderSummary[ele.tableNumber]?.confirmedItems ? (
-						<span style={{ fontSize: '12px', color: 'red', marginLeft: '10px' }}>
-							Chưa xác nhận
-						</span>
-					) : (
-						// <Button
-						// 	icon={<PoweroffOutlined />}
-						// 	loading={loadingConfirmOrder && idCheckConfirm === ele._id ? true : false}
-						// 	style={{ fontSize: '12px', color: 'blue', marginLeft: '10px' }}
-						// 	onClick={(event) => handleConfirmOrder(event, ele._id)}
-						// >
-						// 	chưa Xác nhận
-						// </Button>
-						<span style={{ fontSize: '12px', color: 'green', marginLeft: '10px' }}>
-							Đã xác nhận
-						</span>
-					)}
-				</Menu.Item>
-			))
-		) : (
-			<Menu.Item>{handleTextL10N(L10N['message.avatar.menuItem.nodata.text'], null)}</Menu.Item>
-		)
-	}
-
 	const handleShowOptionMenuAdmin = () => {
 		return messageAdmin?.length > 0 ? (
 			messageAdmin.map((ele, index) => (
@@ -524,7 +403,6 @@ const AvatarComponent: React.FC = () => {
 						<span>
 							<b>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</b>
 						</span>
-						{/* <span>{ele.dateTime}</span> */}
 					</div>
 					<p style={{ fontSize: '12px' }}>
 						<b>Địa điểm: {ele.location}</b>
@@ -554,7 +432,13 @@ const AvatarComponent: React.FC = () => {
 									])}
 								</h5>
 							</Menu.Item>
-							{handleShowOptionMenu()}
+							<HelperMessageForUser
+								dataMessage={message}
+								showMessage={showMessage}
+								orderSummary={orderSummary}
+								// handleConfirmOrder={handleConfirmOrder}
+								condition="userOrder"
+							/>
 						</Menu>
 					)}
 					trigger={['click']}
@@ -597,7 +481,14 @@ const AvatarComponent: React.FC = () => {
 							<Menu.Item>
 								<h5>{handleTextL10N(L10N['message.avatar.menuItem.item.title'], [])}</h5>
 							</Menu.Item>
-							{handleShowOptionMenuEmployee()}
+							<HelperMessageForUser
+								dataMessage={messageEmployee}
+								showMessage={showMessageEmployee}
+								orderSummary={orderSummary}
+								handleConfirmOrder={handleConfirmOrder}
+								condition="employee"
+							/>
+							{/* {handleShowOptionMenuEmployee()} */}
 						</Menu>
 					)}
 					trigger={['click']}
