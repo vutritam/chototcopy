@@ -1,14 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Button, Dropdown, Space, Table, Tag } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Button, Dropdown, MenuProps, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import { FormOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
-import { sortByLatestDate } from '../helper/helper'
 import { useDispatch, useSelector } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
-// import { DropdownItem } from 'semantic-ui-react'
-// import { updateStatusOrder } from '@/redux/componentSlice/orderSlice'
-// import { useDispatch } from 'react-redux'
 
 interface DataType {
 	key: React.Key
@@ -18,10 +14,10 @@ interface DataType {
 }
 
 interface inputProps {
-	handleSubmit?: (itemId: string, flag: boolean) => void
-	handleConfirmOrder?: (Id: string) => void
+	handleSubmit?: (itemId: any, flag: boolean) => void
+	handleConfirmOrder?: (Id: any) => void
 	tittle: string
-	// item: any
+	item: any
 }
 
 const data: DataType[] = []
@@ -35,26 +31,16 @@ for (let i = 0; i < 46; i++) {
 }
 
 const CommonTable = (props: inputProps): JSX.Element => {
-	const { handleSubmit, handleConfirmOrder } = props
+	const { handleSubmit, handleConfirmOrder, item } = props
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
-	const item = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 
-	// const [fixedTop, setFixedTop] = useState(false)
 	const [localData, setLocalData] = useState(null)
 	const [idItem, setIdItem] = useState(null)
-	// const [confirmOrder, setConfirmOrder] = useState({ idItem: [], active: false })
-	// const dispatch = useDispatch()
-	const [checkHeighTd, setCheckHeighTd] = useState(0)
+
 	const [showRedBackground, setShowRedBackground] = useState(false)
-	// const [latestDateRecordId, setLatestDateRecordId] = useState(null)
-	// const tableRef = useRef()
+
 	useEffect(() => {
 		// Cập nhật localData khi data props thay đổi
-		// const checkTd = localData.reduce((count, item) => {
-		// 	return count + 1
-		// }, 0)
-		// const countPx = checkTd * 73
-
 		const localDataWithCustomData =
 			item !== null && typeof item === 'object' && !Array.isArray(item)
 				? item?.data?.map((record: any) => ({
@@ -78,8 +64,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 						},
 				  }))
 		setLocalData(localDataWithCustomData)
-		// setCheckHeighTd(countPx)
-
 		setShowRedBackground(true)
 		const timer = setTimeout(() => {
 			setShowRedBackground(false)
@@ -87,7 +71,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 
 		return () => clearTimeout(timer) // Hủy bỏ timer khi component unmounts hoặc timer được clear
 	}, [item])
-	// console.log(item, 'localData')
+
 	useEffect(() => {
 		const localDataWithCustomData =
 			item !== null && typeof item === 'object' && !Array.isArray(item)
@@ -122,10 +106,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		setSelectedRowKeys(newSelectedRowKeys)
 	}
 
-	// const handleConfirmOrder = async (id) => {
-	// 	const { payload } = await dispatch(updateStatusOrder({ id: id, status: 'order_success' }))
-	// }
-
 	const items: MenuProps['items'] = [
 		{
 			key: '1',
@@ -144,22 +124,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			),
 		},
 	]
-	// const menu = (
-	// 	<Menu>
-	// 		{confirmOrder.active && confirmOrder.idItem === item._id ? (
-	// 			<CheckCircleOutlined color="red" />
-	// 		) : (
-	// 			<>
-	// 				<Button type="dashed" onClick={() => handleSubmit(item._id, true)}>
-	// 					Hủy bỏ
-	// 				</Button>
-	// 				<Button type="primary" onClick={() => handleConfirmOrder(item._id)}>
-	// 					Xác nhận
-	// 				</Button>
-	// 			</>
-	// 		)}
-	// 	</Menu>
-	// )
 
 	const handleStatus = (customData: any) => {
 		switch (customData.status) {
@@ -346,59 +310,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			},
 		],
 	}
-
-	// useEffect(() => {
-	// 	function handleScrollEvent() {
-	// 		if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-	// 			console.log("you're at the bottom of the page")
-	// 			// here add more items in the 'filteredData' state from the 'allData' state source.
-	// 		}
-	// 	}
-
-	// 	window.addEventListener('scroll', handleScrollEvent)
-
-	// 	return () => {
-	// 		window.removeEventListener('scroll', handleScrollEvent)
-	// 	}
-	// }, [])
-	// useEffect(() => {
-
-	// },[])
-	// console.log(checkHeighTd > 365 ? checkHeighTd : 365, 'check')
-	// console.log(localDataWithCustomData.length, 'ô')
-	// const handleRowInit = (record, index) => {
-	// 	// Nếu ô được khởi tạo là ô đầu tiên
-	// 	console.log('vào', index)
-
-	// 	if (index === 0) {
-	// 		// Thay đổi màu background ô
-	// 		record.style.backgroundColor = 'red'
-	// 	}
-	// }
-	// const rowRender = (record, index) => {
-	// 	console.log(record, 'record')
-
-	// 	// Nếu ô là ô đầu tiên
-	// 	if (index === 0) {
-	// 		// Thay đổi màu background ô
-	// 		return (
-	// 			<tr style={{ backgroundColor: 'red' }}>
-	// 				<td>{record.tableNumber}</td>
-	// 				<td>{record.location}</td>
-	// 				<td>{record.customData.productId && record.customData.productId.name}</td>
-	// 				{/* <td>{record.customData.productId && record.customData.productId.name}</td> */}
-	// 			</tr>
-	// 		)
-	// 	}
-	// 	return (
-	// 		<tr>
-	// 			<td>{record.id}</td>
-	// 			<td>{record.name}</td>
-	// 			<td>{record.age}</td>
-	// 		</tr>
-	// 	)
-	// }
-	// console.log(latestDateRecordId, 'latestDateRecordId')
 
 	return (
 		<div>

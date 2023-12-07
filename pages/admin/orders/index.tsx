@@ -1,16 +1,10 @@
 import React, { useEffect, useState } from 'react'
-// import { Affix, Avatar, Button, List, Skeleton } from 'antd'
-// import PaginationCustom from '@/components/common/pagination'
-// import { io } from 'socket.io-client'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { deleteAllRecordOrder, fetchAllOrderByUserRole } from '@/redux/componentSlice/orderSlice'
-// import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
 import CommonTable from '@/components/common/commonTable'
 import { Button, Spin } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
-// import ModalConfirm from '@/components/common/modalConfirm'
-
 interface DataType {
 	gender?: string
 	name: {
@@ -32,24 +26,23 @@ const count = 3
 
 const OrderByAllUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
-	// const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
 	const dispatch = useDispatch()
 	// const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
-	const [list, setList] = useState<DataType[]>([])
 	let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
 	const [open, setOpen] = useState(false)
 	const [idOrder, setIdOrder] = useState(null)
 	const [countOrderDoNotComfirm, setCountOrderDontConfirm] = useState(0)
 	const [refreshPage, setRefresh] = useState(false)
-	// const [page, setPage] = useState(1)
-	// useEffect(() => {}, [])
+	const dataAllOrderAdmin = useSelector((state: any) => state.dataOrder?.dataAllOrderAdmin?.data)
+
 	useEffect(() => {
 		// Fetch dữ liệu ban đầu và cập nhật state
 		let obj = {
 			location: getLocationEmployee?.data?.location,
 			userRole: getLocationEmployee?.data?.roles[0],
 		}
+
 		const fetchData = async () => {
 			const { payload } = await dispatch(fetchAllOrderByUserRole(obj))
 			if (!payload?.success) {
@@ -67,10 +60,7 @@ const OrderByAllUser: React.FC = () => {
 					0
 				)
 				setCountOrderDontConfirm(filterOrderDoNotComfirm)
-				// console.log(filterOrderDoNotComfirm, 'filterOrderDoNotComfirm')
-
 				setData(payload.data)
-				setList(payload.data)
 				setInitLoading(false)
 			}
 		}
@@ -78,40 +68,6 @@ const OrderByAllUser: React.FC = () => {
 		fetchData()
 	}, [refreshPage])
 
-	// const onLoadMore = (page) => {
-	// 	setLoading(true)
-	// 	setList(
-	// 		data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
-	// 	)
-	// }
-
-	// const loadMore =
-	// 	!initLoading && !loading ? (
-	// 		<div
-	// 			style={{
-	// 				textAlign: 'right',
-	// 				marginTop: 12,
-	// 				height: 32,
-	// 				lineHeight: '32px',
-	// 			}}
-	// 		>
-	// 			{/* <Affix offsetBottom={150}> */}
-	// 			<Button onClick={onLoadMore} type="primary">
-	// 				loading more
-	// 			</Button>
-	// 			{/* </Affix> */}
-	// 		</div>
-	// 	) : null
-	// const handleDeleteItem = async () => {
-	// 	const { payload } = await dispatch(
-	// 		deleteOrder({ id: idOrder, location: getLocationEmployee?.data?.location })
-	// 	)
-	// 	if (payload?.data?.length > 0) {
-	// 		setList(payload.data)
-	// 		setData(payload.data)
-	// 	}
-	// 	Toasty.success(payload?.message)
-	// }
 	const handleConfirmDelete = (id, showModal) => {
 		setOpen(showModal)
 		setIdOrder(id)
@@ -121,23 +77,8 @@ const OrderByAllUser: React.FC = () => {
 		Toasty.success(payload?.message)
 	}
 
-	// const removeData = () => {
-	// 	// Xóa dữ liệu khỏi mảng data
-	// 	const newData = data.slice(0, 10); // Giả định xóa 10 dòng đầu tiên
-	// 	setData(newData);
-	//   };
-
 	return (
 		<>
-			{/* <ModalConfirm
-				label=""
-				title="Xác nhận xóa item này ?"
-				position="renderConfirmDeleteItemOrder"
-				open={open}
-				setOpen={setOpen}
-				handleSubmit={handleDeleteItem}
-				size={500}
-			/> */}
 			<div
 				style={{
 					width: '100%',
@@ -165,7 +106,7 @@ const OrderByAllUser: React.FC = () => {
 					<Spin indicator={<LoadingOutlined style={{ fontSize: 16, marginLeft: '10px' }} spin />} />
 				)}
 			</h3>
-			<CommonTable item={list} handleSubmit={handleConfirmDelete} />
+			<CommonTable item={dataAllOrderAdmin} handleSubmit={handleConfirmDelete} />
 		</>
 	)
 }

@@ -8,5 +8,10 @@
     "message.avatar.menuItem.text": "Thông báo mới từ bàn số &n",
     "message.avatar.menuItem.nodata.text": "Không có dữ liệu",
     "message.avatar.menuItem.item.title": "Thông báo của bạn &n",
-    "message.avatar.modal.tooltip.title": "Bạn có thông báo mới"
+    "message.avatar.modal.tooltip.title": "Bạn có thông báo mới",
+    "message.avatar.menuItem.text.employee.confirm": "Bạn đã xác nhận",
+    "message.avatar.menuItem.text.order.confirm": "Món của bạn đã được xác nhận",
+    "message.avatar.menuItem.button.filter": "Tìm kiếm nhanh",
+    "message.avatar.menuItem.text.not.confirm": "Chưa xác nhận",
+    "message.avatar.menuItem.text.confirm": "Đã xác nhận"
 }

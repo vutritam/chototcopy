@@ -48,6 +48,7 @@ import Toasty from '../common/toasty'
 import { handleTextL10N, sortByStatus } from '../helper/helper'
 import ModalCommonOrderByNumberTable from '../common/modalConfirmOrderByMessage'
 import HelperMessageForUser from './helper/avatarHelper'
+import HelperMessageToolTip from './helper/avatarTooltip'
 
 const itemsRender: MenuProps['items'] = [
 	{
@@ -251,6 +252,8 @@ const AvatarComponent: React.FC = () => {
 		}
 	}, [router?.query])
 
+	console.log(message, messageEmployee, 'data render')
+
 	useEffect(() => {
 		;(async () => {
 			if (
@@ -320,6 +323,7 @@ const AvatarComponent: React.FC = () => {
 			}
 		})()
 	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length, idTable, itemOrder])
+	console.log()
 
 	useEffect(() => {
 		let summary
@@ -340,8 +344,9 @@ const AvatarComponent: React.FC = () => {
 			let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 			if (socket) {
 				let roomName = `room-${idTable}-${
-					isOrderPage ? getLocationOrderUser.location : getInforUser.data.location
+					isOrderPage ? getLocationOrderUser?.location : getInforUser.data.location
 				}`
+				console.log(roomName, 'roomName')
 
 				socket.emit('joinRoom', roomName)
 				socket.on('responseEmployee', async (response) => {
@@ -422,104 +427,29 @@ const AvatarComponent: React.FC = () => {
 	const renderMenuMessage = () => {
 		if (isOrderPage) {
 			return (
-				<Dropdown
-					dropdownRender={(menu) => (
-						<Menu className="showScroll">
-							<Menu.Item>
-								<h5>
-									{handleTextL10N(L10N['message.avatar.menuItem.item.title'], [
-										message?.data?.length,
-									])}
-								</h5>
-							</Menu.Item>
-							<HelperMessageForUser
-								dataMessage={message}
-								showMessage={showMessage}
-								orderSummary={orderSummary}
-								// handleConfirmOrder={handleConfirmOrder}
-								condition="userOrder"
-							/>
-						</Menu>
-					)}
-					trigger={['click']}
-					onClick={() => handleUpdateSeenMessage(true)}
-				>
-					<a onClick={(e) => e.preventDefault()}>
-						{/* {isOrderPage ? ( */}
-						<Space size="large">
-							{message?.data?.length > 0 ? (
-								<Tooltip
-									placement="bottomLeft"
-									title={'Bạn có thông báo mới'}
-									color={'red'}
-									key={'red'}
-									open={showMessage}
-								>
-									<Badge count={countMessage > 10 ? `${10}+` : countMessage}>
-										<BellOutlined
-											ref={elementBellOrder}
-											className="bell"
-											style={{ fontSize: '22px', width: '30px' }}
-										/>
-									</Badge>
-								</Tooltip>
-							) : (
-								<Badge style={{ display: 'flex' }}>
-									<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
-								</Badge>
-							)}
-						</Space>
-					</a>
-				</Dropdown>
+				<HelperMessageToolTip
+					dataMessage={message}
+					showMessage={showMessage}
+					countMessage={countMessage}
+					orderSummary={orderSummary}
+					handleUpdateSeenMessage={handleUpdateSeenMessage}
+					condition="userOrder"
+					elementBellOrder={elementBellOrder}
+					handleConfirmOrder={handleConfirmOrder}
+				/>
 			)
 		} else if (isEmployeePage) {
 			return (
-				<Dropdown
-					placement="bottomLeft"
-					dropdownRender={(menu) => (
-						<Menu className="showScroll">
-							<Menu.Item>
-								<h5>{handleTextL10N(L10N['message.avatar.menuItem.item.title'], [])}</h5>
-							</Menu.Item>
-							<HelperMessageForUser
-								dataMessage={messageEmployee}
-								showMessage={showMessageEmployee}
-								orderSummary={orderSummary}
-								handleConfirmOrder={handleConfirmOrder}
-								condition="employee"
-							/>
-							{/* {handleShowOptionMenuEmployee()} */}
-						</Menu>
-					)}
-					trigger={['click']}
-					onClick={() => handleUpdateSeenMessage(true)}
-				>
-					<a onClick={(e) => e.preventDefault()}>
-						<Space>
-							{messageEmployee?.length > 0 ? (
-								<Tooltip
-									placement="bottomLeft"
-									title={'Bạn có thông báo mới'}
-									color={'red'}
-									key={'red'}
-									open={showMessageEmployee}
-								>
-									<Badge count={messageEmployee?.length > 10 ? `${10}+` : messageEmployee?.length}>
-										<BellOutlined
-											ref={elementBellOrderEmployee}
-											className="bell"
-											style={{ fontSize: '22px', width: '30px' }}
-										/>
-									</Badge>
-								</Tooltip>
-							) : (
-								<Badge style={{ display: 'flex' }}>
-									<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
-								</Badge>
-							)}
-						</Space>
-					</a>
-				</Dropdown>
+				<HelperMessageToolTip
+					dataMessage={messageEmployee}
+					showMessage={showMessageEmployee}
+					countMessage={countMessage}
+					orderSummary={orderSummary}
+					handleUpdateSeenMessage={handleUpdateSeenMessage}
+					condition="employee"
+					elementBellOrder={elementBellOrderEmployee}
+					handleConfirmOrder={handleConfirmOrder}
+				/>
 			)
 		} else {
 			return (

@@ -3,18 +3,21 @@ import { DownCircleOutlined } from '@ant-design/icons'
 import { handleTextL10N, sortByStatus } from '@/components/helper/helper'
 import moment from 'moment'
 import L10N from '../../L10N/en.json'
-import { useEffect, useState } from 'react'
+interface inputProps {
+	dataMessage: any
+	showMessage: Boolean
+	orderSummary: any
+	handleConfirmOrder?: any
+	condition: string
+}
 
-const HelperMessageForUser: React.FC = ({
-	dataMessage,
-	showMessage,
-	orderSummary,
-	handleConfirmOrder,
-	condition,
-}) => {
+const HelperMessageForUser = (props: inputProps): JSX.Element => {
+	const { dataMessage, showMessage, orderSummary, handleConfirmOrder, condition } = props
 	const isCheckUserOrderData =
 		condition === 'userOrder' ? sortByStatus(dataMessage?.data, 'order_pending') : dataMessage
 	const isUserOrder = condition === 'userOrder'
+	console.log(isCheckUserOrderData, 'isCheckUserOrderData')
+
 	return isCheckUserOrderData.length > 0 ? (
 		isCheckUserOrderData.map((ele, index) => {
 			const isOrderSumary =
@@ -36,8 +39,8 @@ const HelperMessageForUser: React.FC = ({
 									? handleTextL10N(L10N['message.avatar.menuItem.text'], [ele.tableNumber])
 									: ele.message
 								: !isUserOrder
-								? 'Bạn đã xác nhận'
-								: 'Món của bạn đã được xác nhận'}
+								? L10N['message.avatar.menuItem.text.employee.confirm']
+								: L10N['message.avatar.menuItem.text.order.confirm']}
 						</a>
 					</div>
 					<div style={{ fontSize: '12px' }}>
@@ -62,17 +65,19 @@ const HelperMessageForUser: React.FC = ({
 						<b>Địa điểm: {ele.location}</b>
 					</p>
 					{isOrderSumary && !isUserOrder ? (
-						<Button onClick={(event) => handleConfirmOrder(event, ele)}>Tìm kiếm nhanh</Button>
+						<Button onClick={(event) => handleConfirmOrder(event, ele)}>
+							{L10N['message.avatar.menuItem.button.filter']}
+						</Button>
 					) : null}
 
 					{!isUserOrder ? (
 						ele.status !== 'order_success' && isOrderSumary ? (
 							<span style={{ fontSize: '12px', color: 'red', marginLeft: '10px' }}>
-								Chưa xác nhận
+								{L10N['message.avatar.menuItem.text.not.confirm']}
 							</span>
 						) : (
 							<span style={{ fontSize: '12px', color: 'green', marginLeft: '10px' }}>
-								Đã xác nhận
+								{L10N['message.avatar.menuItem.text.confirm']}
 							</span>
 						)
 					) : null}

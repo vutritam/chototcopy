@@ -74,6 +74,7 @@ const orderSlice = createSlice({
 		dataOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataOrderByNumberTable: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataAllOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
+		dataAllOrderAdmin: { data: null, loading: false, error: '' },
 		idNotiConfirm: [],
 	},
 	reducers: {
@@ -91,6 +92,9 @@ const orderSlice = createSlice({
 			if (!state.idNotiConfirm.includes(newId)) {
 				state.idNotiConfirm.push(newId)
 			}
+		},
+		setAllOrderAdmin: (state, action) => {
+			state.dataAllOrderAdmin.data = action.payload
 		},
 	},
 	extraReducers: (builder) => {
@@ -152,11 +156,23 @@ const orderSlice = createSlice({
 				state.dataAllOrder.loading = false
 				state.dataAllOrder.error = action.error.message || ''
 			})
+			.addCase(fetchAllOrderByUserRole.pending, (state) => {
+				state.dataAllOrderAdmin.loading = true
+			})
+			.addCase(fetchAllOrderByUserRole.fulfilled, (state, action) => {
+				state.dataAllOrderAdmin.loading = false
+				state.dataAllOrderAdmin.data = action.payload
+			})
+			.addCase(fetchAllOrderByUserRole.rejected, (state, action) => {
+				state.dataAllOrderAdmin.loading = false
+				state.dataAllOrderAdmin.error = action.error.message || ''
+			})
 	},
 })
 
 const { reducer, actions } = orderSlice
 
-export const { setOrder, setOrderByNumberTable, setIdNotiConfirm, setAllOrder } = actions
+export const { setOrder, setOrderByNumberTable, setIdNotiConfirm, setAllOrder, setAllOrderAdmin } =
+	actions
 
 export default reducer

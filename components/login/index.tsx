@@ -46,6 +46,7 @@ const LoginForm: React.FC = () => {
 								message: 'Hello from client',
 								location: getUserId?.data?.location,
 								time: new Date(),
+								tableNumber: null,
 								productId: null,
 								userId: getUserId?.data?.userId,
 								isPage: 'admin_page',

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Spin } from 'antd'
 import { io } from 'socket.io-client'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
 	deleteAllRecordOrder,
 	deleteOrder,
@@ -12,7 +12,6 @@ import {
 import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/modalConfirm'
 import CommonTable from '@/components/common/commonTable'
-import { LoadingOutlined } from '@ant-design/icons'
 import { deleteAllRecordNotification } from '@/redux/componentSlice/messageSocketSlice'
 
 interface DataType {
@@ -32,30 +31,19 @@ interface DataType {
 	loading: boolean
 }
 
-// const count = 3
-
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
 	const [open, setOpen] = useState(false)
-	// const dataList = useSelector((state: any) => state.dataOrder?.dataOrder?.data)
 	const dispatch = useDispatch()
-	// const [loading, setLoading] = useState(false)
 	const [idOrder, setIdOrder] = useState(null)
 	const [data, setData] = useState<DataType[]>([])
-	const [list, setList] = useState<DataType[]>([])
+	const list = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const [socket, setSocket] = useState(null)
 	const [refreshPage, setRefresh] = useState(false)
 	const [countOrderDoNotComfirm, setCountOrderDontConfirm] = useState(0)
 
 	const getLocationEmployee =
 		sessionStorage.getItem('user') && JSON.parse(sessionStorage.getItem('user'))
-
-	// let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
-	// const [currentPage, setCurrentPage] = useState(1)
-	let pageSize = 5
-	// const [startIndex, setStartIndex] = useState(0)
-	// const [endIndex, setEndIndex] = useState(pageSize - 1)
-	// useEffect(() => {}, [])
 	useEffect(() => {
 		// setInitLoading(true)
 		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
@@ -85,7 +73,7 @@ const OrderByUser: React.FC = () => {
 				setInitLoading(false)
 				await dispatch(setOrderByNumberTable(payload.data))
 				setData(payload.data)
-				setList(payload.data)
+				// setList(payload.data)
 				setRefresh(false)
 			}
 			// Toasty.error(payload?.message)
@@ -107,34 +95,13 @@ const OrderByUser: React.FC = () => {
 				console.log(response, 'resProductOrder')
 
 				if (item?.location === getLocationEmployee?.data?.location) {
-					setList(response.data)
+					// setList(response.data)
 					await dispatch(setOrderByNumberTable(response.data))
 					setData(response.data)
 				}
 			})
-			// socket.on('resAllOrderByStatus', async (response) => {
-			// 	console.log(response, 'resAllOrderByStatus')
-			// })
 		}
 	}, [socket])
-
-	// const onLoadMore = (page) => {
-	// 	// console.log(page, 'page')
-
-	// 	setLoading(true)
-	// 	setCurrentPage(page)
-	// 	const newStartIndex = (page - 1) * pageSize
-	// 	const newEndIndex = newStartIndex + pageSize - 1
-	// 	const items = list.slice(startIndex, endIndex + 1)
-	// 	// const dataInit = [...list]
-	// 	setStartIndex(newStartIndex)
-	// 	setEndIndex(newEndIndex)
-	// 	if (page !== 1) {
-	// 		setList(items)
-	// 		return
-	// 	}
-	// 	setList(data)
-	// }
 
 	const handleConfirmOrder = async (item) => {
 		if (item) {
@@ -158,9 +125,7 @@ const OrderByUser: React.FC = () => {
 			})
 		)
 		if (payload?.success) {
-			setList(payload.data)
 			setData(payload.data)
-			// setRefresh(false)
 		}
 		Toasty.success(payload?.message)
 	}
@@ -179,24 +144,6 @@ const OrderByUser: React.FC = () => {
 		setOpen(showModal)
 		setIdOrder(id)
 	}
-
-	// const loadMore =
-	// 	!initLoading && !loading ? (
-	// 		<div
-	// 			style={{
-	// 				textAlign: 'right',
-	// 				marginTop: 12,
-	// 				height: 32,
-	// 				lineHeight: '32px',
-	// 			}}
-	// 		>
-	// 			{/* <Affix offsetBottom={150}> */}
-	// 			<Button onClick={onLoadMore} type="primary">
-	// 				loading more
-	// 			</Button>
-	// 			{/* </Affix> */}
-	// 		</div>
-	// 	) : null
 
 	return (
 		<>
@@ -228,53 +175,11 @@ const OrderByUser: React.FC = () => {
 					Delete All Notification
 				</Button>
 			</div>
-			{/* <h3>
-				Số đơn đã xác nhận:{' '}
-				{countOrderDoNotComfirm > 0 ? (
-					<span style={{ color: 'green' }}>{countOrderDoNotComfirm}</span>
-				) : (
-					<Spin indicator={<LoadingOutlined style={{ fontSize: 16, marginLeft: '10px' }} spin />} />
-				)}
-			</h3> */}
 			<CommonTable
-				// item={list}
+				item={list}
 				handleSubmit={handleConfirmDelete}
 				handleConfirmOrder={handleConfirmOrder}
 			/>
-
-			{/* <List
-				className="demo-loadmore-list showScroll"
-				loading={initLoading}
-				itemLayout="horizontal"
-				// header={['name', 'quantity']}
-				// loadMore={loadMore}
-				dataSource={list}
-				renderItem={(item) => (
-					<List.Item
-						actions={[
-							<Button type="dashed" onClick={() => handleConfirmDelete(item._id, true)}>
-								Hủy bỏ
-							</Button>,
-							<Button type="primary">Xác nhận</Button>,
-						]}
-					>
-						<Skeleton avatar title={false} loading={item.loading} active>
-							<List.Item.Meta
-								avatar={
-									<Avatar
-										src={'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'}
-									/>
-								}
-								title={`Bàn số ${item.tableNumber}`}
-								description={item.location}
-							/>
-							<div>{item.productId?.name || 'no data'}</div>
-							<div style={{ marginLeft: '40px' }}>{item.quantity || '0'}</div>
-						</Skeleton>
-					</List.Item>
-				)}
-			/> */}
-			{/* <PaginationCustom data={list.length} pageSize={5} onChangeItem={onLoadMore} /> */}
 		</>
 	)
 }

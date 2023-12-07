@@ -219,20 +219,6 @@ const CommonModal = (props: inputProps): JSX.Element => {
 										.toLowerCase()
 										.localeCompare((optionB?.label ?? '').toLowerCase())
 								}
-								// options={[
-								// 	{
-								// 		value: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
-								// 		label: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
-								// 	},
-								// 	{
-								// 		value: 'Trường chinh, tân bình',
-								// 		label: 'Trường chinh, tân bình',
-								// 	},
-								// 	{
-								// 		value: 'Hóc môn quận 12',
-								// 		label: 'Hóc môn quận 12',
-								// 	},
-								// ]}
 							/>
 						</div>
 						<div style={{ marginTop: 10 }}>

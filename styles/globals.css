@@ -44,6 +44,18 @@
   margin-left: 200px
 
 }
+.custom-container {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+.custom-container-item{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  align-items: center;
+}
 
 .ant-layout.ant-layout-has-sider.active-collapse {
   margin-left: 80px;
