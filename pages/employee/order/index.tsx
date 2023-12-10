@@ -6,6 +6,7 @@ import {
 	deleteAllRecordOrder,
 	deleteOrder,
 	fetchAllOrderByUserRole,
+	fetchOrderByNumberTable,
 	setOrderByNumberTable,
 	updateStatusOrder,
 } from '@/redux/componentSlice/orderSlice'
@@ -40,10 +41,12 @@ const OrderByUser: React.FC = () => {
 	const list = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const [socket, setSocket] = useState(null)
 	const [refreshPage, setRefresh] = useState(false)
-	const [countOrderDoNotComfirm, setCountOrderDontConfirm] = useState(0)
+	const [dummyOrderConfirm, setDummyConfirm] = useState([])
+	const [loadingDataTable, setLoadingDataTable] = useState(false)
 
 	const getLocationEmployee =
 		sessionStorage.getItem('user') && JSON.parse(sessionStorage.getItem('user'))
+
 	useEffect(() => {
 		// setInitLoading(true)
 		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
@@ -69,11 +72,9 @@ const OrderByUser: React.FC = () => {
 
 					0
 				)
-				setCountOrderDontConfirm(filterOrderDoNotComfirm)
 				setInitLoading(false)
 				await dispatch(setOrderByNumberTable(payload.data))
 				setData(payload.data)
-				// setList(payload.data)
 				setRefresh(false)
 			}
 			// Toasty.error(payload?.message)
@@ -89,29 +90,40 @@ const OrderByUser: React.FC = () => {
 
 	useEffect(() => {
 		if (socket) {
-			socket.emit('joinRoom', 'room')
+			socket.emit('joinRoom', `room-${getLocationEmployee.data.location}`)
 			socket.on('resProductOrder', async (response) => {
-				let item = response.data?.find((item) => item?.location)
 				console.log(response, 'resProductOrder')
 
-				if (item?.location === getLocationEmployee?.data?.location) {
-					// setList(response.data)
-					await dispatch(setOrderByNumberTable(response.data))
-					setData(response.data)
-				}
+				await dispatch(setOrderByNumberTable(response))
+				setData(response.data)
 			})
 		}
 	}, [socket])
 
 	const handleConfirmOrder = async (item) => {
 		if (item) {
-			await dispatch(updateStatusOrder({ id: item._id, status: 'order_success' }))
-			if (socket) {
-				// gửi sự kiện get sản phẩm
-				socket.emit('getAllOrderByStatus', {
-					tableNumber: item.tableNumber,
-					location: item.location,
+			setLoadingDataTable(true)
+			const { payload } = await dispatch(
+				updateStatusOrder({ id: item._id, status: 'order_success' })
+			)
+
+			const isIdExists = dummyOrderConfirm.some((order) => order.id === item._id)
+
+			if (!isIdExists) {
+				setDummyConfirm((prevDummy) => {
+					return [...prevDummy, { id: item._id, message: 'đã xác nhận' }]
 				})
+			}
+
+			if (payload.success) {
+				if (socket) {
+					// gửi sự kiện get sản phẩm
+					socket.emit('getAllOrderByStatus', {
+						tableNumber: item.tableNumber,
+						location: item.location,
+					})
+					setLoadingDataTable(false)
+				}
 			}
 		}
 	}
@@ -177,8 +189,10 @@ const OrderByUser: React.FC = () => {
 			</div>
 			<CommonTable
 				item={list}
+				dummyOrderConfirm={dummyOrderConfirm}
 				handleSubmit={handleConfirmDelete}
 				handleConfirmOrder={handleConfirmOrder}
+				loadingDataTable={loadingDataTable}
 			/>
 		</>
 	)

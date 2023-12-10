@@ -76,6 +76,9 @@ const orderSlice = createSlice({
 		dataAllOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataAllOrderAdmin: { data: null, loading: false, error: '' },
 		idNotiConfirm: [],
+		message: { data: [], loading: false, error: '', checkSeen: false }, // 0: options 0 trong menu dropdown client, 1: ...
+		messageEmployee: { data: [], loading: false, error: '', checkSeen: false }, // 0: options 0 trong menu dropdown client, 1: ...
+		messageAdmin: { data: [], loading: false, error: '', checkSeen: false }, // 0: options 0 trong menu dropdown client, 1: ...
 	},
 	reducers: {
 		setOrder: (state, action) => {
@@ -95,6 +98,16 @@ const orderSlice = createSlice({
 		},
 		setAllOrderAdmin: (state, action) => {
 			state.dataAllOrderAdmin.data = action.payload
+		},
+		///// message data slice
+		setMessage: (state, action) => {
+			state.message.data = action.payload
+		},
+		setMessageEmployee: (state, action) => {
+			state.messageEmployee.data = action.payload
+		},
+		setMessageAdmin: (state, action) => {
+			state.messageAdmin.data = action.payload
 		},
 	},
 	extraReducers: (builder) => {
@@ -172,7 +185,15 @@ const orderSlice = createSlice({
 
 const { reducer, actions } = orderSlice
 
-export const { setOrder, setOrderByNumberTable, setIdNotiConfirm, setAllOrder, setAllOrderAdmin } =
-	actions
+export const {
+	setOrder,
+	setOrderByNumberTable,
+	setIdNotiConfirm,
+	setAllOrder,
+	setAllOrderAdmin,
+	setMessage,
+	setMessageEmployee,
+	setMessageAdmin,
+} = actions
 
 export default reducer

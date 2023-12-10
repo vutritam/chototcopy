@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import {
 	DownOutlined,
 	UserOutlined,
@@ -26,13 +26,10 @@ import {
 	fetchMessageByUserRole,
 	fetchMessageConfirmOrderByUser,
 	fetchMessageFromServer,
-	setMessage,
 	setMessageAdmin,
-	setMessageEmployee,
 	updateMessageNotification,
 } from '@/redux/componentSlice/messageSocketSlice'
 import L10N from '../L10N/en.json'
-import { decodeNumber, encodeNumber } from '../common/hashCode'
 import { processRouterQuery } from '../common/parseNumber'
 import moment from 'moment'
 import { io } from 'socket.io-client'
@@ -43,11 +40,11 @@ import {
 	setIdNotiConfirm,
 	setOrderByNumberTable,
 	fetchAllOrder,
+	setMessage,
+	setMessageEmployee,
 } from '@/redux/componentSlice/orderSlice'
-import Toasty from '../common/toasty'
 import { handleTextL10N, sortByStatus } from '../helper/helper'
-import ModalCommonOrderByNumberTable from '../common/modalConfirmOrderByMessage'
-import HelperMessageForUser from './helper/avatarHelper'
+
 import HelperMessageToolTip from './helper/avatarTooltip'
 
 const itemsRender: MenuProps['items'] = [
@@ -85,26 +82,22 @@ const AvatarComponent: React.FC = () => {
 	const isOrderPage = router.pathname.startsWith('/order')
 	const isEmployeePage = router.pathname.startsWith('/employee')
 	//message redux store
-	const message = useSelector((state: any) => state.message?.message?.data)
-	const messageEmployee = useSelector((state: any) => state.message?.messageEmployee?.data)
-	const messageAdmin = useSelector((state: any) => state.message?.messageAdmin?.data)
+	const message = useSelector((state: any) => state.dataOrder?.message?.data)
+	const messageEmployee = useSelector((state: any) => state.dataOrder?.messageEmployee?.data)
+	const messageAdmin = useSelector((state: any) => state.dataOrder?.messageAdmin?.data)
 
 	const [userRequest, setUserRequest] = React.useState('')
-	const [checkMessageByUserRole, setMessageByUserRole] = React.useState(null)
 	const [showMessage, setShowMessage] = React.useState<Boolean>(false)
-	const [countMessage, setCountMessage] = React.useState<Boolean>(0)
-	const [countMessageEmployee, setCountMessageEmployee] = React.useState<Boolean>(0)
+	const [countMessage, setCountMessage] = React.useState<number>(0)
+	const [countMessageEmployee, setCountMessageEmployee] = React.useState<number>(0)
 	const [idCheckConfirm, setCheckConfirm] = React.useState<String>('')
 	const [showMessageEmployee, setShowMessageEmployee] = React.useState<Boolean>(false)
 	const [showMessageAdmin, setShowMessageAdmin] = React.useState<Boolean>(false)
-	const [countMessageAdmin, setCountMessageAdmin] = React.useState<Boolean>(0)
+	const [countMessageAdmin, setCountMessageAdmin] = React.useState<number>(0)
 	const [loadingConfirmOrder, setLoadingConfirmOrder] = React.useState<Boolean>(false)
-	const [convertedValue, setConvertvalue] = React.useState(null)
 	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
 	const [orderSummary, setOrderSummary] = React.useState({})
-	const [dataOrderOrigin, setDataOrderOrigin] = React.useState<Boolean>(0)
-	// const [checkConfirmOrder, setCheckConfirmOrder] = React.useState<Boolean>(false)
 	const [dataLocal, setDataLocal] = React.useState<Object>([
 		{
 			userInfo: {},
@@ -112,7 +105,6 @@ const AvatarComponent: React.FC = () => {
 		},
 	])
 	const [socket, setSocket] = React.useState<any>(null)
-	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 	const elementBellOrder = useRef()
 	const elementBellOrderEmployee = useRef()
 	const elementBellAdmin = useRef()
@@ -252,8 +244,6 @@ const AvatarComponent: React.FC = () => {
 		}
 	}, [router?.query])
 
-	console.log(message, messageEmployee, 'data render')
-
 	useEffect(() => {
 		;(async () => {
 			if (
@@ -264,14 +254,15 @@ const AvatarComponent: React.FC = () => {
 				let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 				if (isOrderPage) {
 					const { payload } = await dispatch(
-						fetchMessageFromServer({
+						fetchAllOrderByNumberTableAndLocationUser({
 							tableNumber: idTable,
 							location: getLocationOrderUser?.location,
-							isPage: 'user_order',
 						})
 					)
+
 					if (payload) {
 						setShowMessage(true)
+						await dispatch(setMessage(payload.data))
 						// setShowMenu(payload.data)
 						setCountMessage(payload.data.length)
 
@@ -281,16 +272,15 @@ const AvatarComponent: React.FC = () => {
 					}
 				} else if (isEmployeePage) {
 					const { payload } = await dispatch(
-						fetchMessageByUserRole({
-							userId: getInforUser?.data?.userId,
-							location: getInforUser?.data?.location,
-							isPage: 'user_order',
+						fetchAllOrder({
+							location: getInforUser?.data.location,
 						})
 					)
 
 					if (payload) {
 						setShowMessageEmployee(true)
 						// setShowMenuEmployee(payload.data)
+						await dispatch(setMessageEmployee(payload.data))
 						setCountMessageEmployee(payload.data.length)
 						setCountMessage(payload.data.length)
 						setTimeout(() => {
@@ -322,8 +312,12 @@ const AvatarComponent: React.FC = () => {
 				)
 			}
 		})()
-	}, [message.data?.length, messageEmployee?.length, messageAdmin?.length, idTable, itemOrder])
-	console.log()
+	}, [
+		JSON.stringify(message),
+		JSON.stringify(messageEmployee),
+		JSON.stringify(messageAdmin),
+		idTable,
+	])
 
 	useEffect(() => {
 		let summary
@@ -343,25 +337,32 @@ const AvatarComponent: React.FC = () => {
 			let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 			let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 			if (socket) {
-				let roomName = `room-${idTable}-${
-					isOrderPage ? getLocationOrderUser?.location : getInforUser.data.location
-				}`
-				console.log(roomName, 'roomName')
-
+				let roomName
+				if (isOrderPage) {
+					roomName = `room-${idTable}-${getLocationOrderUser?.location}`
+				} else {
+					roomName = `room-${getInforUser.data.location}`
+				}
 				socket.emit('joinRoom', roomName)
-				socket.on('responseEmployee', async (response) => {
+				socket.on('response', async (response) => {
 					if (response) {
-						await dispatch(setMessageEmployee(response))
-					}
-				})
-				socket.on('resAllItemNotification', async (response) => {
-					if (response) {
-						setLoadingConfirmOrder(false)
-						setCheckConfirm('')
 						await dispatch(setMessage(response))
+					}
+				})
+				socket.on('responseEmployee', async (response) => {
+					console.log(response, 'socket employee')
+					if (response) {
 						await dispatch(setMessageEmployee(response))
 					}
 				})
+				// socket.on('resAllItemNotification', async (response) => {
+				// 	if (response) {
+				// 		setLoadingConfirmOrder(false)
+				// 		setCheckConfirm('')
+				// 		await dispatch(setMessage(response))
+				// 		await dispatch(setMessageEmployee(response))
+				// 	}
+				// })
 				socket.on('ResponseAfterUserLogin', async (response) => {
 					if (response) {
 						setLoadingConfirmOrder(false)
@@ -508,13 +509,7 @@ const AvatarComponent: React.FC = () => {
 			elementBellAdmin.current && element.classList.remove('bell')
 		}
 		setCountMessage(0)
-
-		// setCheckConfirmOrder(true)
-		await dispatch(
-			updateMessageNotification({
-				checkSeen: params,
-			})
-		)
+		setShowMessage(false)
 	}
 	return (
 		<div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>

@@ -19,7 +19,6 @@ const ListItem: React.FC = () => {
 	const [loading, setLoading] = useState(true)
 	const [dataList, setDataList] = useState([])
 	const dataStore = useSelector((state) => state.products.products.data)
-	console.log(dataStore, 'counter')
 
 	const dispatch = useDispatch()
 	useEffect(() => {

@@ -18,6 +18,8 @@ interface inputProps {
 	handleConfirmOrder?: (Id: any) => void
 	tittle: string
 	item: any
+	loadingDataTable?: boolean
+	dummyOrderConfirm?: any
 }
 
 const data: DataType[] = []
@@ -31,7 +33,7 @@ for (let i = 0; i < 46; i++) {
 }
 
 const CommonTable = (props: inputProps): JSX.Element => {
-	const { handleSubmit, handleConfirmOrder, item } = props
+	const { handleSubmit, handleConfirmOrder, item, loadingDataTable, dummyOrderConfirm } = props
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
 	const [localData, setLocalData] = useState(null)
@@ -126,71 +128,69 @@ const CommonTable = (props: inputProps): JSX.Element => {
 	]
 
 	const handleStatus = (customData: any) => {
-		switch (customData.status) {
-			case 'order_success':
-				return (
-					<Space direction="vertical">
-						<Space
-							style={{
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								textAlign: 'center',
-							}}
-						>
-							<CheckCircleOutlined style={{ color: '#40cf0e', fontSize: ' 18px' }} />
-							<p>Đã xác nhận</p>
-						</Space>
+		const checkConfirmOrder = dummyOrderConfirm.filter((item) => item.id === customData._id)
+		if (customData.status === 'order_success' || checkConfirmOrder.length > 0) {
+			return (
+				<Space direction="vertical">
+					<Space
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							textAlign: 'center',
+						}}
+					>
+						<CheckCircleOutlined style={{ color: '#40cf0e', fontSize: ' 18px' }} />
+						<p>Đã xác nhận</p>
 					</Space>
-				)
-
-			case 'order_failured':
-				return (
-					<Space direction="vertical">
-						<Space
-							style={{
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								textAlign: 'center',
-							}}
-						>
-							<IssuesCloseOutlined style={{ color: '#40cf0e', fontSize: ' 18px' }} />
-							<p>Thất bại</p>
-						</Space>
+				</Space>
+			)
+		} else if (customData.status === 'order_failured') {
+			return (
+				<Space direction="vertical">
+					<Space
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							textAlign: 'center',
+						}}
+					>
+						<IssuesCloseOutlined style={{ color: '#40cf0e', fontSize: ' 18px' }} />
+						<p>Thất bại</p>
 					</Space>
-				)
-			case 'order_deleted':
-				return (
-					<Space direction="vertical">
-						<Space
-							style={{
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								textAlign: 'center',
-							}}
-						>
-							<IssuesCloseOutlined style={{ color: 'rgb(255 0 21)', fontSize: ' 18px' }} />
-							<p>Đã hủy</p>
-						</Space>
+				</Space>
+			)
+		} else if (customData.status === 'order_deleted') {
+			return (
+				<Space direction="vertical">
+					<Space
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							textAlign: 'center',
+						}}
+					>
+						<IssuesCloseOutlined style={{ color: 'rgb(255 0 21)', fontSize: ' 18px' }} />
+						<p>Đã hủy</p>
 					</Space>
-				)
-
-			default:
-				return (
-					<Dropdown.Button
-						menu={{ items }}
-						placement="bottomRight"
-						trigger={['click']}
-						icon={
-							<FormOutlined
-								style={{ fontSize: '20px', display: 'flex' }}
-								onClick={() => setIdItem(customData)}
-							/>
-						}
-					></Dropdown.Button>
-				)
+				</Space>
+			)
+		} else {
+			return (
+				<Dropdown.Button
+					menu={{ items }}
+					placement="bottomRight"
+					trigger={['click']}
+					icon={
+						<FormOutlined
+							style={{ fontSize: '20px', display: 'flex' }}
+							onClick={() => setIdItem(customData)}
+						/>
+					}
+				></Dropdown.Button>
+			)
 		}
 	}
 
@@ -310,6 +310,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			},
 		],
 	}
+	console.log(loadingDataTable, 'loadingDataTable')
 
 	return (
 		<div>
@@ -318,7 +319,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 				rowKey="_id"
 				virtual={true}
 				dataSource={localData}
-				// loading={localData?.length > 0 ? false : true}
+				loading={loadingDataTable}
 				scroll={{ x: 1000, y: 300 }}
 				rowSelection={{ ...rowSelection }}
 				pagination={false}

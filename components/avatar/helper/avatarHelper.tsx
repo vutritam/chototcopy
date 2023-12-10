@@ -13,10 +13,8 @@ interface inputProps {
 
 const HelperMessageForUser = (props: inputProps): JSX.Element => {
 	const { dataMessage, showMessage, orderSummary, handleConfirmOrder, condition } = props
-	const isCheckUserOrderData =
-		condition === 'userOrder' ? sortByStatus(dataMessage?.data, 'order_pending') : dataMessage
+	const isCheckUserOrderData = sortByStatus(dataMessage, 'order_inprogess')
 	const isUserOrder = condition === 'userOrder'
-	console.log(isCheckUserOrderData, 'isCheckUserOrderData')
 
 	return isCheckUserOrderData.length > 0 ? (
 		isCheckUserOrderData.map((ele, index) => {
@@ -26,18 +24,16 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 			return (
 				<Menu.Item key={index} className={`${showMessage ? '' : 'show-readed-message'}`}>
 					<div className="box-message">
-						{ele.status === 'order_pending' &&
-						orderSummary[ele.tableNumber]?.totalOrderedItems !==
-							orderSummary[ele.tableNumber]?.confirmedItems ? (
+						{isOrderSumary ? (
 							<div className="moving-shadow-dot" />
 						) : (
 							<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
 						)}
 						<a style={{ marginLeft: '5px', fontWeight: '600' }}>
-							{ele.status === 'order_pending'
+							{isOrderSumary
 								? !isUserOrder
 									? handleTextL10N(L10N['message.avatar.menuItem.text'], [ele.tableNumber])
-									: ele.message
+									: 'Đang chờ nhân viên xác nhận'
 								: !isUserOrder
 								? L10N['message.avatar.menuItem.text.employee.confirm']
 								: L10N['message.avatar.menuItem.text.order.confirm']}
@@ -71,7 +67,7 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 					) : null}
 
 					{!isUserOrder ? (
-						ele.status !== 'order_success' && isOrderSumary ? (
+						isOrderSumary ? (
 							<span style={{ fontSize: '12px', color: 'red', marginLeft: '10px' }}>
 								{L10N['message.avatar.menuItem.text.not.confirm']}
 							</span>
