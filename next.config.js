@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
-const path = require('path')
+const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
-const nextConfig = {
+
+module.exports = {
   reactStrictMode: true,
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
@@ -10,7 +11,19 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
- 
-}
+  webpack: (config, { isServer }) => {
+    // Chỉ cần cấu hình loader nếu đang chạy trên phía client
+    if (!isServer) {
+      config.module.rules.push({
+        test: /\.(mp3)$/,
+        use: [
+          {
+            loader: 'raw-loader',
+          },
+        ],
+      });
+    }
 
-module.exports = nextConfig
+    return config;
+  },
+};

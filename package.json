@@ -40,9 +40,13 @@
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
     "styled-components": "^5.3.9",
-    "typescript": "5.0.2"
+    "typescript": "5.0.2",
+    "use-sound": "^4.0.1"
   },
   "devDependencies": {
-    "@types/styled-components": "^5.1.26"
+    "@types/styled-components": "^5.1.26",
+    "file-loader": "^6.2.0",
+    "raw-loader": "^4.0.2",
+    "url-loader": "^4.1.1"
   }
 }

@@ -44,6 +44,10 @@ import {
 	setMessageEmployee,
 } from '@/redux/componentSlice/orderSlice'
 import { handleTextL10N, sortByStatus } from '../helper/helper'
+import useSound from 'use-sound'
+const notificationSoundPath = '/sound/am-thanh-thong-bao-messenger-www_hieuung_com.mp3'
+
+// Sử dụng notificationSound như bình thường
 
 import HelperMessageToolTip from './helper/avatarTooltip'
 
@@ -77,6 +81,7 @@ const onSearch = (value: string) => console.log(value)
 const AvatarComponent: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const router = useRouter()
+	// const audio = new Audio(notificationSoundPath)
 	const [idTable, setIdTable] = React.useState<any>(0)
 	const user = useSelector((state: any) => state.user.account.user)
 	const isOrderPage = router.pathname.startsWith('/order')
@@ -108,7 +113,7 @@ const AvatarComponent: React.FC = () => {
 	const elementBellOrder = useRef()
 	const elementBellOrderEmployee = useRef()
 	const elementBellAdmin = useRef()
-
+	const [playNotification, { sound }] = useSound(notificationSoundPath)
 	const handleLogOut = () => {
 		if (sessionStorage.getItem('user') !== null) {
 			sessionStorage.removeItem('user')
@@ -175,21 +180,34 @@ const AvatarComponent: React.FC = () => {
 
 		return summary
 	}
-	useEffect(() => {
-		;(async () => {
-			const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-			const newSocket = io(ENV_HOST)
-			setSocket(newSocket)
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
 
+	let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
+	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
+
+	useEffect(() => {
+		const initSocket = () => {
+			const newSocket = io(ENV_HOST)
+			newSocket.on('connect', () => {
+				console.log('Socket connected')
+			})
+			newSocket.on('disconnect', () => {
+				console.log('Socket disconnected')
+			})
+			setSocket(newSocket)
+		}
+		initSocket()
+	}, [ENV_HOST])
+
+	useEffect(() => {
+		const fetchData = async () => {
 			let obj = {
 				userInfo: {},
 				dataNoti: [],
 			}
 
-			let getDataUserInfo = JSON.parse(sessionStorage.getItem('user'))
-			let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 			if (typeof window !== 'undefined') {
-				obj.userInfo = getDataUserInfo?.data
+				obj.userInfo = getInforUser?.data
 				obj.dataNoti = message
 
 				onSetDataLocal(obj, async ({ userInfo, dataNoti }: propsData) => {
@@ -227,15 +245,12 @@ const AvatarComponent: React.FC = () => {
 			)
 			await dispatch(
 				fetchAllOrder({
-					location: getDataUserInfo?.data.location,
+					location: getInforUser?.data.location,
 				})
 			)
-
-			return () => {
-				newSocket.disconnect()
-			}
-		})()
-	}, [idTable])
+		}
+		fetchData()
+	}, [])
 
 	useEffect(() => {
 		const idTable = processRouterQuery(router?.query)
@@ -246,71 +261,67 @@ const AvatarComponent: React.FC = () => {
 
 	useEffect(() => {
 		;(async () => {
-			if (
-				sessionStorage.getItem('location_user') !== null ||
-				sessionStorage.getItem('user') !== null
-			) {
-				let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
-				let getInforUser = JSON.parse(sessionStorage.getItem('user'))
-				if (isOrderPage) {
-					const { payload } = await dispatch(
-						fetchAllOrderByNumberTableAndLocationUser({
-							tableNumber: idTable,
-							location: getLocationOrderUser?.location,
-						})
-					)
+			if (isOrderPage) {
+				const { payload } = await dispatch(
+					fetchAllOrderByNumberTableAndLocationUser({
+						tableNumber: idTable,
+						location: getLocationOrderUser?.location,
+					})
+				)
 
-					if (payload) {
-						setShowMessage(true)
-						await dispatch(setMessage(payload.data))
-						// setShowMenu(payload.data)
-						setCountMessage(payload.data.length)
+				if (payload) {
+					setShowMessage(true)
+					await dispatch(setMessage(payload.data))
+					// setShowMenu(payload.data)
+					setCountMessage(payload.data.length)
 
-						setTimeout(() => {
-							setShowMessage(false)
-						}, 2000)
-					}
-				} else if (isEmployeePage) {
-					const { payload } = await dispatch(
-						fetchAllOrder({
-							location: getInforUser?.data.location,
-						})
-					)
-
-					if (payload) {
-						setShowMessageEmployee(true)
-						// setShowMenuEmployee(payload.data)
-						await dispatch(setMessageEmployee(payload.data))
-						setCountMessageEmployee(payload.data.length)
-						setCountMessage(payload.data.length)
-						setTimeout(() => {
-							setShowMessageEmployee(false)
-						}, 2000)
-					}
-				} else {
-					const { payload } = await dispatch(
-						fetchMessageByUserRole({
-							userId: getInforUser?.data?.userId,
-							location: getInforUser?.data?.location,
-							isPage: 'admin_page',
-						})
-					)
-					if (payload) {
-						setShowMessageAdmin(true)
-						// setShowMenuAdmin(payload.data)
-						setCountMessage(payload.data.length)
-						setCountMessageAdmin(payload.data.length)
-						setTimeout(() => {
-							setShowMessageAdmin(false)
-						}, 2000)
-					}
+					setTimeout(() => {
+						setShowMessage(false)
+					}, 2000)
 				}
-				await dispatch(
+			} else if (isEmployeePage) {
+				const { payload } = await dispatch(
 					fetchAllOrder({
 						location: getInforUser?.data.location,
 					})
 				)
+
+				if (payload) {
+					setShowMessageEmployee(true)
+					// setShowMenuEmployee(payload.data)
+					await dispatch(setMessageEmployee(payload.data))
+					setCountMessageEmployee(payload.data.length)
+					setCountMessage(payload.data.length)
+					setTimeout(() => {
+						setShowMessageEmployee(false)
+					}, 2000)
+				}
+			} else {
+				const { payload } = await dispatch(
+					fetchMessageByUserRole({
+						userId: getInforUser?.data?.userId,
+						location: getInforUser?.data?.location,
+						isPage: 'admin_page',
+					})
+				)
+				if (payload) {
+					setShowMessageAdmin(true)
+					// setShowMenuAdmin(payload.data)
+					setCountMessage(payload.data.length)
+					setCountMessageAdmin(payload.data.length)
+					setTimeout(() => {
+						setShowMessageAdmin(false)
+					}, 2000)
+				}
 			}
+			await dispatch(
+				fetchAllOrder({
+					location: getInforUser?.data.location,
+				})
+			)
+
+			// playNotification()
+			// playNotification()
 		})()
 	}, [
 		JSON.stringify(message),
@@ -330,54 +341,51 @@ const AvatarComponent: React.FC = () => {
 	}, [itemOrder, itemAllOrder])
 
 	useEffect(() => {
-		if (
-			sessionStorage.getItem('location_user') !== null ||
-			sessionStorage.getItem('user') !== null
-		) {
-			let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
-			let getInforUser = JSON.parse(sessionStorage.getItem('user'))
-			if (socket) {
-				let roomName
-				if (isOrderPage) {
-					roomName = `room-${idTable}-${getLocationOrderUser?.location}`
-				} else {
-					roomName = `room-${getInforUser.data.location}`
-				}
-				socket.emit('joinRoom', roomName)
-				socket.on('response', async (response) => {
-					if (response) {
-						await dispatch(setMessage(response))
-					}
-				})
-				socket.on('responseEmployee', async (response) => {
-					console.log(response, 'socket employee')
-					if (response) {
-						await dispatch(setMessageEmployee(response))
-					}
-				})
-				// socket.on('resAllItemNotification', async (response) => {
-				// 	if (response) {
-				// 		setLoadingConfirmOrder(false)
-				// 		setCheckConfirm('')
-				// 		await dispatch(setMessage(response))
-				// 		await dispatch(setMessageEmployee(response))
-				// 	}
-				// })
-				socket.on('ResponseAfterUserLogin', async (response) => {
-					if (response) {
-						setLoadingConfirmOrder(false)
-						setCheckConfirm('')
-						await dispatch(setMessageAdmin(response))
-					}
-				})
-				socket.on('resAllOrderByStatus', async (response) => {
-					if (response) {
-						await dispatch(setOrderByNumberTable(response))
-					}
-				})
+		if (socket) {
+			let roomName
+			if (isOrderPage) {
+				roomName = `room-${idTable}-${getLocationOrderUser?.location}`
+			} else {
+				roomName = `room-${getInforUser?.data?.location}`
 			}
+			socket.emit('joinRoom', roomName)
+			socket.on('response', async (response) => {
+				if (response) {
+					await dispatch(setMessage(response))
+				}
+				playNotification()
+			})
+			socket.on('responseEmployee', async (response) => {
+				if (response) {
+					await dispatch(setMessageEmployee(response))
+				}
+				playNotification()
+			})
+			// socket.on('resAllItemNotification', async (response) => {
+			// 	if (response) {
+			// 		setLoadingConfirmOrder(false)
+			// 		setCheckConfirm('')
+			// 		await dispatch(setMessage(response))
+			// 		await dispatch(setMessageEmployee(response))
+			// 	}
+			// })
+			socket.on('ResponseAfterUserLogin', async (response) => {
+				if (response) {
+					setLoadingConfirmOrder(false)
+					setCheckConfirm('')
+					await dispatch(setMessageAdmin(response))
+				}
+				playNotification()
+			})
+			socket.on('resAllOrderByStatus', async (response) => {
+				if (response) {
+					await dispatch(setOrderByNumberTable(response))
+				}
+			})
 		}
-	}, [socket])
+
+		// playNotification()
+	}, [socket, getLocationOrderUser, getInforUser])
 
 	const handleConfirmOrder = async (event, item: any) => {
 		event.stopPropagation()
@@ -387,6 +395,7 @@ const AvatarComponent: React.FC = () => {
 		await dispatch(
 			fetchOrderByNumberTable({
 				tableNumber: item.tableNumber,
+				location: getInforUser?.data?.location,
 			})
 		)
 	}
