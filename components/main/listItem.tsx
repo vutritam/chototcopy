@@ -6,34 +6,66 @@ import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '../common/toasty'
+import { createLikeAndDisLike, fetchAllLikeAndDisLike } from '@/redux/componentSlice/likeSlice'
 
-const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
-	<Space>
-		{React.createElement(icon)}
-		{text}
-	</Space>
-)
+const IconText = ({
+	icon,
+	text,
+	color,
+	onClick,
+}: {
+	icon: React.FC
+	text: string
+	color: string
+	onClick: () => void
+}) => {
+	return (
+		<Space onClick={onClick}>
+			{React.createElement(icon, { style: { color: color } })}
+			{text}
+		</Space>
+	)
+}
 
 const ListItem: React.FC = () => {
 	let router = useRouter()
 	const [loading, setLoading] = useState(true)
+	const [backGroundclickedLike, setBackGroundAfterClick] = useState([])
 	const [dataList, setDataList] = useState([])
 	const dataStore = useSelector((state) => state.products.products.data)
-
+	let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 	const dispatch = useDispatch()
+
 	useEffect(() => {
 		setLoading(true)
 		;(async () => {
-			const { payload } = await dispatch(fetchAllProduct())
-			if (payload?.success) {
+			const allProduct = await dispatch(fetchAllProduct())
+			if (allProduct?.payload?.success) {
 				setLoading(false)
 				// setTimeout(() => {
 				// 	setLoading(false)
-				setDataList(payload.data)
+				setDataList(allProduct?.payload.data)
+
 				// }, 1000)
 				// Toasty.error('Network and proplem when call data from server')
-				return
 			}
+			// const allLikeProduct = await dispatch(fetchAllLikeAndDisLike())
+			// if (allLikeProduct?.payload?.status) {
+			// 	allLikeProduct?.payload?.data?.map((item, index) => {
+			// 		console.log(item, 'item all like')
+
+			// 		const exists = backGroundclickedLike.some((obj) => obj.id === item._id)
+			// 		if (!exists) {
+			// 			setBackGroundAfterClick([
+			// 				...backGroundclickedLike,
+			// 				{
+			// 					id: item.productId,
+			// 					isClicked: item.like === 1 ? true : false,
+			// 				},
+			// 			])
+			// 		}
+			// 	})
+			// }
 		})()
 	}, [])
 
@@ -50,6 +82,37 @@ const ListItem: React.FC = () => {
 		}, 1000)
 	}, [dataStore])
 	// console.log(dataList, 'dataList')
+
+	// const handleClickLike = async (item, fieldName) => {
+	// 	let data
+	// 	if (fieldName === 'like') {
+	// 		data = {
+	// 			productId: item.id,
+	// 			like: 1,
+	// 			location: getLocationOrderUser?.location,
+	// 			tableNumber: getLocationOrderUser?.tableNumber,
+	// 		}
+	// 	} else {
+	// 		data = {
+	// 			productId: item.id,
+	// 			location: getLocationOrderUser?.location,
+	// 			tableNumber: getLocationOrderUser?.tableNumber,
+	// 			dislike: 1,
+	// 		}
+	// 	}
+	// 	const allLikeProduct = await dispatch(fetchAllLikeAndDisLike())
+	// 	if (allLikeProduct?.payload?.status) {
+	// 		const existsItemDB = allLikeProduct?.payload?.data?.some((obj) => obj.id === item.id)
+	// 		if (existsItemDB && !!data.like) {
+	// 			const { payload } = await dispatch(updateLikeAndDisLike({ ...data, like: 0 }))
+	// 		} else {
+	// 			const { payload } = await dispatch(createLikeAndDisLike(data))
+	// 		}
+
+	// 		setBackGroundAfterClick([...backGroundclickedLike, { id: item.id, isClicked: true }])
+	// 	}
+	// }
+	// console.log(backGroundclickedLike, 'background')
 
 	return (
 		<>
@@ -105,7 +168,17 @@ const ListItem: React.FC = () => {
 							key={item.id}
 							actions={[
 								<IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-								<IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
+								// <IconText
+								// 	color={
+								// 		backGroundclickedLike.find((ele, index) => ele.id === item.id && ele.isClicked)
+								// 			? 'blue'
+								// 			: ''
+								// 	}
+								// 	icon={LikeOutlined}
+								// 	text="156"
+								// 	onClick={() => handleClickLike(item, 'like')}
+								// 	key="list-vertical-like-o"
+								// />,
 								<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
 								router.pathname.includes('/order') ? (
 									<CommonModal tittle="Xác nhận chọn món này ?" label="chọn ngay" item={item} />
@@ -139,7 +212,9 @@ const ListItem: React.FC = () => {
 								description={
 									<span>
 										Giá:
-										<b style={{ color: 'blue', marginLeft: '10px' }}>{item.price}</b>
+										<span style={{ color: 'blue', marginLeft: '10px' }}>
+											<span className="strike-through-bold">{item.price}</span>
+										</span>
 									</span>
 								}
 							/>

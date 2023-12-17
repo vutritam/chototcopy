@@ -135,17 +135,45 @@
   position: relative;
   animation: moveShadow 2s infinite linear; /* Hiệu ứng chuyển động trong 2 giây, lặp vô hạn, chuyển động đều */
 }
+.strike-through-bold {
+  text-decoration: line-through;
+  font-weight: bold;
+}
+/* styles.css */
+.marquee-container {
+  width: 100%; /* Chiều rộng của container */
+  overflow: hidden; /* Ẩn phần vượt quá chiều rộng của container */
+  background: white;
+}
+
+.marquee-content {
+  display: inline-block; /* Hiển thị văn bản theo chiều ngang */
+  white-space: nowrap; /* Không ngắt dòng */
+  animation: marquee 15s linear infinite; /* Áp dụng animation */
+  color: #ff5500de;
+  font-weight: bold;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%); /* Di chuyển văn bản từ phải sang trái */
+  }
+}
+
 @keyframes moveShadowbtn {
   0% {
-     background-color: rgb(191, 241, 191);
+     background-color: rgb(191, 229, 241);
     box-shadow: 0 10px 10px rgb(221, 226, 247); /* Bắt đầu với một đổ bóng đậm hơn */
   }
   50% {
     background-color: rgb(128, 193, 253);
-    box-shadow: 0 0 5px rgba(121, 210, 245, 0.9), 0 0 10px rgba(155, 0, 0, 2); /* Trong giữa, có một đổ bóng lớn và đậm hơn */
+    box-shadow: 0 0 5px rgba(121, 210, 245, 0.9), 0 0 10px rgb(0 108 155) /* Trong giữa, có một đổ bóng lớn và đậm hơn */
   }
   100% {
-    box-shadow: 0 0 20px rgba(173, 210, 235, 0.9) /* Kết thúc với một đổ bóng đậm hơn */
+    box-shadow: 0 0 20px rgba(220, 235, 245, 0.9) /* Kết thúc với một đổ bóng đậm hơn */
   }
 }
 

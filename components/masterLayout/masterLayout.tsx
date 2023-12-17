@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Breadcrumb, Layout, Space, Spin, theme } from 'antd'
 import { SideBar } from '../siderBar/siderBar'
+
 const { Header, Content, Footer } = Layout
 import AvatarComponent from '../avatar/avatar'
 import { useRouter } from 'next/router'
 import ComfirmLocationOrder from '../common/confirmLocation'
+import { useSelector } from 'react-redux'
 
 type MyComponentProps = {
 	children: React.ReactNode
@@ -24,7 +26,13 @@ const MasterLayout: React.FC<MyComponentProps> = ({
 	const [collapsed, setCollapsed] = useState(false)
 	const [triggerWidthSiderBar, setTriggerWidth] = useState(0)
 	const [openShowConfirmLocation, setShowConfirmLocation] = useState(false)
+	const [dataTotalOrderAndConfirm, setDataTotalOrderAndConfirm] = useState({
+		totalOrderedItems: 0,
+		confirmedItems: 0,
+	})
 	const [loading, setLoading] = useState(false)
+
+	//message redux store
 	const {
 		token: { colorBgContainer },
 	} = theme.useToken()
@@ -80,7 +88,12 @@ const MasterLayout: React.FC<MyComponentProps> = ({
 						paddingInline: collapsed ? '0px' : '',
 					}}
 				>
-					{collapsed && <b style={{ color: 'blue' }}>GOLD COFFEE</b>}
+					{collapsed ? (
+						<div>
+							<b style={{ color: 'blue' }}>GOLD COFFEE</b>
+						</div>
+					) : null}
+
 					<AvatarComponent />
 				</Header>
 				<Content style={{ margin: '0 16px' }}>
@@ -88,6 +101,7 @@ const MasterLayout: React.FC<MyComponentProps> = ({
 						<Breadcrumb.Item>User</Breadcrumb.Item>
 						<Breadcrumb.Item>Quản lí ca</Breadcrumb.Item>
 					</Breadcrumb>
+
 					<div
 						style={{
 							position: 'relative',

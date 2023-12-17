@@ -1,35 +1,39 @@
 import { Avatar, List } from 'antd'
 import React from 'react'
 
-const data = [
-	{
-		title: 'Ant Design Title 1',
-	},
-	{
-		title: 'Ant Design Title 2',
-	},
-	{
-		title: 'Ant Design Title 3',
-	},
-	{
-		title: 'Ant Design Title 4',
-	},
-]
+const ListUser: React.FC = (props) => {
+	const { data } = props
 
-const ListUser: React.FC = () => (
-	<List
-		itemLayout="horizontal"
-		dataSource={data}
-		renderItem={(item, index) => (
-			<List.Item>
-				<List.Item.Meta
-					avatar={<Avatar src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`} />}
-					title={<a href="https://ant.design">{item.title}</a>}
-					description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-				/>
-			</List.Item>
-		)}
-	/>
-)
+	return (
+		<List
+			loading={data?.length > 0 ? false : true}
+			itemLayout="horizontal"
+			dataSource={data}
+			renderItem={(item, index) => (
+				<List.Item>
+					<List.Item.Meta
+						avatar={
+							<Avatar
+								src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item?.productId?.file}`}
+							/>
+						}
+						title={<a href="https://ant.design">{item.productId.name}</a>}
+						description={
+							<>
+								<p>{item?.productId?.Description}</p>
+								<span>
+									Giá:
+									<span style={{ color: 'blue', marginLeft: '10px' }}>
+										<span className="strike-through-bold">{item.productId.price}</span>
+									</span>
+								</span>
+							</>
+						}
+					/>
+				</List.Item>
+			)}
+		/>
+	)
+}
 
 export default ListUser

@@ -202,13 +202,11 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			fixed: 'left',
 			sorter: true,
 			width: 100,
-			// responsive: ['sm'],
 		},
 		{
 			title: 'Địa điểm',
 			dataIndex: 'customData',
 			key: 'location',
-			// fixed: 'left',
 			sorter: true,
 			render: (customData) => (
 				<div
@@ -218,13 +216,11 @@ const CommonTable = (props: inputProps): JSX.Element => {
 					{customData?.location}
 				</div>
 			),
-			// responsive: ['sm'],
 		},
 		{
 			title: 'Tên món',
 			dataIndex: 'customData',
 			key: 'productId',
-			// fixed: 'left',
 			sorter: true,
 			render: (customData) => (
 				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -243,14 +239,12 @@ const CommonTable = (props: inputProps): JSX.Element => {
 					/>
 				</div>
 			),
-			// responsive: ['sm'],
 		},
 		{
 			title: 'Số lượng',
 			dataIndex: 'quantity',
 			key: 'quantity',
 			width: 120,
-			// fixed: 'left',
 			sorter: true,
 		},
 
@@ -259,7 +253,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			dataIndex: 'description',
 			key: 'description',
 			width: 150,
-			// fixed: 'left',
 			sorter: true,
 		},
 		{
@@ -268,7 +261,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			key: 'operation',
 			fixed: 'right',
 			width: 150,
-			// responsive: ['sm'],
 			render: (customData) => handleStatus(customData),
 		},
 	]
@@ -310,7 +302,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			},
 		],
 	}
-	console.log(loadingDataTable, 'loadingDataTable')
 
 	return (
 		<div>
@@ -329,8 +320,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 						background: showRedBackground && index === 0 ? '#92d7e7' : '',
 					},
 				})}
-
-				// onRow={rowRender}
 			/>
 		</div>
 	)

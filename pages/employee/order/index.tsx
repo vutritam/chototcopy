@@ -14,6 +14,8 @@ import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/modalConfirm'
 import CommonTable from '@/components/common/commonTable'
 import { deleteAllRecordNotification } from '@/redux/componentSlice/messageSocketSlice'
+import BillExport from '@/components/common/commonBillExport'
+import CartItem from '@/components/main/cartItem'
 
 interface DataType {
 	gender?: string
@@ -187,6 +189,8 @@ const OrderByUser: React.FC = () => {
 					Delete All Notification
 				</Button>
 			</div>
+			<CartItem className="exportBill" />
+
 			<CommonTable
 				item={list}
 				dummyOrderConfirm={dummyOrderConfirm}

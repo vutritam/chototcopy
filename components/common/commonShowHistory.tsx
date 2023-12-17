@@ -32,10 +32,6 @@ const CommonShowHistory = (props: inputProps): JSX.Element => {
 	const isOrderPage = router.pathname.startsWith('/order')
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
-	// const [dataInput, setDataInput] = useState({
-	// 	quantity: 1,
-	// 	location: '',
-	// })
 	const [isExpanded, setExpanded] = React.useState(false)
 	let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
 	const dispatch = useDispatch()
@@ -48,23 +44,6 @@ const CommonShowHistory = (props: inputProps): JSX.Element => {
 			{text}
 		</Space>
 	)
-
-	// const [socket, setSocket] = useState(null)
-
-	// useEffect(() => {
-	// 	const newSocket = io('http://localhost:3500')
-	// 	setSocket(newSocket)
-
-	// 	return () => {
-	// 		newSocket.disconnect()
-	// 	}
-	// }, [])
-
-	// useEffect(() => {
-	// 	// setLoading(true)
-	// 	const convertedValue = processRouterQuery(router?.query)
-	// 	setIdTable(convertedValue)
-	// }, [router?.query])
 
 	const handleOk = () => {}
 
@@ -139,13 +118,6 @@ const CommonShowHistory = (props: inputProps): JSX.Element => {
 	}
 	// --------------- end handle common filter---------------
 
-	// const onChangeQuantity = (value: any) => {
-	// 	// setDataInput({ ...dataInput, quantity: value })
-	// }
-	// const onChangeLocation = (label: any) => {
-	// 	// setDataInput({ ...dataInput, location: label })
-	// }
-
 	return (
 		<>
 			<Button type="primary" onClick={showModal}>
@@ -190,9 +162,6 @@ const CommonShowHistory = (props: inputProps): JSX.Element => {
 					<b>Lịch sử hoạt động</b>
 				</div>
 				<div style={{ maxHeight: '400px', overflow: 'auto' }}>
-					{/* <CommonCollapseItem isActive={isExpanded} />
-					<CommonCollapseItem isActive={isExpanded} /> */}
-					{/* <CommonCollapseItem isActive={isExpanded} /> */}
 					<div>
 						<div
 							style={{

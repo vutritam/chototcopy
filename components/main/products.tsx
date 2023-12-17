@@ -1,12 +1,19 @@
 import * as React from 'react'
 import ListItem from './listItem'
-import { FilterOutlined, FileSearchOutlined, DeleteOutlined, StopOutlined } from '@ant-design/icons'
+import {
+	FilterOutlined,
+	FileSearchOutlined,
+	DeleteOutlined,
+	StopOutlined,
+	FireFilled,
+} from '@ant-design/icons'
 import { Button, Dropdown, Space, Tooltip } from 'antd'
 import type { MenuProps } from 'antd'
 import CommonFilter from '../common/commonFilter'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct, fetchProductByFilterCondition } from '@/redux/componentSlice/productSlice'
 import Toasty from '../common/toasty'
+import { useRouter } from 'next/router'
 export interface IAppProps {}
 
 export default function Products(props: IAppProps) {
@@ -18,6 +25,7 @@ export default function Products(props: IAppProps) {
 	// 	comparition: '=',
 	// 	dateTime: '',
 	// })
+	const router = useRouter()
 	const initItem = {
 		name: 'all',
 		price: 'all',
@@ -30,41 +38,13 @@ export default function Products(props: IAppProps) {
 	const [showCancelTooltip, setCancelTooltip] = React.useState(false)
 	const [itemFilterValueChecked, setItemFilterValueChecked] = React.useState(initItem)
 	const [disableFilter, setDisableFilter] = React.useState(true)
+	const [allProduct, setAllProduct] = React.useState([])
 
 	const handleFilterItem = (fieldName, value) => {
 		setItemFilterValueChecked({ ...itemFilterValueChecked, [fieldName]: value })
 		setDisableFilter(false)
 	}
-	// const handleSelectedItemValue = (field, value) => {
-	// 	console.log(value, 'value')
-	// }
 
-	// const itemsFilter: MenuProps['items'] = [
-	// 	{
-	// 		key: '1',
-	// 		label: (
-	// 			<p value={1} onClick={(e) => handleFilterItem('name', e.target.innerText)}>
-	// 				Tên
-	// 			</p>
-	// 		),
-	// 	},
-	// 	{
-	// 		key: '2',
-	// 		label: (
-	// 			<p value={1} onClick={(e) => handleFilterItem('price', e.target.innerText)}>
-	// 				Giá
-	// 			</p>
-	// 		),
-	// 	},
-	// 	{
-	// 		key: '3',
-	// 		label: (
-	// 			<p value={1} onClick={(e) => handleFilterItem('orther', e.target.innerText)}>
-	// 				Loại
-	// 			</p>
-	// 		),
-	// 	},
-	// ]
 	const itemsFilterValue0: MenuProps['items'] = [
 		{
 			key: '1',
@@ -196,21 +176,16 @@ export default function Products(props: IAppProps) {
 			}, 2000)
 		}
 	}, [itemFilterChecked])
-	// const handleRenderValue = (value: Number) => {
-	// 	switch (value) {
-	// 		case 1:
-	// 			return renderItemSelected(itemsFilterValue1, state.name, 'name')
+	React.useEffect(() => {
+		const fetchData = async () => {
+			const { payload } = await dispatch(fetchAllProduct())
+			if (payload.success) {
+				setAllProduct(payload.data)
+			}
+		}
+		fetchData()
+	}, [])
 
-	// 		case 2:
-	// 			return renderItemSelected(itemsFilterValue2, state.price, 'price')
-
-	// 		case 3:
-	// 			return renderItemSelected(itemsFilterValue3, state.orther, 'orther')
-
-	// 		default:
-	// 			break
-	// 	}
-	// }
 	const handleSelectedFilterItem = (value: boolean) => {
 		setItemFilter(!itemFilterChecked)
 	}
@@ -228,34 +203,52 @@ export default function Products(props: IAppProps) {
 	// 	handleChecked(itemFilterChecked)
 	// }, [itemFilterChecked])
 	const dispatch = useDispatch()
+	const isOrderPage = router.pathname.startsWith('/order')
+	const [dataTotalOrderAndConfirm, setDataTotalOrderAndConfirm] = React.useState({
+		totalOrderedItems: 0,
+		confirmedItems: 0,
+	})
+	//message redux store
+	const dataOrderByNumberTable = useSelector(
+		(state: any) => state.dataOrder?.dataOrderByNumberTable?.data
+	)
+	React.useEffect(() => {
+		let sessionOrder = JSON.parse(sessionStorage.getItem('warning_text_order') || '')
+		console.log('getTotalOrder changed:', sessionOrder)
+		setDataTotalOrderAndConfirm({
+			totalOrderedItems: sessionOrder.totalOrderedItems,
+			confirmedItems: sessionOrder.confirmedItems,
+		})
+	}, [JSON.stringify(dataOrderByNumberTable)])
 	const handleSubmit = async () => {
 		const { payload } = await dispatch(fetchProductByFilterCondition(itemFilterValueChecked))
 		if (!payload?.success) {
 			Toasty.error('Network and proplem when call data from server')
 		}
-
-		// console.log(payload, 'payload')
-
-		// // [itemFilterValueChecked].map((item,index)=>[
-		// // 	'Chọn tên',
-		// // 	'Chọn giá',
-		// // 	'Chọn đồ ăn vặt',
-		// // 	'Và',
-		// // 	'=',
-		// // 	itemFilterValueChecked.dateTime,
-		// // ].includes(item)? )
 	}
 	const handleClearFilter = async () => {
 		const { payload } = await dispatch(fetchAllProduct())
 		if (!payload?.success) {
 			Toasty.error('Network and proplem when call data from server')
 		}
+
 		setItemFilterValueChecked(initItem)
 		setDisableFilter(true)
 	}
 
 	return (
 		<div>
+			{isOrderPage &&
+			dataTotalOrderAndConfirm.confirmedItems !== dataTotalOrderAndConfirm.totalOrderedItems ? (
+				<div className="marquee-container screen-mobile">
+					<div className="marquee-content">
+						<span style={{ color: 'yellow', marginRight: '5px' }}>
+							<FireFilled color="yellow" />
+						</span>
+						{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${dataTotalOrderAndConfirm.totalOrderedItems} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
+					</div>
+				</div>
+			) : null}
 			<div
 				className="catelories"
 				style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '10px' }}
@@ -277,8 +270,22 @@ export default function Products(props: IAppProps) {
 					)}
 				</Space>
 				<Space wrap>
-					<b style={{ fontSize: '17px' }}>Danh mục sản phẩm (100)</b>
+					<div style={{ width: '220px' }}>
+						<b style={{ fontSize: '17px' }}>Danh mục sản phẩm ({allProduct.length})</b>
+					</div>
 				</Space>
+
+				{isOrderPage &&
+				dataTotalOrderAndConfirm.confirmedItems !== dataTotalOrderAndConfirm.totalOrderedItems ? (
+					<div className="marquee-container show-desktop-menu">
+						<div className="marquee-content">
+							<span style={{ color: 'yellow', marginRight: '5px' }}>
+								<FireFilled color="yellow" />
+							</span>
+							{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${dataTotalOrderAndConfirm.totalOrderedItems} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
+						</div>
+					</div>
+				) : null}
 			</div>
 			<Space className="filter-mobile">
 				{itemFilterChecked ? (

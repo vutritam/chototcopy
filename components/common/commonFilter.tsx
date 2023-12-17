@@ -1,6 +1,4 @@
 import { Button, Dropdown, Menu, Space } from 'antd'
-import InputDateTime from './inputDateTime'
-import { useEffect, useState } from 'react'
 
 const CommonFilter: React.FC = ({ items, state, fieldName, handleLocationChange }) => {
 	// const [labelAll, setLableAll] = useState(state === 'Tất cả' ? 'all' : state)
@@ -26,7 +24,6 @@ const CommonFilter: React.FC = ({ items, state, fieldName, handleLocationChange 
 						))}
 					</Menu>
 				)
-				// )}
 			}}
 		>
 			<Button style={{ width: '100%' }}>{state !== 'all' ? state : 'Tất cả'}</Button>

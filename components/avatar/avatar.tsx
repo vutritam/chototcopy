@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
 	DownOutlined,
 	UserOutlined,
@@ -8,8 +8,6 @@ import {
 	DownCircleOutlined,
 	BellOutlined,
 	EnvironmentOutlined,
-	InfoCircleOutlined,
-	PoweroffOutlined,
 } from '@ant-design/icons'
 import { Avatar, Badge, Button, Menu, MenuProps } from 'antd'
 import { Dropdown, Space, Input, Tooltip } from 'antd'
@@ -22,13 +20,7 @@ import _ from 'lodash'
 import Link from 'next/link'
 import { fetchUserById } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
-import {
-	fetchMessageByUserRole,
-	fetchMessageConfirmOrderByUser,
-	fetchMessageFromServer,
-	setMessageAdmin,
-	updateMessageNotification,
-} from '@/redux/componentSlice/messageSocketSlice'
+import { fetchMessageByUserRole, setMessageAdmin } from '@/redux/componentSlice/messageSocketSlice'
 import L10N from '../L10N/en.json'
 import { processRouterQuery } from '../common/parseNumber'
 import moment from 'moment'
@@ -36,14 +28,13 @@ import { io } from 'socket.io-client'
 import {
 	fetchAllOrderByNumberTableAndLocationUser,
 	fetchOrderByNumberTable,
-	fetchOrderByNumberTableAndLocation,
 	setIdNotiConfirm,
 	setOrderByNumberTable,
 	fetchAllOrder,
 	setMessage,
 	setMessageEmployee,
 } from '@/redux/componentSlice/orderSlice'
-import { handleTextL10N, sortByStatus } from '../helper/helper'
+import { handleTextL10N } from '../helper/helper'
 import useSound from 'use-sound'
 const notificationSoundPath = '/sound/am-thanh-thong-bao-messenger-www_hieuung_com.mp3'
 
@@ -100,6 +91,7 @@ const AvatarComponent: React.FC = () => {
 	const [showMessageAdmin, setShowMessageAdmin] = React.useState<Boolean>(false)
 	const [countMessageAdmin, setCountMessageAdmin] = React.useState<number>(0)
 	const [loadingConfirmOrder, setLoadingConfirmOrder] = React.useState<Boolean>(false)
+	const [isOrderConfirmed, setIsOrderConfirmed] = React.useState<boolean>(false)
 	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
 	const [orderSummary, setOrderSummary] = React.useState({})
@@ -114,6 +106,10 @@ const AvatarComponent: React.FC = () => {
 	const elementBellOrderEmployee = useRef()
 	const elementBellAdmin = useRef()
 	const [playNotification, { sound }] = useSound(notificationSoundPath)
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+
+	let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
+	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 	const handleLogOut = () => {
 		if (sessionStorage.getItem('user') !== null) {
 			sessionStorage.removeItem('user')
@@ -174,16 +170,21 @@ const AvatarComponent: React.FC = () => {
 		const summary = _.mapValues(groupedOrders, (tableOrders) => {
 			const totalOrderedItems = tableOrders.length
 			const confirmedItems = tableOrders.filter((order) => order.status === 'order_success').length
-
+			if (totalOrderedItems !== confirmedItems) {
+				setIsOrderConfirmed(true)
+			}
+			sessionStorage.setItem(
+				'warning_text_order',
+				JSON.stringify({
+					totalOrderedItems: totalOrderedItems,
+					confirmedItems: confirmedItems,
+				})
+			)
 			return { totalOrderedItems, confirmedItems }
 		})
 
 		return summary
 	}
-	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-
-	let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
-	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 
 	useEffect(() => {
 		const initSocket = () => {
@@ -198,6 +199,25 @@ const AvatarComponent: React.FC = () => {
 		}
 		initSocket()
 	}, [ENV_HOST])
+	// useEffect để theo dõi sự thay đổi của orderConfirmed
+	useEffect(() => {
+		const handleBeforeUnload = (event) => {
+			if (isOrderConfirmed) {
+				const message =
+					'Bạn có chắc muốn đóng trang web? Tất cả các món chưa được xác nhận sẽ bị mất.'
+				event.returnValue = message // Cho các trình duyệt cũ
+				return message // Cho các trình duyệt mới
+			}
+		}
+
+		// Thêm event listener khi component được mount
+		window.addEventListener('beforeunload', handleBeforeUnload)
+
+		// Clean up để tránh memory leaks khi component unmount
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload)
+		}
+	}, [isOrderConfirmed])
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -319,9 +339,6 @@ const AvatarComponent: React.FC = () => {
 					location: getInforUser?.data.location,
 				})
 			)
-
-			// playNotification()
-			// playNotification()
 		})()
 	}, [
 		JSON.stringify(message),
@@ -361,14 +378,6 @@ const AvatarComponent: React.FC = () => {
 				}
 				playNotification()
 			})
-			// socket.on('resAllItemNotification', async (response) => {
-			// 	if (response) {
-			// 		setLoadingConfirmOrder(false)
-			// 		setCheckConfirm('')
-			// 		await dispatch(setMessage(response))
-			// 		await dispatch(setMessageEmployee(response))
-			// 	}
-			// })
 			socket.on('ResponseAfterUserLogin', async (response) => {
 				if (response) {
 					setLoadingConfirmOrder(false)
@@ -520,6 +529,7 @@ const AvatarComponent: React.FC = () => {
 		setCountMessage(0)
 		setShowMessage(false)
 	}
+
 	return (
 		<div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>
 			<div

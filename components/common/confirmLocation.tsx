@@ -3,9 +3,6 @@ import { Button, Modal, Select, Space } from 'antd'
 import { useDispatch } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { fetchAllOrderByNumberTableAndLocationUser } from '@/redux/componentSlice/orderSlice'
-// import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
-// import Toasty from './toasty'
-// import { Label } from 'semantic-ui-react'
 interface inputProps {
 	label?: string
 	tittle?: string
@@ -33,21 +30,7 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 				location: dataInput.location,
 			})
 		)
-		// setModalText('The modal will be closed after two seconds')
-		// setConfirmLoading(true)
-		// setTimeout(() => {
-		// 	setOpen(false)
-		// 	setConfirmLoading(false)
-		// 	// Toasty.success('Đặt món thành công')
-		// 	if (socket) {
-		// 		// Gửi sự kiện tới Socket.IO server
-		// 		socket.emit('myEvent', { message: 'Hello from client' })
-		// 		socket.on('response', async (response) => {
-		// 			await dispatch(setMessage(response))
-		// 			console.log('Received response:', response)
-		// 		})
-		// 	}
-		// }, 2000)
+		window.location.reload()
 	}
 	const onChangeLocation = useCallback(
 		(label: any) => {

@@ -76,29 +76,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 			description: '',
 		})
 		setConfirmLoading(false)
-
-		// const { payload } = await dispatch(
-		// 	fetchCreateOrder({
-		// 		tableNumber: idTable,
-		// 		productId: props.item.id,
-		// 		location: getLocationOrderUser?.location,
-		// 		quantity: dataInput.quantity,
-		// 		description: dataInput.description,
-		// 		status: 'order_inprogess',
-		// 	})
-		// )
-		// if (payload?.success) {
-		// 	if (socket) {
-		// 		// gửi sự kiện get sản phẩm
-		// 		socket.emit('getProductOrder', {
-		// 			message: 'Gửi sự kiện lấy sản phẩm',
-		// 			location: getLocationOrderUser?.location,
-		// 		})
-		// 	}
-		// }
-
 		if (socket) {
-			// let getUserId = isOrderPage ? null : getLocationEmployee?.data?.userId
 			// Gửi sự kiện tới Socket.IO server
 			socket.emit('myEvent', {
 				tableNumber: idTable,
@@ -108,22 +86,12 @@ const CommonModal = (props: inputProps): JSX.Element => {
 				description: dataInput.description,
 				status: 'order_inprogess',
 			})
-			// socket.on('response', async (response) => {
-			// 	await dispatch(setMessage(response))
 
-			// 	localStorage.setItem('notification', JSON.stringify(response))
-			// })
 			socket.emit('getProductOrder', {
 				message: 'Gửi sự kiện lấy sản phẩm',
 				location: getLocationOrderUser?.location,
 			})
-			// socket.emit('getAllOrderByStatus', {
-			// 	tableNumber: idTable,
-			// 	location: getLocationOrderUser?.location,
-			// })
 		}
-		// Toasty.success('Đặt món thành công')
-		// }, 2000)
 	}
 
 	const handleCancel = () => {

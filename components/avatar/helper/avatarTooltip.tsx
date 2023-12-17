@@ -71,7 +71,7 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 					{isDataMessage?.length > 0 ? (
 						<Tooltip
 							placement="bottomLeft"
-							title={'Bạn có thông báo mới'}
+							title={showMessage ? 'Bạn có thông báo mới' : null}
 							color={'red'}
 							key={'red'}
 							open={showMessage}
