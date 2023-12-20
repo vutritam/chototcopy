@@ -21,10 +21,10 @@ const Onboarding: React.FC = () => {
 				flexDirection: 'column',
 			}}
 		>
-			<h1>Welcome to My Website!</h1>
-			<p>Explore the amazing features we offer.</p>
+			<h1>Chào mừng đến với gold coffee</h1>
+			<p>Vui lòng quét QR tại bàn để đặt món online nhé.!</p>
 			<Image
-				width={'50%'}
+				width={'40%'}
 				height={150}
 				alt="logo"
 				src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/QR_GIF.gif`}
