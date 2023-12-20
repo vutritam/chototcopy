@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import QRCode from 'react-qr-code'
 import { encodeNumber, decodeNumber } from '@/components/common/hashCode'
-// import useSWR from "swr";
 
 const QRcode: React.FC = () => {
 	const [dataQR, setData] = useState<Array<object>>([])
@@ -19,7 +18,7 @@ const QRcode: React.FC = () => {
 			let table = {
 				tittle: `bàn số ${index}`,
 				tableNumber: index,
-				linkOrder: `http://localhost:3000/admin/client/${encodeNumber(index)}`,
+				linkOrder: `http://localhost:3000/order/${encodeNumber(index)}`,
 			}
 
 			if (!array.includes(table)) {

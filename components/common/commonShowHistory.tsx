@@ -1,19 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { Avatar, Button, InputNumber, List, Modal, Select, Space, Spin } from 'antd'
-import { LikeOutlined, MessageOutlined, ClockCircleOutlined } from '@ant-design/icons'
-import Toasty from './toasty'
-import { Label } from 'semantic-ui-react'
-import SocketClient from './socketIoConnect'
-import io from 'socket.io-client'
-import { setMessage } from '@/redux/componentSlice/messageSocketSlice'
+import React, { useState } from 'react'
+import { Button, Modal, Space } from 'antd'
+import { ClockCircleOutlined } from '@ant-design/icons'
 import { useDispatch } from 'react-redux'
-import { fetchCreateOrder, setOrder } from '@/redux/componentSlice/orderSlice'
-import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
 import { useRouter } from 'next/router'
-import { decodeNumber, encodeNumber } from './hashCode'
-import { processRouterQuery } from './parseNumber'
-import L10N from '../L10N/en.json'
-import CommonCollapseItem from './commonCollapse'
 import InputDateTime from './inputDateTime'
 import CommonFilter from './commonFilter'
 import type { MenuProps } from 'antd'
@@ -27,24 +16,14 @@ interface inputProps {
 	item: any
 }
 const CommonShowHistory = (props: inputProps): JSX.Element => {
-	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
 	const isOrderPage = router.pathname.startsWith('/order')
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
-	const [isExpanded, setExpanded] = React.useState(false)
-	let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
 	const dispatch = useDispatch()
 	const showModal = () => {
 		setOpen(true)
 	}
-	const IconText = ({ icon, text }: { icon: React.FC; text: string }) => (
-		<Space>
-			{React.createElement(icon)}
-			{text}
-		</Space>
-	)
-
 	const handleOk = () => {}
 
 	const handleCancel = () => {
@@ -55,60 +34,34 @@ const CommonShowHistory = (props: inputProps): JSX.Element => {
 		{
 			key: '1',
 			value: '1st menu item',
-			label: (
-				<p>1st menu item</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
+			label: <p>1st menu item</p>,
 		},
 		{
 			key: '2',
 			value: '2st menu item',
-			label: (
-				<p>1st menu item</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
-			// label: <p>1st menu item</p>,
+			label: <p>1st menu item</p>,
 		},
 		{
 			key: '3',
 			value: '3st menu item',
-			label: (
-				<p>1st menu item</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
+			label: <p>1st menu item</p>,
 		},
 	]
 	const works: MenuProps['items'] = [
 		{
 			key: '1',
 			value: 'ca 1',
-			label: (
-				<p>ca 1</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
+			label: <p>ca 1</p>,
 		},
 		{
 			key: '2',
 			value: 'ca 2',
-			label: (
-				<p>ca 2</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
-			// label: <p>1st menu item</p>,
+			label: <p>ca 2</p>,
 		},
 		{
 			key: '3',
 			value: 'ca 3',
-			label: (
-				<p>ca 3</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
+			label: <p>ca 3</p>,
 		},
 	]
 
@@ -149,47 +102,32 @@ const CommonShowHistory = (props: inputProps): JSX.Element => {
 						/>
 					</Space>
 				</Space>
-				<div
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						gap: '5px',
-						color: 'green',
-						marginTop: '10px',
-					}}
-				>
+				<div className="history_style">
 					<ClockCircleOutlined />
 					<b>Lịch sử hoạt động</b>
 				</div>
 				<div style={{ maxHeight: '400px', overflow: 'auto' }}>
 					<div>
-						<div
-							style={{
-								// marginTop: '10px',
-								fontSize: '13px',
-								borderLeft: '2px solid #bdbde3',
-								padding: '8px',
-							}}
-						>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+						<div className="history_style_box">
+							<div className="style-bill">
 								Số đơn xác nhận:
 								<span style={{ marginLeft: '10px', color: 'green' }}>
 									<b>100</b>
 								</span>
 							</div>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+							<div className="style-bill">
 								Số đơn hủy:
 								<span style={{ marginLeft: '10px', color: 'red' }}>
 									<b>100</b>
 								</span>
 							</div>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+							<div className="style-bill">
 								Số ca làm việc:
 								<span style={{ marginLeft: '10px', color: 'blue' }}>
 									<b>100</b>
 								</span>
 							</div>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+							<div className="style-bill">
 								Nơi làm việc:
 								<span style={{ marginLeft: '10px' }}>
 									<b>Tân chánh hiệp quận 12</b>

@@ -1,4 +1,3 @@
-/** @type {import('next').NextConfig} */
 const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -26,4 +25,14 @@ module.exports = {
 
     return config;
   },
+  
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/',
+  //       destination: process.env.BASE_PATH,
+  //       permanent: true,
+  //     },
+  //   ];
+  // },
 };

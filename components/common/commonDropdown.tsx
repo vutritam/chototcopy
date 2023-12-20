@@ -12,9 +12,7 @@ const CommonDropdown = (props: inputProps): JSX.Element => {
 	const { trigger, handleDropdown, tittle, items } = props
 	return (
 		<Dropdown menu={{ items }} trigger={trigger}>
-			{/* <a onClick={(e) => handleDropdown(e, true)}> */}
 			<Space>{tittle}</Space>
-			{/* </a> */}
 		</Dropdown>
 	)
 }

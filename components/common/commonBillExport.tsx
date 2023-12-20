@@ -2,11 +2,9 @@ import React from 'react'
 import type { MenuProps } from 'antd'
 import { Button, Dropdown } from 'antd'
 import { FileTextOutlined } from '@ant-design/icons'
-import { useSelector } from 'react-redux'
 
 const BillExport: React.FC = (props) => {
 	const { showDrawer } = props
-	const list = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const items: MenuProps['items'] = [
 		{
 			key: '1',

@@ -6,6 +6,7 @@ import {
 	DeleteOutlined,
 	StopOutlined,
 	FireFilled,
+	DownCircleOutlined,
 } from '@ant-design/icons'
 import { Button, Dropdown, Space, Tooltip } from 'antd'
 import type { MenuProps } from 'antd'
@@ -179,7 +180,7 @@ export default function Products(props: IAppProps) {
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const { payload } = await dispatch(fetchAllProduct())
-			if (payload.success) {
+			if (payload?.success) {
 				setAllProduct(payload.data)
 			}
 		}
@@ -213,13 +214,23 @@ export default function Products(props: IAppProps) {
 		(state: any) => state.dataOrder?.dataOrderByNumberTable?.data
 	)
 	React.useEffect(() => {
-		let sessionOrder = JSON.parse(sessionStorage.getItem('warning_text_order') || '')
-		console.log('getTotalOrder changed:', sessionOrder)
-		setDataTotalOrderAndConfirm({
-			totalOrderedItems: sessionOrder.totalOrderedItems,
-			confirmedItems: sessionOrder.confirmedItems,
-		})
+		let sessionOrder = sessionStorage.getItem('warning_text_order')
+
+		if (sessionOrder) {
+			try {
+				sessionOrder = JSON.parse(sessionOrder)
+				console.log('getTotalOrder changed:', sessionOrder)
+
+				setDataTotalOrderAndConfirm({
+					totalOrderedItems: sessionOrder.totalOrderedItems,
+					confirmedItems: sessionOrder.confirmedItems,
+				})
+			} catch (error) {
+				console.error('Error parsing JSON:', error)
+			}
+		}
 	}, [JSON.stringify(dataOrderByNumberTable)])
+
 	const handleSubmit = async () => {
 		const { payload } = await dispatch(fetchProductByFilterCondition(itemFilterValueChecked))
 		if (!payload?.success) {
@@ -248,7 +259,23 @@ export default function Products(props: IAppProps) {
 						{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${dataTotalOrderAndConfirm.totalOrderedItems} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
 					</div>
 				</div>
-			) : null}
+			) : (
+				<>
+					<div className="marquee-container screen-mobile">
+						<div className="marquee-content">
+							<DownCircleOutlined />{' '}
+							<span style={{ fontSize: '16px', color: 'green' }}>
+								Các món bạn đặt đã được xác nhận
+							</span>{' '}
+							(
+							<span style={{ color: 'red' }}>
+								Lưu ý: Các thông báo này sẽ tự xóa sau khi bạn đóng trang web
+							</span>
+							)
+						</div>
+					</div>
+				</>
+			)}
 			<div
 				className="catelories"
 				style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '10px' }}
@@ -282,10 +309,28 @@ export default function Products(props: IAppProps) {
 							<span style={{ color: 'yellow', marginRight: '5px' }}>
 								<FireFilled color="yellow" />
 							</span>
-							{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${dataTotalOrderAndConfirm.totalOrderedItems} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
+							{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${
+								dataTotalOrderAndConfirm.totalOrderedItems - dataTotalOrderAndConfirm.confirmedItems
+							} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
 						</div>
 					</div>
-				) : null}
+				) : (
+					<>
+						<div className="marquee-container show-desktop-menu">
+							<div className="marquee-content">
+								<DownCircleOutlined style={{ fontSize: '16px', color: 'green' }} />{' '}
+								<span style={{ fontSize: '16px', color: 'green' }}>
+									Các món bạn đặt đã được xác nhận
+								</span>{' '}
+								(
+								<span style={{ color: 'red' }}>
+									Lưu ý: Các thông báo này sẽ tự xóa sau khi bạn đóng trang web
+								</span>
+								)
+							</div>
+						</div>
+					</>
+				)}
 			</div>
 			<Space className="filter-mobile">
 				{itemFilterChecked ? (

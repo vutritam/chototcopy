@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useCollapse } from 'react-collapsed'
-import InputDateTime from './inputDateTime'
 import { RightOutlined, DownOutlined } from '@ant-design/icons'
 const CommonCollapseItem = ({ isActive }) => {
 	const [isExpanded, setExpanded] = React.useState(isActive)
@@ -15,7 +14,7 @@ const CommonCollapseItem = ({ isActive }) => {
 	return (
 		<>
 			<div
-				style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+				className="collapse-container"
 				{...getToggleProps({
 					style: { display: 'block' },
 					onClick: () => setExpanded((x) => !x),
@@ -37,33 +36,26 @@ const CommonCollapseItem = ({ isActive }) => {
 			<div {...getCollapseProps()}>
 				<h2 style={{ margin: '0 20px' }}>
 					<div style={{ marginTop: '10px' }}>
-						<div
-							style={{
-								marginTop: '10px',
-								fontSize: '13px',
-								borderLeft: '2px solid #bdbde3',
-								padding: '8px',
-							}}
-						>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+						<div className="bill-container">
+							<div className="style-bill">
 								Số đơn xác nhận:
 								<span style={{ marginLeft: '10px', color: 'green' }}>
 									<b>100</b>
 								</span>
 							</div>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+							<div className="style-bill">
 								Số đơn hủy:
 								<span style={{ marginLeft: '10px', color: 'red' }}>
 									<b>100</b>
 								</span>
 							</div>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+							<div className="style-bill">
 								Số ca làm việc:
 								<span style={{ marginLeft: '10px', color: 'blue' }}>
 									<b>100</b>
 								</span>
 							</div>
-							<div style={{ padding: 0, margin: 0, lineHeight: '20px' }}>
+							<div className="style-bill">
 								Nơi làm việc:
 								<span style={{ marginLeft: '10px' }}>
 									<b>Tân chánh hiệp quận 12</b>

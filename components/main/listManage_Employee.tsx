@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Avatar, Button, List, MenuProps, Skeleton, Space } from 'antd'
-import Link from 'next/link'
 import CommonShowHistory from '../common/commonShowHistory'
-import CommonCollapseItem from '../common/commonCollapse'
 import CommonFilter from '../common/commonFilter'
 import InputDateTime from '../common/inputDateTime'
-import { UserAddOutlined, FileSearchOutlined } from '@ant-design/icons'
-import CommonDropdown from '../common/commonDropdown'
-import CommonAddEmployee from '../common/commonModalAddEmployee'
+import { FileSearchOutlined } from '@ant-design/icons'
 import type { DatePickerProps, RangePickerProps } from 'antd/es/date-picker'
 
 interface DataType {
@@ -105,21 +101,12 @@ const List_manage_employee: React.FC = () => {
 		{
 			key: '2',
 			value: 'Tân chánh hiệp ',
-			label: (
-				<p>Tân chánh hiệp </p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
-			// label: <p>1st menu item</p>,
+			label: <p>Tân chánh hiệp </p>,
 		},
 		{
 			key: '3',
 			value: 'Tân bình',
-			label: (
-				<p>Tân bình</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
+			label: <p>Tân bình</p>,
 		},
 	]
 	// ca làm việc
@@ -127,30 +114,17 @@ const List_manage_employee: React.FC = () => {
 		{
 			key: '1',
 			value: 'ca 1',
-			label: (
-				<p>ca 1</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
+			label: <p>ca 1</p>,
 		},
 		{
 			key: '2',
 			value: 'ca 2',
-			label: (
-				<p>ca 2</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
-			// label: <p>1st menu item</p>,
+			label: <p>ca 2</p>,
 		},
 		{
 			key: '3',
 			value: 'ca 3',
-			label: (
-				<p>ca 3</p>
-				// <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-				// </a>
-			),
+			label: <p>ca 3</p>,
 		},
 	]
 
@@ -175,7 +149,6 @@ const List_manage_employee: React.FC = () => {
 		dateTime: '',
 	})
 	const handleLocationChange = (field, value) => {
-		// console.log(data, 'eee')
 		setState({ ...state, [field]: value })
 	}
 
@@ -229,31 +202,8 @@ const List_manage_employee: React.FC = () => {
 					</Space>
 				</Space>
 			</div>
-			{/* <Space style={{ padding: '10px 0', width: '100%' }}>
-				<Button
-					style={{
-						justifyContent: 'end',
-						boxShadow:
-							'rgba(17, 18, 18, 0.18) 0px 2px 6px 0px, rgba(103, 151, 255, 0.11) 0px 5px 21px 0px',
-					}}
-					type="default"
-					icon={<UserAddOutlined />}
-				>
-					<CommonDropdown
-						trigger={['click']}
-						tittle="Thêm"
-						items={itemsAdd}
-						handleDropdown={handleDropdown}
-					/>
-					<CommonAddEmployee open={modal2Open} handleModal={handleModal} title={titleModal} />
-				</Button>
-			</Space> */}
 
 			<List
-				// style={{
-				// 	maxHeight: '100vh',
-				// 	overflow: 'auto',
-				// }}
 				className="demo-loadmore-list"
 				loading={initLoading}
 				itemLayout="horizontal"
@@ -278,15 +228,12 @@ const List_manage_employee: React.FC = () => {
 								}
 							/>
 							<div>
-								{/* <Link onClick={() => handleShowModalHistory()}> */}
 								<CommonShowHistory
 									label="Lịch sử hoạt động"
 									tittle="Thông tin nhân viên"
 									open={showHistory}
 									handleShow={handleShowModalHistory}
 								/>
-
-								{/* </Link> */}
 							</div>
 						</Skeleton>
 					</List.Item>

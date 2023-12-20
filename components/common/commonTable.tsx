@@ -3,7 +3,7 @@ import { Button, Dropdown, MenuProps, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import { FormOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 
 interface DataType {

@@ -27,8 +27,6 @@ export default function ManageMoney({}: Props) {
 				<ModalConfirm
 					label="Tạo trình chi"
 					title="Tạo phiếu chi"
-					// open={open}
-					// setOpen={setOpen}
 					size={1000}
 				/>
 			),

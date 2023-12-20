@@ -122,6 +122,38 @@
   align-items: center;
   gap: 7px;
 }
+.style_bell {
+  font-size: 22px;
+   width: 30px;
+}
+.bill-container {
+  margin-top: 10px;
+  font-size: 13px;
+  border-left: 2px solid #bdbde3;
+  padding: 8px;
+}
+.history_style_box{
+  font-size: 13px;
+  border-left: 2px solid #bdbde3;
+  padding: 8px;
+}
+.collapse-container{
+  display: flex;
+   align-items: center;
+    gap: 5px; 
+}
+.history_style{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: green;
+  margin-top: 10px;
+}
+.style-bill {
+  padding: 0;
+   margin: 0; 
+   line-height: 20px;
+}
 .button-styles{
   /* border-radius: 50%; */
   position: relative;

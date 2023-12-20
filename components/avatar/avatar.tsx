@@ -495,16 +495,12 @@ const AvatarComponent: React.FC = () => {
 									open={showMessageAdmin}
 								>
 									<Badge count={countMessage > 10 ? `${10}+` : countMessage}>
-										<BellOutlined
-											ref={elementBellAdmin}
-											className="bell"
-											style={{ fontSize: '22px', width: '30px' }}
-										/>
+										<BellOutlined ref={elementBellAdmin} className="bell style_bell" />
 									</Badge>
 								</Tooltip>
 							) : (
 								<Badge style={{ display: 'flex' }}>
-									<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
+									<BellOutlined className="style_bell " />
 								</Badge>
 							)}
 						</Space>
