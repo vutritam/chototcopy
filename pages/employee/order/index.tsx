@@ -94,8 +94,6 @@ const OrderByUser: React.FC = () => {
 		if (socket) {
 			socket.emit('joinRoom', `room-${getLocationEmployee.data.location}`)
 			socket.on('resProductOrder', async (response) => {
-				console.log(response, 'resProductOrder')
-
 				await dispatch(setOrderByNumberTable(response))
 				setData(response.data)
 			})
@@ -142,11 +140,18 @@ const OrderByUser: React.FC = () => {
 			setData(payload.data)
 		}
 		Toasty.success(payload?.message)
+		setRefresh(!refreshPage)
 	}
 
 	const handleDeleteAllRecord = async () => {
 		const { payload } = await dispatch(deleteAllRecordOrder())
-		Toasty.success(payload?.message)
+		if (payload?.success) {
+			const item = sessionStorage.getItem('warning_text_order')
+			if (item) {
+				sessionStorage.removeItem('warning_text_order')
+			}
+			Toasty.success(payload?.message)
+		}
 	}
 
 	const handleDeleteAllRecordNotification = async () => {

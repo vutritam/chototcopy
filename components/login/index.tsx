@@ -29,6 +29,8 @@ const LoginForm: React.FC = () => {
 		setLoadings(true)
 		if (keyTab === 1) {
 			const { payload } = await dispatch(fetchCreatePost(options))
+			console.log(payload, 'login nè')
+
 			if (payload?.success) {
 				sessionStorage.setItem('user', JSON.stringify(payload))
 

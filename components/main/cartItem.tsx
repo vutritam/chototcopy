@@ -6,7 +6,8 @@ import {
 	ShoppingCartOutlined,
 	MenuUnfoldOutlined,
 	DesktopOutlined,
-	LoadingOutlined,
+	LeftOutlined,
+	CloseOutlined,
 	TeamOutlined,
 } from '@ant-design/icons'
 import { MenuProps, Menu } from 'antd'
@@ -38,6 +39,7 @@ const CartItem: React.FC = (props) => {
 	const { className } = props
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [open, setOpen] = React.useState<Boolean>(false)
+	const [backModal, setBackModal] = React.useState<Boolean>(false)
 	const [typeBill, setTypeBill] = React.useState<string>('')
 	const [itemRender, setItemRender] = React.useState<any>([])
 	const [dataSubmit, setDataSubmit] = React.useState<any>([])
@@ -170,7 +172,16 @@ const CartItem: React.FC = (props) => {
 	// 		))}
 	// 	</Menu>
 	// )
-
+	const handleBackModal = () => {
+		setConfirmTableNumber(null)
+	}
+	const CustomCloseIcon = () => {
+		return confirmTableNumber !== null ? (
+			<LeftOutlined onClick={handleBackModal} />
+		) : (
+			<CloseOutlined onClick={onClose} />
+		)
+	}
 	return (
 		<>
 			<Tooltip title="Bạn có 23 sản phẩm" color={'red'} key={'red'}>
@@ -204,7 +215,7 @@ const CartItem: React.FC = (props) => {
 					)
 				}
 				placement="right"
-				onClose={onClose}
+				closeIcon={<CustomCloseIcon />}
 				open={open}
 			>
 				<Space direction="vertical" style={{ width: '100%' }}>

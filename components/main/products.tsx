@@ -256,7 +256,10 @@ export default function Products(props: IAppProps) {
 						<span style={{ color: 'yellow', marginRight: '5px' }}>
 							<FireFilled color="yellow" />
 						</span>
-						{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${dataTotalOrderAndConfirm.totalOrderedItems} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
+						{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${
+							Number(dataTotalOrderAndConfirm.totalOrderedItems) -
+							Number(dataTotalOrderAndConfirm.confirmedItems)
+						} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
 					</div>
 				</div>
 			) : (
@@ -310,7 +313,8 @@ export default function Products(props: IAppProps) {
 								<FireFilled color="yellow" />
 							</span>
 							{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${
-								dataTotalOrderAndConfirm.totalOrderedItems - dataTotalOrderAndConfirm.confirmedItems
+								Number(dataTotalOrderAndConfirm.totalOrderedItems) -
+								Number(dataTotalOrderAndConfirm.confirmedItems)
 							} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
 						</div>
 					</div>

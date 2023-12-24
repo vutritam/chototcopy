@@ -180,6 +180,8 @@ const AvatarComponent: React.FC = () => {
 					confirmedItems: confirmedItems,
 				})
 			)
+			console.log({ totalOrderedItems, confirmedItems }, '{ totalOrderedItems, confirmedItems }')
+
 			return { totalOrderedItems, confirmedItems }
 		})
 
@@ -282,6 +284,10 @@ const AvatarComponent: React.FC = () => {
 	useEffect(() => {
 		;(async () => {
 			if (isOrderPage) {
+				const item = sessionStorage.getItem('warning_text_order')
+				if (item && message?.length <= 0) {
+					sessionStorage.removeItem('warning_text_order')
+				}
 				const { payload } = await dispatch(
 					fetchAllOrderByNumberTableAndLocationUser({
 						tableNumber: idTable,

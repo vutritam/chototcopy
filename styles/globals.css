@@ -105,7 +105,9 @@
 .text-error-message {
   color: red;
 }
-
+html {
+  scroll-behavior: smooth;
+}
 .show-readed-message{
   background: #efeffd;
 						margin-bottom: 5px;
