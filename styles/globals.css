@@ -102,6 +102,28 @@
     justify-content: center;
 
 }
+.online-avatar {
+  position: relative;
+}
+
+.online-avatar::before {
+  content: "";
+    position: absolute;
+    top: 20px;
+    right: 1px;
+    width: 9px;
+    height: 9px;
+    /* z-index: 100; */
+    border-radius: 50%;
+    background-color: #26d902;
+}
+.online-active-employee {
+  width: 9px;
+  height: 9px;
+  /* z-index: 100; */
+  border-radius: 50%;
+  background-color: #26d902;
+}
 .text-error-message {
   color: red;
 }

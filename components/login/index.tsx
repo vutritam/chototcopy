@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Form, Input, Select, Space, Spin, Tabs } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
@@ -14,6 +14,8 @@ const LoginForm: React.FC = () => {
 	const [loadings, setLoadings] = useState<boolean>(false)
 	const [keyTab, setKeyTab] = useState<number>(1)
 	const [socket, setSocket] = useState(null)
+	const passwordInputRef = useRef(null)
+	const usernameInputRef = useRef(null)
 	// const user = JSON.parse(sessionStorage.getItem('user'))
 	let router = useRouter()
 	useEffect(() => {
@@ -37,6 +39,7 @@ const LoginForm: React.FC = () => {
 				setTimeout(() => {
 					setLoadings(false)
 					Toasty.success(payload?.message)
+
 					if (payload.data?.roles?.includes('admin')) {
 						localStorage.setItem('role_access', '/admin')
 						router.push('/admin')
@@ -65,6 +68,41 @@ const LoginForm: React.FC = () => {
 
 				return
 			}
+
+			setTimeout(() => {
+				setLoadings(false)
+				toast(payload?.message, {
+					position: 'top-center',
+					autoClose: 1500,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					isLoading: false,
+					draggable: true,
+					progress: undefined,
+					type: 'error',
+				})
+				if (passwordInputRef !== null && payload.fieldError === 'username') {
+					usernameInputRef.current.focus()
+					usernameInputRef.current.select()
+				} else {
+					passwordInputRef.current.focus()
+					passwordInputRef.current.select()
+				}
+			}, 1800)
+		} else {
+			const { payload } = await dispatch(fetchRegisterUser(options))
+			if (payload?.success) {
+				usernameInputRef.current.value = ''
+				passwordInputRef.current.value = ''
+				setTimeout(() => {
+					setLoadings(false)
+					// dispatch(setUser(payload))
+					Toasty.success(payload?.message)
+					setKeyTab(1)
+				}, 1000)
+				return
+			}
 			setTimeout(() => {
 				setLoadings(false)
 				toast(payload?.message, {
@@ -80,30 +118,6 @@ const LoginForm: React.FC = () => {
 				})
 			}, 1800)
 		}
-		const { payload } = await dispatch(fetchRegisterUser(options))
-		if (payload?.success) {
-			setTimeout(() => {
-				setLoadings(false)
-				// dispatch(setUser(payload))
-				Toasty.success(payload?.message)
-				setKeyTab(1)
-			}, 1000)
-			return
-		}
-		setTimeout(() => {
-			setLoadings(false)
-			toast(payload?.message, {
-				position: 'top-center',
-				autoClose: 1500,
-				hideProgressBar: false,
-				closeOnClick: true,
-				pauseOnHover: true,
-				isLoading: false,
-				draggable: true,
-				progress: undefined,
-				type: 'error',
-			})
-		}, 1800)
 	}
 
 	const onChange = (key: number) => {
@@ -136,6 +150,7 @@ const LoginForm: React.FC = () => {
 							rules={[{ required: true, message: 'Please input your Username!' }]}
 						>
 							<Input
+								ref={usernameInputRef}
 								prefix={<UserOutlined className="site-form-item-icon" />}
 								placeholder="Username"
 							/>
@@ -145,6 +160,7 @@ const LoginForm: React.FC = () => {
 							rules={[{ required: true, message: 'Please input your Password!' }]}
 						>
 							<Input
+								ref={passwordInputRef}
 								prefix={<LockOutlined className="site-form-item-icon" />}
 								type="password"
 								placeholder="Password"

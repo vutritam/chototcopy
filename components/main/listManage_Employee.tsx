@@ -26,7 +26,8 @@ interface DataType {
 const count = 3
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`
 
-const List_manage_employee: React.FC = () => {
+const List_manage_employee: React.FC = (props) => {
+	const { item } = props
 	const [initLoading, setInitLoading] = useState(true)
 	const [loading, setLoading] = useState(false)
 	const [showHistory, setShowHistory] = useState(false)
@@ -42,25 +43,34 @@ const List_manage_employee: React.FC = () => {
 				setList(res.results)
 			})
 	}, [])
+	useEffect(() => {
+		console.log(item, 'loading')
 
-	const onLoadMore = () => {
-		setLoading(true)
-		setList(
-			data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
-		)
-		fetch(fakeDataUrl)
-			.then((res) => res.json())
-			.then((res) => {
-				const newData = data.concat(res.results)
-				setData(newData)
-				setList(newData)
-				setLoading(false)
-				// Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-				// In real scene, you can using public method of react-virtualized:
-				// https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-				window.dispatchEvent(new Event('resize'))
-			})
-	}
+		if (item.length > 0) {
+			setLoading(false)
+		} else {
+			setLoading(true)
+		}
+	}, [item])
+
+	// const onLoadMore = () => {
+	// 	setLoading(true)
+	// 	setList(
+	// 		data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
+	// 	)
+	// 	fetch(fakeDataUrl)
+	// 		.then((res) => res.json())
+	// 		.then((res) => {
+	// 			const newData = data.concat(res.results)
+	// 			setData(newData)
+	// 			setList(newData)
+	// 			setLoading(false)
+	// 			// Resetting window's offsetTop so as to display react-virtualized demo underfloor.
+	// 			// In real scene, you can using public method of react-virtualized:
+	// 			// https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
+	// 			window.dispatchEvent(new Event('resize'))
+	// 		})
+	// }
 	const handleShowModalHistory = () => {
 		setShowHistory(!showHistory)
 	}
@@ -77,19 +87,19 @@ const List_manage_employee: React.FC = () => {
 		console.log('ok vào nhé')
 		setModal2Open(value)
 	}
-	const loadMore =
-		!initLoading && !loading ? (
-			<div
-				style={{
-					textAlign: 'center',
-					marginTop: 12,
-					height: 32,
-					lineHeight: '32px',
-				}}
-			>
-				<Button onClick={onLoadMore}>loading more</Button>
-			</div>
-		) : null
+	// const loadMore =
+	// 	!initLoading && !loading ? (
+	// 		<div
+	// 			style={{
+	// 				textAlign: 'center',
+	// 				marginTop: 12,
+	// 				height: 32,
+	// 				lineHeight: '32px',
+	// 			}}
+	// 		>
+	// 			<Button onClick={onLoadMore}>loading more</Button>
+	// 		</div>
+	// 	) : null
 
 	// nơi làm việc
 	const items: MenuProps['items'] = [
@@ -167,6 +177,7 @@ const List_manage_employee: React.FC = () => {
 			setInitLoading(false)
 		}, 1000)
 	}
+	console.log(loading, 'lo')
 
 	return (
 		<>
@@ -207,37 +218,65 @@ const List_manage_employee: React.FC = () => {
 				className="demo-loadmore-list"
 				loading={initLoading}
 				itemLayout="horizontal"
-				loadMore={loadMore}
-				dataSource={list}
-				renderItem={(item) => (
-					<List.Item
-						actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">more</a>]}
-					>
-						<Skeleton avatar title={false} loading={item.loading} active>
-							<List.Item.Meta
-								avatar={<Avatar src={item.picture.large} />}
-								title={<a href="https://ant.design">{item.name?.last}</a>}
-								description={
-									<>
-										<p>19/09/2023</p>
-										<p>
-											Ant Design, a design language for background List_manage_employeelications, is
-											refined by Ant UED Team
-										</p>
-									</>
-								}
-							/>
-							<div>
-								<CommonShowHistory
-									label="Lịch sử hoạt động"
-									tittle="Thông tin nhân viên"
-									open={showHistory}
-									handleShow={handleShowModalHistory}
+				// loadMore={loadMore}
+				dataSource={item}
+				renderItem={(item) => {
+					console.log(item, 'item employee')
+
+					return (
+						<List.Item
+							actions={[
+								<a key="list-loadmore-edit">Chỉnh sửa</a>,
+								<a key="list-loadmore-more">Khác</a>,
+							]}
+						>
+							<Skeleton avatar title={false} loading={loading} active>
+								<List.Item.Meta
+									avatar={
+										<>
+											<Avatar
+												src={
+													'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'
+												}
+											/>
+											<span className="online-avatar"></span>
+										</>
+									}
+									title={<a href="https://ant.design">{item.username}</a>}
+									description={
+										<>
+											<p>19/09/2023</p>
+
+											<span>
+												<b>Vai trò</b>: {item.roles.includes('client') ? 'Nhân viên' : 'Admin'}
+											</span>
+											<span>
+												<div style={{ display: 'flex', gap: '10px' }}>
+													<b>Trạng thái hoạt động: </b>
+													<div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+														<div
+															className="online-active-employee "
+															style={{ width: '10px' }}
+														></div>
+														<span>{item.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}</span>
+													</div>
+												</div>
+											</span>
+										</>
+									}
 								/>
-							</div>
-						</Skeleton>
-					</List.Item>
-				)}
+								<div>
+									<CommonShowHistory
+										label="Lịch sử hoạt động"
+										tittle="Thông tin nhân viên"
+										open={showHistory}
+										handleShow={handleShowModalHistory}
+									/>
+								</div>
+							</Skeleton>
+						</List.Item>
+					)
+				}}
 			/>
 		</>
 	)

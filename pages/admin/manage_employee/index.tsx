@@ -1,10 +1,13 @@
 // import ListItem from '@/components/main/listItem'
 // import ManageMoney from '@/components/main/manageMoney'
 import List_manage_employee from '@/components/main/listManage_Employee'
-import { Dropdown, Space, Table } from 'antd'
+import { fetchAllUser } from '@/redux/componentSlice/userSlice'
+import { ThunkDispatch } from '@reduxjs/toolkit'
+import { Dropdown, Space, Table, Tag } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { TableRowSelection } from 'antd/es/table/interface'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 // import ListItem from './listItem'
 // import ManageMoney fro'
 
@@ -17,11 +20,23 @@ interface DataType {
 }
 export default function ManageWork({}: Props) {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-
+	//message redux store
+	const allUser = useSelector((state: any) => state.user?.allUser?.data)
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
 		// console.log('selectedRowKeys changed: ', newSelectedRowKeys)
 		setSelectedRowKeys(newSelectedRowKeys)
 	}
+	console.log(allUser, 'allUser')
+
+	useEffect(() => {
+		const fetchDataUser = async () => {
+			try {
+				await dispatch(fetchAllUser())
+			} catch (error) {}
+		}
+		fetchDataUser()
+	}, [])
 	// const onChange = (key: string) => {
 	// 	// console.log(key)
 	// }
@@ -137,7 +152,7 @@ export default function ManageWork({}: Props) {
 	}
 	return (
 		<div>
-			<List_manage_employee />
+			<List_manage_employee item={allUser} />
 			{/* <Table
 				columns={columns}
 				// dataSource={localData}

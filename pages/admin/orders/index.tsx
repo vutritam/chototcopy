@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
 	deleteAllRecordOrder,
 	fetchAllOrderByUserRole,
+	setOrderByNumberTable,
 	updateStatusOrder,
 } from '@/redux/componentSlice/orderSlice'
 import Toasty from '@/components/common/toasty'
@@ -151,14 +152,14 @@ const OrderByAllUser: React.FC = () => {
 					Delete All Notification
 				</Button> */}
 			</div>
-			<h3>
+			{/* <h3>
 				Số đơn chưa xác nhận:{' '}
 				{countOrderDoNotComfirm > 0 ? (
 					<span style={{ color: 'red' }}>{countOrderDoNotComfirm}</span>
 				) : (
 					<Spin indicator={<LoadingOutlined style={{ fontSize: 16, marginLeft: '10px' }} spin />} />
 				)}
-			</h3>
+			</h3> */}
 			<CommonTable
 				item={dataAllOrderAdmin}
 				dummyOrderConfirm={dummyOrderConfirm}

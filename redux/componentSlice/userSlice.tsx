@@ -18,20 +18,29 @@ export const fetchUserById = createAsyncThunk<any, string>('api/fetchUserById', 
 export const fetchRegisterUser = createAsyncThunk<any, string>(
 	'api/fetchRegisterUser',
 	async (options) => {
-		let response = await axiosConfig.post('/users', options)
+		let response = await axiosConfig.post('/users/add', options)
 		return response.data
 	}
 )
+
+export const fetchAllUser = createAsyncThunk<any, string>('api/fetchAllUser', async () => {
+	let response = await axiosConfig.get('/users')
+	return response.data
+})
 
 const userSlice = createSlice({
 	name: 'user',
 	initialState: {
 		account: { user: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataList: { dataItem: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
+		allUser: { data: null, loading: false, error: '' },
 	},
 	reducers: {
 		setUser: (state, action) => {
 			state.account.user = action.payload
+		},
+		setAllUser: (state, action) => {
+			state.allUser.data = action.payload
 		},
 	},
 	extraReducers: (builder) => {
@@ -70,11 +79,23 @@ const userSlice = createSlice({
 				state.account.loading = false
 				state.account.error = action.error.message || ''
 			})
+			/// ------ trigger when get all user ----------
+			.addCase(fetchAllUser.pending, (state) => {
+				state.allUser.loading = true
+			})
+			.addCase(fetchAllUser.fulfilled, (state, action) => {
+				state.allUser.loading = false
+				state.allUser.data = action.payload
+			})
+			.addCase(fetchAllUser.rejected, (state, action) => {
+				state.allUser.loading = false
+				state.allUser.error = action.error.message || ''
+			})
 	},
 })
 
 const { reducer, actions } = userSlice
 
-export const { setUser } = actions
+export const { setUser, setAllUser } = actions
 
 export default reducer

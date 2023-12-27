@@ -20,7 +20,7 @@ import _ from 'lodash'
 import Link from 'next/link'
 import { fetchUserById } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
-import { fetchMessageByUserRole, setMessageAdmin } from '@/redux/componentSlice/messageSocketSlice'
+import { fetchMessageByUserRole } from '@/redux/componentSlice/messageSocketSlice'
 import L10N from '../L10N/en.json'
 import { processRouterQuery } from '../common/parseNumber'
 import moment from 'moment'
@@ -33,6 +33,7 @@ import {
 	fetchAllOrder,
 	setMessage,
 	setMessageEmployee,
+	setMessageAdmin,
 } from '@/redux/componentSlice/orderSlice'
 import { handleTextL10N } from '../helper/helper'
 import useSound from 'use-sound'
@@ -332,6 +333,7 @@ const AvatarComponent: React.FC = () => {
 				)
 				if (payload) {
 					setShowMessageAdmin(true)
+					await dispatch(setMessageAdmin(payload.data))
 					// setShowMenuAdmin(payload.data)
 					setCountMessage(payload.data.length)
 					setCountMessageAdmin(payload.data.length)
@@ -368,8 +370,10 @@ const AvatarComponent: React.FC = () => {
 			let roomName
 			if (isOrderPage) {
 				roomName = `room-${idTable}-${getLocationOrderUser?.location}`
-			} else {
+			} else if (isEmployeePage) {
 				roomName = `room-${getInforUser?.data?.location}`
+			} else {
+				roomName = 'room'
 			}
 			socket.emit('joinRoom', roomName)
 			socket.on('response', async (response) => {
@@ -414,6 +418,7 @@ const AvatarComponent: React.FC = () => {
 			})
 		)
 	}
+	console.log(messageAdmin, 'admin')
 
 	const handleShowOptionMenuAdmin = () => {
 		return messageAdmin?.length > 0 ? (
