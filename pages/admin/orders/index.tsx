@@ -8,9 +8,9 @@ import {
 } from '@/redux/componentSlice/orderSlice'
 import Toasty from '@/components/common/toasty'
 import { io } from 'socket.io-client'
-import CommonTable from '@/components/common/commonTable'
-import { Button, Spin } from 'antd'
-import { LoadingOutlined } from '@ant-design/icons'
+import CommonTable from '@/components/common/commonTable/commonTableListOrder'
+import { Button } from 'antd'
+import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
 interface DataType {
 	gender?: string
 	name: {
@@ -27,8 +27,6 @@ interface DataType {
 	nat?: string
 	loading: boolean
 }
-
-const count = 3
 
 const OrderByAllUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
@@ -142,24 +140,17 @@ const OrderByAllUser: React.FC = () => {
 					marginBottom: '30px',
 				}}
 			>
-				<Button type="primary" onClick={() => setRefresh(true)}>
-					Refresh
+				<Button type="primary" onClick={() => setRefresh(true)} icon={<ReloadOutlined />}>
+					Làm mới
 				</Button>
-				<Button type="default" onClick={() => handleDeleteAllRecord()}>
-					Delete All
+				<Button
+					type="default"
+					onClick={() => handleDeleteAllRecord()}
+					icon={<DeleteOutlined color="red" />}
+				>
+					Xóa tất cả đơn
 				</Button>
-				{/* <Button type="default" onClick={() => handleDeleteAllRecordNotification()}>
-					Delete All Notification
-				</Button> */}
 			</div>
-			{/* <h3>
-				Số đơn chưa xác nhận:{' '}
-				{countOrderDoNotComfirm > 0 ? (
-					<span style={{ color: 'red' }}>{countOrderDoNotComfirm}</span>
-				) : (
-					<Spin indicator={<LoadingOutlined style={{ fontSize: 16, marginLeft: '10px' }} spin />} />
-				)}
-			</h3> */}
 			<CommonTable
 				item={dataAllOrderAdmin}
 				dummyOrderConfirm={dummyOrderConfirm}

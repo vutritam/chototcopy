@@ -13,5 +13,12 @@
     "message.avatar.menuItem.text.order.confirm": "Món của bạn đã được xác nhận",
     "message.avatar.menuItem.button.filter": "Tìm kiếm nhanh",
     "message.avatar.menuItem.text.not.confirm": "Chưa hoàn thành",
-    "message.avatar.menuItem.text.confirm": "Đã xác nhận"
+    "message.avatar.menuItem.text.confirm": "Đã xác nhận",
+    "message.avatar.menuItem.element.date.title": "Thời gian",
+    "message.avatar.menuItem.element.totalOrder.title": "Tổng số lượng: ",
+    "message.avatar.menuItem.element.confirmOrder.title": "Đã xác nhận: ",
+    "message.avatar.menuItem.element.deleteOrder.title": "Bị hủy: ",
+    "message.avatar.menuItem.element.locationOrder.title": "Địa điểm: ",
+    "message.product.orderConfirm.marquee.content": "Các món bạn đặt đã được xác nhận",
+    "message.product.orderConfirm.marquee.content.warning": "Lưu ý: Các thông báo này sẽ tự xóa sau khi bạn đóng trang web"
 }

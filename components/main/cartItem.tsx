@@ -11,7 +11,7 @@ import {
 	TeamOutlined,
 } from '@ant-design/icons'
 import { MenuProps, Menu } from 'antd'
-import BillExport from '../common/commonBillExport'
+import BillExport from '../srcExportBill/modalBillExport'
 import {
 	fetchAllOrder,
 	fetchAllOrderByNumberTableAndLocationUser,
@@ -163,18 +163,11 @@ const CartItem: React.FC = (props) => {
 		setConfirmTableNumber(null)
 		setDataSubmit([])
 	}
-	// const menu = (
-	// 	<Menu>
-	// 		{mappedData?.map((item) => (
-	// 			<Menu.Item key={item.key} onClick={() => setConfirmTableNumber(item.key)}>
-	// 				{item.label}
-	// 			</Menu.Item>
-	// 		))}
-	// 	</Menu>
-	// )
+
 	const handleBackModal = () => {
 		setConfirmTableNumber(null)
 	}
+
 	const CustomCloseIcon = () => {
 		return confirmTableNumber !== null ? (
 			<LeftOutlined onClick={handleBackModal} />
@@ -182,6 +175,7 @@ const CartItem: React.FC = (props) => {
 			<CloseOutlined onClick={onClose} />
 		)
 	}
+
 	return (
 		<>
 			<Tooltip title="Bạn có 23 sản phẩm" color={'red'} key={'red'}>
@@ -194,6 +188,7 @@ const CartItem: React.FC = (props) => {
 					<BillExport showDrawer={showDrawer} />
 				) : (
 					<ShoppingCartOutlined
+						className="style_cart"
 						style={{ fontSize: '22px', width: '30px', display: 'flex' }}
 						onClick={showDrawer}
 					/>
@@ -220,14 +215,7 @@ const CartItem: React.FC = (props) => {
 			>
 				<Space direction="vertical" style={{ width: '100%' }}>
 					{className && className === 'screen-mobile' ? (
-						<Menu
-							mode={'inline'}
-							theme={'light'}
-							// onClick={props.handleMenuClick}
-							// selectedKeys={[props.selectedItemKey]}
-							// defaultSelectedKeys={[getKeyActived]}
-							items={itemsOrder}
-						/>
+						<Menu mode={'inline'} theme={'light'} items={itemsOrder} />
 					) : className === 'exportBill' ? (
 						<div>
 							{confirmTableNumber !== null ? (
@@ -260,19 +248,7 @@ const CartItem: React.FC = (props) => {
 						</div>
 					) : (
 						<div>
-							<div>
-								<ListUser data={itemRender} />
-							</div>
-
-							<div className="">
-								<div className="flex-box">
-									<h2>Tổng tiền</h2>
-									<p>12.000.000 Đ</p>
-								</div>
-								<Button type="primary" block>
-									Thanh toán
-								</Button>
-							</div>
+							<div>Chưa hỗ trợ</div>
 						</div>
 					)}
 				</Space>

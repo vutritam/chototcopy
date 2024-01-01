@@ -1,7 +1,7 @@
 import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons'
 import { Avatar, Button, Image, List, Space, Spin } from 'antd'
 import React, { useState, useEffect } from 'react'
-import CommonModal from '../common/commonModal'
+import CommonModal from '../srcModalOrder/modalOrder'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
@@ -42,30 +42,8 @@ const ListItem: React.FC = () => {
 			const allProduct = await dispatch(fetchAllProduct())
 			if (allProduct?.payload?.success) {
 				setLoading(false)
-				// setTimeout(() => {
-				// 	setLoading(false)
-				setDataList(allProduct?.payload.data)
-
-				// }, 1000)
-				// Toasty.error('Network and proplem when call data from server')
+				setDataList(allProduct?.payload?.data)
 			}
-			// const allLikeProduct = await dispatch(fetchAllLikeAndDisLike())
-			// if (allLikeProduct?.payload?.status) {
-			// 	allLikeProduct?.payload?.data?.map((item, index) => {
-			// 		console.log(item, 'item all like')
-
-			// 		const exists = backGroundclickedLike.some((obj) => obj.id === item._id)
-			// 		if (!exists) {
-			// 			setBackGroundAfterClick([
-			// 				...backGroundclickedLike,
-			// 				{
-			// 					id: item.productId,
-			// 					isClicked: item.like === 1 ? true : false,
-			// 				},
-			// 			])
-			// 		}
-			// 	})
-			// }
 		})()
 	}, [])
 
@@ -78,42 +56,9 @@ const ListItem: React.FC = () => {
 		setLoading(true)
 		setTimeout(() => {
 			setLoading(false)
-			setDataList(dataStore.data)
+			setDataList(dataStore?.data)
 		}, 1000)
 	}, [dataStore])
-	// console.log(dataList, 'dataList')
-
-	// const handleClickLike = async (item, fieldName) => {
-	// 	let data
-	// 	if (fieldName === 'like') {
-	// 		data = {
-	// 			productId: item.id,
-	// 			like: 1,
-	// 			location: getLocationOrderUser?.location,
-	// 			tableNumber: getLocationOrderUser?.tableNumber,
-	// 		}
-	// 	} else {
-	// 		data = {
-	// 			productId: item.id,
-	// 			location: getLocationOrderUser?.location,
-	// 			tableNumber: getLocationOrderUser?.tableNumber,
-	// 			dislike: 1,
-	// 		}
-	// 	}
-	// 	const allLikeProduct = await dispatch(fetchAllLikeAndDisLike())
-	// 	if (allLikeProduct?.payload?.status) {
-	// 		const existsItemDB = allLikeProduct?.payload?.data?.some((obj) => obj.id === item.id)
-	// 		if (existsItemDB && !!data.like) {
-	// 			const { payload } = await dispatch(updateLikeAndDisLike({ ...data, like: 0 }))
-	// 		} else {
-	// 			const { payload } = await dispatch(createLikeAndDisLike(data))
-	// 		}
-
-	// 		setBackGroundAfterClick([...backGroundclickedLike, { id: item.id, isClicked: true }])
-	// 	}
-	// }
-	// console.log(backGroundclickedLike, 'background')
-
 	return (
 		<>
 			{loading ? (
@@ -142,25 +87,28 @@ const ListItem: React.FC = () => {
 						},
 						pageSize: 3,
 					}}
-					dataSource={dataList.map((item, index) => {
-						return {
-							Description: item.Description,
-							EndDate: item.EndDate,
-							Like: item.Like,
-							StartDate: item.StartDate,
-							file: item.file,
-							name: item.name,
-							position: item.position,
-							price: item.price,
-							quantity: item.quantity,
-							status: item.status,
-							viewer: item.Viewer,
-							id: item._id,
-						}
-					})}
+					dataSource={
+						dataList &&
+						dataList.map((item, index) => {
+							return {
+								Description: item.Description,
+								EndDate: item.EndDate,
+								Like: item.Like,
+								StartDate: item.StartDate,
+								file: item.file,
+								name: item.name,
+								position: item.position,
+								price: item.price,
+								quantity: item.quantity,
+								status: item.status,
+								viewer: item.Viewer,
+								id: item._id,
+							}
+						})
+					}
 					footer={
 						<div>
-							<b>Created by team gold coffee</b>
+							<b>Tạo Bởi by Tam Vu Tri</b>
 						</div>
 					}
 					renderItem={(item) => (
@@ -168,17 +116,6 @@ const ListItem: React.FC = () => {
 							key={item.id}
 							actions={[
 								<IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-								// <IconText
-								// 	color={
-								// 		backGroundclickedLike.find((ele, index) => ele.id === item.id && ele.isClicked)
-								// 			? 'blue'
-								// 			: ''
-								// 	}
-								// 	icon={LikeOutlined}
-								// 	text="156"
-								// 	onClick={() => handleClickLike(item, 'like')}
-								// 	key="list-vertical-like-o"
-								// />,
 								<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
 								router.pathname.includes('/order') ? (
 									<CommonModal tittle="Xác nhận chọn món này ?" label="chọn ngay" item={item} />
@@ -213,7 +150,7 @@ const ListItem: React.FC = () => {
 									<span>
 										Giá:
 										<span style={{ color: 'blue', marginLeft: '10px' }}>
-											<span className="strike-through-bold">{item.price}</span>
+											<span className="">{item.price}</span>
 										</span>
 									</span>
 								}

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCollapse } from 'react-collapsed'
 import { RightOutlined, DownOutlined } from '@ant-design/icons'
-const CommonCollapseItem = ({ isActive }) => {
+const ManageWorkShiftItem = ({ isActive }) => {
 	const [isExpanded, setExpanded] = React.useState(isActive)
 	const { getToggleProps, getCollapseProps } = useCollapse({
 		isExpanded,
@@ -69,4 +69,4 @@ const CommonCollapseItem = ({ isActive }) => {
 	)
 }
 
-export default CommonCollapseItem
+export default ManageWorkShiftItem

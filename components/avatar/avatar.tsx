@@ -14,7 +14,7 @@ import { Dropdown, Space, Input, Tooltip } from 'antd'
 import CartItem from '../main/cartItem'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/router'
-import SelectSearch from '@/components/common/inputSelectSearch'
+import SelectSearch from '@/components/common/commonInput/inputSelectSearch'
 import { toast } from 'react-toastify'
 import _ from 'lodash'
 import Link from 'next/link'
@@ -169,8 +169,11 @@ const AvatarComponent: React.FC = () => {
 
 		// Tạo đối tượng tổng hợp thông tin
 		const summary = _.mapValues(groupedOrders, (tableOrders) => {
-			const totalOrderedItems = tableOrders.length
-			const confirmedItems = tableOrders.filter((order) => order.status === 'order_success').length
+			const totalOrderedItems = tableOrders.length || 0
+			const confirmedItems =
+				tableOrders.filter((order) => order.status === 'order_success').length || 0
+			const canceledItems =
+				tableOrders.filter((order) => order.status === 'order_deleted').length || 0
 			if (totalOrderedItems !== confirmedItems) {
 				setIsOrderConfirmed(true)
 			}
@@ -179,11 +182,10 @@ const AvatarComponent: React.FC = () => {
 				JSON.stringify({
 					totalOrderedItems: totalOrderedItems,
 					confirmedItems: confirmedItems,
+					canceledItems: canceledItems,
 				})
 			)
-			console.log({ totalOrderedItems, confirmedItems }, '{ totalOrderedItems, confirmedItems }')
-
-			return { totalOrderedItems, confirmedItems }
+			return { totalOrderedItems, confirmedItems, canceledItems }
 		})
 
 		return summary
@@ -376,19 +378,19 @@ const AvatarComponent: React.FC = () => {
 				roomName = 'room'
 			}
 			socket.emit('joinRoom', roomName)
-			socket.on('response', async (response) => {
+			socket.on('response', async (response: Array<[]>) => {
 				if (response) {
 					await dispatch(setMessage(response))
 				}
 				playNotification()
 			})
-			socket.on('responseEmployee', async (response) => {
+			socket.on('responseEmployee', async (response: Array<[]>) => {
 				if (response) {
 					await dispatch(setMessageEmployee(response))
 				}
 				playNotification()
 			})
-			socket.on('ResponseAfterUserLogin', async (response) => {
+			socket.on('ResponseAfterUserLogin', async (response: Array<[]>) => {
 				if (response) {
 					setLoadingConfirmOrder(false)
 					setCheckConfirm('')
@@ -396,10 +398,11 @@ const AvatarComponent: React.FC = () => {
 				}
 				playNotification()
 			})
-			socket.on('resAllOrderByStatus', async (response) => {
+			socket.on('resAllOrderByStatus', async (response: Array<[]>) => {
 				if (response) {
 					await dispatch(setOrderByNumberTable(response))
 				}
+				playNotification()
 			})
 		}
 
@@ -418,7 +421,6 @@ const AvatarComponent: React.FC = () => {
 			})
 		)
 	}
-	console.log(messageAdmin, 'admin')
 
 	const handleShowOptionMenuAdmin = () => {
 		return messageAdmin?.length > 0 ? (
@@ -522,7 +524,7 @@ const AvatarComponent: React.FC = () => {
 	}
 
 	// console.log(showMenuEmployee, 'showMenu?.length')
-	const handleUpdateSeenMessage = async (params) => {
+	const handleUpdateSeenMessage = async () => {
 		if (isOrderPage) {
 			const element = elementBellOrder.current
 			elementBellOrder.current && element.classList.remove('bell')

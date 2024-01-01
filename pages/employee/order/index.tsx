@@ -11,12 +11,12 @@ import {
 	updateStatusOrder,
 } from '@/redux/componentSlice/orderSlice'
 import Toasty from '@/components/common/toasty'
-import ModalConfirm from '@/components/common/modalConfirm'
-import CommonTable from '@/components/common/commonTable'
+import ModalConfirm from '@/components/common/commonModal/modalConfirm'
+import CommonTable from '@/components/common/commonTable/commonTableListOrder'
 import { deleteAllRecordNotification } from '@/redux/componentSlice/messageSocketSlice'
-import BillExport from '@/components/common/commonBillExport'
+import BillExport from '@/components/srcExportBill/modalBillExport'
 import CartItem from '@/components/main/cartItem'
-
+import { ReloadOutlined } from '@ant-design/icons'
 interface DataType {
 	gender?: string
 	name: {
@@ -39,6 +39,7 @@ const OrderByUser: React.FC = () => {
 	const [open, setOpen] = useState(false)
 	const dispatch = useDispatch()
 	const [idOrder, setIdOrder] = useState(null)
+	const [orderData, setOrderData] = useState(null)
 	const [data, setData] = useState<DataType[]>([])
 	const list = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const [socket, setSocket] = useState(null)
@@ -138,39 +139,34 @@ const OrderByUser: React.FC = () => {
 		)
 		if (payload?.success) {
 			setData(payload.data)
+			if (socket) {
+				// gửi sự kiện get sản phẩm
+				socket.emit('getAllOrderByStatus', {
+					tableNumber: orderData.tableNumber,
+					location: orderData.location,
+				})
+				setLoadingDataTable(false)
+			}
 		}
+
 		Toasty.success(payload?.message)
 		setRefresh(!refreshPage)
 	}
 
-	const handleDeleteAllRecord = async () => {
-		const { payload } = await dispatch(deleteAllRecordOrder())
-		if (payload?.success) {
-			const item = sessionStorage.getItem('warning_text_order')
-			if (item) {
-				sessionStorage.removeItem('warning_text_order')
-			}
-			Toasty.success(payload?.message)
-		}
-	}
-
-	const handleDeleteAllRecordNotification = async () => {
-		const { payload } = await dispatch(deleteAllRecordNotification())
-		Toasty.success(payload?.message)
-	}
-
 	const handleConfirmDelete = (id, showModal) => {
 		setOpen(showModal)
-		setIdOrder(id)
+		setIdOrder(id._id)
+		setOrderData(id)
 	}
 
 	return (
 		<>
 			<ModalConfirm
 				label=""
-				title="Xác nhận xóa item này ?"
+				title="Xác nhận xóa đơn này ?"
 				position="renderConfirmDeleteItemOrder"
 				open={open}
+				item={orderData}
 				setOpen={setOpen}
 				handleSubmit={handleDeleteItem}
 				size={500}
@@ -184,14 +180,8 @@ const OrderByUser: React.FC = () => {
 					marginBottom: '30px',
 				}}
 			>
-				<Button type="primary" onClick={() => setRefresh(true)}>
+				<Button type="primary" onClick={() => setRefresh(true)} icon={<ReloadOutlined />}>
 					Refresh
-				</Button>
-				<Button type="default" onClick={() => handleDeleteAllRecord()}>
-					Delete All
-				</Button>
-				<Button type="default" onClick={() => handleDeleteAllRecordNotification()}>
-					Delete All Notification
 				</Button>
 			</div>
 			<CartItem className="exportBill" />

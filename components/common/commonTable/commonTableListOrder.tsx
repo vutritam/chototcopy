@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Dropdown, MenuProps, Space, Table, Tag } from 'antd'
+import { Button, Dropdown, MenuProps, Space, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import { FormOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
 import { useDispatch } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
+import { useRouter } from 'next/router'
 
 interface DataType {
 	key: React.Key
@@ -35,7 +36,8 @@ for (let i = 0; i < 46; i++) {
 const CommonTable = (props: inputProps): JSX.Element => {
 	const { handleSubmit, handleConfirmOrder, item, loadingDataTable, dummyOrderConfirm } = props
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
-
+	const router = useRouter()
+	const isEmployeePage = router.pathname.startsWith('/employee')
 	const [localData, setLocalData] = useState(null)
 	const [idItem, setIdItem] = useState(null)
 
@@ -65,7 +67,11 @@ const CommonTable = (props: inputProps): JSX.Element => {
 							productId: record.productId,
 						},
 				  }))
-		setLocalData(localDataWithCustomData)
+
+		const filterLocalDataWithCustomData = localDataWithCustomData?.filter((record: any) =>
+			isEmployeePage ? record.status !== 'order_deleted' : record
+		)
+		setLocalData(filterLocalDataWithCustomData)
 		setShowRedBackground(true)
 		const timer = setTimeout(() => {
 			setShowRedBackground(false)
@@ -74,33 +80,33 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		return () => clearTimeout(timer) // Hủy bỏ timer khi component unmounts hoặc timer được clear
 	}, [item])
 
-	useEffect(() => {
-		const localDataWithCustomData =
-			item !== null && typeof item === 'object' && !Array.isArray(item)
-				? item?.data?.map((record: any) => ({
-						...record,
-						customData: {
-							tableNumber: record.tableNumber,
-							status: record.status,
-							_id: record._id,
-							location: record.location,
-							productId: record.productId,
-						},
-				  }))
-				: item?.map((record: any) => ({
-						...record,
-						customData: {
-							tableNumber: record.tableNumber,
-							status: record.status,
-							_id: record._id,
-							location: record.location,
-							productId: record.productId,
-						},
-				  }))
+	// useEffect(() => {
+	// 	const localDataWithCustomData =
+	// 		item !== null && typeof item === 'object' && !Array.isArray(item)
+	// 			? item?.data?.map((record: any) => ({
+	// 					...record,
+	// 					customData: {
+	// 						tableNumber: record.tableNumber,
+	// 						status: record.status,
+	// 						_id: record._id,
+	// 						location: record.location,
+	// 						productId: record.productId,
+	// 					},
+	// 			  }))
+	// 			: item?.map((record: any) => ({
+	// 					...record,
+	// 					customData: {
+	// 						tableNumber: record.tableNumber,
+	// 						status: record.status,
+	// 						_id: record._id,
+	// 						location: record.location,
+	// 						productId: record.productId,
+	// 					},
+	// 			  }))
 
-		// Cập nhật state để giữ record có ngày mới nhất
-		setLocalData(localDataWithCustomData)
-	}, [])
+	// 	// Cập nhật state để giữ record có ngày mới nhất
+	// 	setLocalData(localDataWithCustomData)
+	// }, [])
 
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
@@ -178,7 +184,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 				</Space>
 			)
 		} else {
-			return (
+			return isEmployeePage ? (
 				<Dropdown.Button
 					menu={{ items }}
 					placement="bottomRight"
@@ -190,6 +196,8 @@ const CommonTable = (props: inputProps): JSX.Element => {
 						/>
 					}
 				></Dropdown.Button>
+			) : (
+				'Đang chờ nhân viên'
 			)
 		}
 	}
@@ -244,7 +252,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			title: 'Số lượng',
 			dataIndex: 'quantity',
 			key: 'quantity',
-			width: 120,
+			width: 100,
 			sorter: true,
 		},
 
@@ -252,15 +260,20 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			title: 'Mô tả',
 			dataIndex: 'description',
 			key: 'description',
-			width: 150,
+			width: 170,
 			sorter: true,
+			render: (text, record) => (
+				<Tooltip placement="top" title={text} key={'red'}>
+					<div className="text-norwap">{text || 'N/A'}</div>
+				</Tooltip>
+			),
 		},
 		{
 			title: 'Action',
 			dataIndex: 'customData',
 			key: 'operation',
 			fixed: 'right',
-			width: 150,
+			width: 180,
 			render: (customData) => handleStatus(customData),
 		},
 	]
@@ -311,9 +324,13 @@ const CommonTable = (props: inputProps): JSX.Element => {
 				virtual={true}
 				dataSource={localData}
 				loading={loadingDataTable}
-				scroll={{ x: 1000, y: 300 }}
 				rowSelection={{ ...rowSelection }}
-				pagination={false}
+				pagination={{
+					onChange: (page) => {
+						console.log(page)
+					},
+					pageSize: 5,
+				}}
 				sticky
 				onRow={(record, index) => ({
 					style: {

@@ -117,6 +117,11 @@
     border-radius: 50%;
     background-color: #26d902;
 }
+.text-norwap{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
 .online-active-employee {
   width: 9px;
   height: 9px;
@@ -148,6 +153,12 @@ html {
 }
 .style_bell {
   font-size: 22px;
+  color: #ef9509;
+   width: 30px;
+}
+.style_cart {
+  font-size: 22px;
+  color: #050755;
    width: 30px;
 }
 .bill-container {

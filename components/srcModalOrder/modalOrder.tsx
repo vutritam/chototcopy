@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Avatar, Button, InputNumber, List, Modal, Select, Space, Spin, Tooltip } from 'antd'
 import { LikeOutlined, MessageOutlined } from '@ant-design/icons'
-import Toasty from './toasty'
+import Toasty from '../common/toasty'
 import { Label, TextArea } from 'semantic-ui-react'
-import SocketClient from './socketIoConnect'
+import SocketClient from '../common/socketIoConnect'
 import io from 'socket.io-client'
 import { setMessage, setMessageEmployee } from '@/redux/componentSlice/messageSocketSlice'
 import { useDispatch } from 'react-redux'
 import { fetchCreateOrder, setOrder } from '@/redux/componentSlice/orderSlice'
 import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
 import { useRouter } from 'next/router'
-import { decodeNumber, encodeNumber } from './hashCode'
-import { processRouterQuery } from './parseNumber'
+import { decodeNumber, encodeNumber } from '../common/hashCode'
+import { processRouterQuery } from '../common/parseNumber'
 import L10N from '../L10N/en.json'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 
@@ -71,10 +71,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	const handleOk = () => {
 		// setTimeout(async () => {
 		setOpen(false)
-		setDataInput({
-			quantity: 0,
-			description: '',
-		})
+
 		setConfirmLoading(false)
 		if (socket) {
 			// Gửi sự kiện tới Socket.IO server
@@ -107,6 +104,8 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	}
 
 	const onChangeDescription = (event: any) => {
+		console.log(event?.target?.value, 'event?.target?.value')
+
 		setDataInput({ ...dataInput, description: event?.target?.value })
 	}
 

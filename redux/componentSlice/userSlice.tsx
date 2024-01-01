@@ -33,7 +33,7 @@ const userSlice = createSlice({
 	initialState: {
 		account: { user: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataList: { dataItem: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
-		allUser: { data: null, loading: false, error: '' },
+		allUser: { data: [], loading: false, error: '' },
 	},
 	reducers: {
 		setUser: (state, action) => {

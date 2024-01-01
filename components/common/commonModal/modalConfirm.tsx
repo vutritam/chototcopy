@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Form, Input, Modal, Select, Space, Spin, TreeSelect } from 'antd'
+import {
+	Avatar,
+	Button,
+	Form,
+	Image,
+	Input,
+	List,
+	Modal,
+	Select,
+	Space,
+	Spin,
+	TreeSelect,
+} from 'antd'
 import { SizeType } from 'antd/es/config-provider/SizeContext'
 
 interface inputProps {
@@ -7,6 +19,7 @@ interface inputProps {
 	title: string
 	position?: string
 	open?: boolean
+	item: any
 	setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 	handleSubmit?: () => void
 	size?: number
@@ -25,12 +38,25 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 	}
 
 	const renderDeleteItemOrder = () => {
+		const { item } = props
+		console.log(item, 'item')
+		const itemRender = item !== null && item.productId
 		return (
-			<Space direction="vertical" style={{ width: '100%' }}>
-				<Space style={{ justifyContent: 'center', height: '100px', width: '100%' }}>
-					<Spin tip="Xác nhận xóa?"></Spin>
-				</Space>
-			</Space>
+			<List.Item>
+				<List.Item.Meta
+					avatar={
+						<Image
+							width={50}
+							height={50}
+							style={{ borderRadius: '50px', objectFit: 'cover' }}
+							alt="logo"
+							src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${itemRender.file || ''}`}
+						/>
+					}
+					title={<a href="https://ant.design">{itemRender.name || ''}</a>}
+					description={itemRender.Description}
+				/>
+			</List.Item>
 		)
 	}
 

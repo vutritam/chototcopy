@@ -79,14 +79,14 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 							<Badge count={countMessage > 10 ? `${10}+` : countMessage}>
 								<BellOutlined
 									ref={elementBellOrder}
-									className="bell"
+									className="bell style_bell"
 									style={{ fontSize: '22px', width: '30px' }}
 								/>
 							</Badge>
 						</Tooltip>
 					) : (
 						<Badge style={{ display: 'flex' }}>
-							<BellOutlined style={{ fontSize: '22px', width: '30px' }} />
+							<BellOutlined style={{ fontSize: '22px', width: '30px' }} className="style_bell" />
 						</Badge>
 					)}
 				</Space>

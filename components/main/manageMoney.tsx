@@ -1,7 +1,7 @@
 import { Button, Dropdown, Space } from 'antd'
 import React, { useState } from 'react'
 import type { MenuProps } from 'antd'
-import ModalConfirm from '@/components/common/modalConfirm'
+import ModalConfirm from '@/components/common/commonModal/modalConfirm'
 type Props = {}
 
 export default function ManageMoney({}: Props) {
@@ -23,13 +23,7 @@ export default function ManageMoney({}: Props) {
 		},
 		{
 			key: '2',
-			label: (
-				<ModalConfirm
-					label="Tạo trình chi"
-					title="Tạo phiếu chi"
-					size={1000}
-				/>
-			),
+			label: <ModalConfirm label="Tạo trình chi" title="Tạo phiếu chi" size={1000} />,
 		},
 	]
 	return (

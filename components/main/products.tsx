@@ -10,13 +10,13 @@ import {
 } from '@ant-design/icons'
 import { Button, Dropdown, Space, Tooltip } from 'antd'
 import type { MenuProps } from 'antd'
-import CommonFilter from '../common/commonFilter'
+import CommonFilter from '../common/commonInput/commonFilter'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct, fetchProductByFilterCondition } from '@/redux/componentSlice/productSlice'
 import Toasty from '../common/toasty'
 import { useRouter } from 'next/router'
 export interface IAppProps {}
-
+import L10N from '../L10N/en.json'
 export default function Products(props: IAppProps) {
 	// const [state, setState] = React.useState({
 	// 	name: 'Chọn tên',
@@ -191,23 +191,12 @@ export default function Products(props: IAppProps) {
 		setItemFilter(!itemFilterChecked)
 	}
 
-	// React.useEffect(() => {
-	// 	const handleChecked = (itemFilterChecked) => {
-	// 		switch (itemFilterChecked) {
-	// 			case 1:
-	// 				break
-
-	// 			default:
-	// 				break
-	// 		}
-	// 	}
-	// 	handleChecked(itemFilterChecked)
-	// }, [itemFilterChecked])
 	const dispatch = useDispatch()
 	const isOrderPage = router.pathname.startsWith('/order')
 	const [dataTotalOrderAndConfirm, setDataTotalOrderAndConfirm] = React.useState({
 		totalOrderedItems: 0,
 		confirmedItems: 0,
+		canceledItems: 0,
 	})
 	//message redux store
 	const dataOrderByNumberTable = useSelector(
@@ -219,11 +208,10 @@ export default function Products(props: IAppProps) {
 		if (sessionOrder) {
 			try {
 				sessionOrder = JSON.parse(sessionOrder)
-				console.log('getTotalOrder changed:', sessionOrder)
-
 				setDataTotalOrderAndConfirm({
 					totalOrderedItems: sessionOrder.totalOrderedItems,
 					confirmedItems: sessionOrder.confirmedItems,
+					canceledItems: sessionOrder.canceledItems,
 				})
 			} catch (error) {
 				console.error('Error parsing JSON:', error)
@@ -247,38 +235,43 @@ export default function Products(props: IAppProps) {
 		setDisableFilter(true)
 	}
 
-	return (
-		<div>
-			{isOrderPage &&
-			dataTotalOrderAndConfirm.confirmedItems !== dataTotalOrderAndConfirm.totalOrderedItems ? (
+	const renderNotiItemOrder = () => {
+		return isOrderPage &&
+			dataTotalOrderAndConfirm.confirmedItems + dataTotalOrderAndConfirm.canceledItems !==
+				dataTotalOrderAndConfirm.totalOrderedItems ? (
+			<div className="marquee-container screen-mobile">
+				<div className="marquee-content">
+					<span style={{ color: 'yellow', marginRight: '5px' }}>
+						<FireFilled color="yellow" />
+					</span>
+					{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${
+						Number(dataTotalOrderAndConfirm.totalOrderedItems) -
+						Number(dataTotalOrderAndConfirm.confirmedItems)
+					} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
+				</div>
+			</div>
+		) : (
+			<>
 				<div className="marquee-container screen-mobile">
 					<div className="marquee-content">
-						<span style={{ color: 'yellow', marginRight: '5px' }}>
-							<FireFilled color="yellow" />
+						<DownCircleOutlined />{' '}
+						<span style={{ fontSize: '16px', color: 'green' }}>
+							{L10N['message.product.orderConfirm.marquee.content']}
+						</span>{' '}
+						(
+						<span style={{ color: 'red' }}>
+							{L10N['message.product.orderConfirm.marquee.content.warning']}
 						</span>
-						{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${
-							Number(dataTotalOrderAndConfirm.totalOrderedItems) -
-							Number(dataTotalOrderAndConfirm.confirmedItems)
-						} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
+						)
 					</div>
 				</div>
-			) : (
-				<>
-					<div className="marquee-container screen-mobile">
-						<div className="marquee-content">
-							<DownCircleOutlined />{' '}
-							<span style={{ fontSize: '16px', color: 'green' }}>
-								Các món bạn đặt đã được xác nhận
-							</span>{' '}
-							(
-							<span style={{ color: 'red' }}>
-								Lưu ý: Các thông báo này sẽ tự xóa sau khi bạn đóng trang web
-							</span>
-							)
-						</div>
-					</div>
-				</>
-			)}
+			</>
+		)
+	}
+
+	return (
+		<div>
+			{renderNotiItemOrder()}
 			<div
 				className="catelories"
 				style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '10px' }}
@@ -305,36 +298,7 @@ export default function Products(props: IAppProps) {
 					</div>
 				</Space>
 
-				{isOrderPage &&
-				dataTotalOrderAndConfirm.confirmedItems !== dataTotalOrderAndConfirm.totalOrderedItems ? (
-					<div className="marquee-container show-desktop-menu">
-						<div className="marquee-content">
-							<span style={{ color: 'yellow', marginRight: '5px' }}>
-								<FireFilled color="yellow" />
-							</span>
-							{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${
-								Number(dataTotalOrderAndConfirm.totalOrderedItems) -
-								Number(dataTotalOrderAndConfirm.confirmedItems)
-							} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
-						</div>
-					</div>
-				) : (
-					<>
-						<div className="marquee-container show-desktop-menu">
-							<div className="marquee-content">
-								<DownCircleOutlined style={{ fontSize: '16px', color: 'green' }} />{' '}
-								<span style={{ fontSize: '16px', color: 'green' }}>
-									Các món bạn đặt đã được xác nhận
-								</span>{' '}
-								(
-								<span style={{ color: 'red' }}>
-									Lưu ý: Các thông báo này sẽ tự xóa sau khi bạn đóng trang web
-								</span>
-								)
-							</div>
-						</div>
-					</>
-				)}
+				{renderNotiItemOrder()}
 			</div>
 			<Space className="filter-mobile">
 				{itemFilterChecked ? (

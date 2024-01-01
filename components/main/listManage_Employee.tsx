@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Avatar, Button, List, MenuProps, Skeleton, Space } from 'antd'
-import CommonShowHistory from '../common/commonShowHistory'
-import CommonFilter from '../common/commonFilter'
-import InputDateTime from '../common/inputDateTime'
+import CommonShowHistory from '../srcShowHistory/modalShowHistory'
+import CommonFilter from '../common/commonInput/commonFilter'
+import InputDateTime from '../common/commonInput/inputDateTime'
 import { FileSearchOutlined } from '@ant-design/icons'
 import type { DatePickerProps, RangePickerProps } from 'antd/es/date-picker'
 
@@ -177,7 +177,7 @@ const List_manage_employee: React.FC = (props) => {
 			setInitLoading(false)
 		}, 1000)
 	}
-	console.log(loading, 'lo')
+	console.log(item, 'lo')
 
 	return (
 		<>
@@ -218,6 +218,12 @@ const List_manage_employee: React.FC = (props) => {
 				className="demo-loadmore-list"
 				loading={initLoading}
 				itemLayout="horizontal"
+				pagination={{
+					onChange: (page) => {
+						console.log(page)
+					},
+					pageSize: 3,
+				}}
 				// loadMore={loadMore}
 				dataSource={item}
 				renderItem={(item) => {

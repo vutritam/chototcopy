@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 // import Products from '@/components/main/products'
 // import { decodeNumber, encodeNumber } from '@/components/common/hashCode'
 import RenderedComponent from '@/components/common/renderComponent'
-import ComfirmLocationOrder from '@/components/common/confirmLocation'
+import ComfirmLocationOrder from '@/components/srcConfirmLocation/confirmLocation'
 import { processRouterQuery } from '@/components/common/parseNumber'
 
 const App: React.FC = () => {

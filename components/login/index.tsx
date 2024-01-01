@@ -27,6 +27,16 @@ const LoginForm: React.FC = () => {
 			newSocket.disconnect()
 		}
 	}, [])
+	useEffect(() => {
+		if (
+			usernameInputRef.current &&
+			passwordInputRef.current &&
+			(usernameInputRef.current.input.value && passwordInputRef.current.input.value) !== ''
+		) {
+			usernameInputRef.current.focus()
+			passwordInputRef.current.focus()
+		}
+	}, [keyTab])
 	const onFinish = async (options: any) => {
 		setLoadings(true)
 		if (keyTab === 1) {
@@ -93,8 +103,6 @@ const LoginForm: React.FC = () => {
 		} else {
 			const { payload } = await dispatch(fetchRegisterUser(options))
 			if (payload?.success) {
-				usernameInputRef.current.value = ''
-				passwordInputRef.current.value = ''
 				setTimeout(() => {
 					setLoadings(false)
 					// dispatch(setUser(payload))
