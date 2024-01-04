@@ -6,3 +6,21 @@ export const CONST_TYPE_ELEMENT = {
 	LocationOrder: 'locationOrder',
 	ElementL10n: 'elementL10n',
 }
+
+export const CONST_TYPE_KEY_VALUE = {
+	TableNumber: 'tableNumber',
+	Order_success: 'order_success',
+	Order_deleted: 'order_deleted',
+	Admin_page: 'admin_page',
+	UserOrder: 'userOrder',
+	Employee: 'employee',
+	Admin: 'admin',
+}
+
+export const CONST_TYPE_SOCKET = {
+	JoinRoom: 'joinRoom',
+	Response: 'response',
+	ResponseEmployee: 'responseEmployee',
+	ResponseAfterUserLogin: 'responseAfterUserLogin',
+	ResAllOrderByStatus: 'resAllOrderByStatus',
+}

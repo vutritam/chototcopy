@@ -1,12 +1,13 @@
 import { Badge, Button, Dropdown, Menu, Space, Tooltip } from 'antd'
 import { BellOutlined } from '@ant-design/icons'
-import { handleTextL10N, sortByStatus } from '@/components/helper/helper'
+import { handleTextL10N, sortByStatus } from '@/components/utils/utils'
 import L10N from '../../L10N/en.json'
 import HelperMessageForUser from './avatarHelper'
 import { useEffect, useState } from 'react'
 import _ from 'lodash'
+import { CONST_TYPE_KEY_VALUE } from '@/constanst/constanst.const'
 interface inputProps {
-	dataMessage: any
+	dataMessage: Array<[]>
 	showMessage: boolean
 	countMessage: number
 	orderSummary: any
@@ -28,22 +29,25 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 		handleConfirmOrder,
 	} = props
 	const isDataMessage = dataMessage && dataMessage
-	const isUserOrder = condition === 'userOrder'
+	const isUserOrder = condition === CONST_TYPE_KEY_VALUE.UserOrder
+	const isAdmin = condition === CONST_TYPE_KEY_VALUE.Admin
 
-	const [data, setData] = useState<array>([])
+	const [data, setData] = useState<Array<[]>>([])
 	useEffect(() => {
-		const sortItemByTableNumber = isDataMessage.reduce((acc, order) => {
-			const { tableNumber, quantity } = order
-			const existingOrder = acc.find((group) => group.tableNumber === tableNumber)
+		const sortItemByTableNumber = !isAdmin
+			? isDataMessage.reduce((acc, order) => {
+					const { tableNumber, quantity } = order
+					const existingOrder = acc.find((group) => group.tableNumber === tableNumber)
 
-			if (existingOrder) {
-				existingOrder.quantity += quantity
-			} else {
-				acc.push({ ...order })
-			}
+					if (existingOrder) {
+						existingOrder.quantity += quantity
+					} else {
+						acc.push({ ...order })
+					}
 
-			return acc
-		}, [])
+					return acc
+			  }, [])
+			: dataMessage
 		setData(sortItemByTableNumber)
 	}, [dataMessage.length])
 

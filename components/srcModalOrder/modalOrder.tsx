@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Avatar, Button, InputNumber, List, Modal, Select, Space, Spin, Tooltip } from 'antd'
 import { LikeOutlined, MessageOutlined } from '@ant-design/icons'
-import Toasty from '../common/toasty'
-import { Label, TextArea } from 'semantic-ui-react'
-import SocketClient from '../common/socketIoConnect'
+import { TextArea } from 'semantic-ui-react'
 import io from 'socket.io-client'
-import { setMessage, setMessageEmployee } from '@/redux/componentSlice/messageSocketSlice'
-import { useDispatch } from 'react-redux'
-import { fetchCreateOrder, setOrder } from '@/redux/componentSlice/orderSlice'
-import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
 import { useRouter } from 'next/router'
-import { decodeNumber, encodeNumber } from '../common/hashCode'
 import { processRouterQuery } from '../common/parseNumber'
-import L10N from '../L10N/en.json'
-import { ThunkDispatch } from '@reduxjs/toolkit'
+import L10N from '../../L10N/en.json'
 
 interface inputProps {
 	label: string
@@ -23,8 +15,6 @@ interface inputProps {
 const CommonModal = (props: inputProps): JSX.Element => {
 	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
-	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
-	const isOrderPage = router.pathname.startsWith('/order')
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const [getLocationOrderUser, setGetLocationOrderUser] = useState(null)

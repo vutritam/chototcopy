@@ -21,7 +21,7 @@ import Link from 'next/link'
 import { fetchUserById } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { fetchMessageByUserRole } from '@/redux/componentSlice/messageSocketSlice'
-import L10N from '../L10N/en.json'
+import L10N from '../../L10N/en.json'
 import { processRouterQuery } from '../common/parseNumber'
 import moment from 'moment'
 import { io } from 'socket.io-client'
@@ -35,13 +35,11 @@ import {
 	setMessageEmployee,
 	setMessageAdmin,
 } from '@/redux/componentSlice/orderSlice'
-import { handleTextL10N } from '../helper/helper'
+import { handleTextL10N } from '../utils/utils'
 import useSound from 'use-sound'
 const notificationSoundPath = '/sound/am-thanh-thong-bao-messenger-www_hieuung_com.mp3'
-
-// Sử dụng notificationSound như bình thường
-
 import HelperMessageToolTip from './helper/avatarTooltip'
+import { CONST_TYPE_KEY_VALUE, CONST_TYPE_SOCKET } from '@/constanst/constanst.const'
 
 const itemsRender: MenuProps['items'] = [
 	{
@@ -146,9 +144,6 @@ const AvatarComponent: React.FC = () => {
 		},
 	]
 
-	const [showMenu, setShowMenu] = React.useState([])
-	const [showMenuEmployee, setShowMenuEmployee] = React.useState([])
-
 	const onSetDataLocal = (data: propsData, callback: Function) => {
 		const { userInfo, dataNoti } = data
 		setDataLocal({ userInfo: userInfo, dataNoti: dataNoti })
@@ -204,6 +199,7 @@ const AvatarComponent: React.FC = () => {
 		}
 		initSocket()
 	}, [ENV_HOST])
+
 	// useEffect để theo dõi sự thay đổi của orderConfirmed
 	useEffect(() => {
 		const handleBeforeUnload = (event) => {
@@ -330,7 +326,7 @@ const AvatarComponent: React.FC = () => {
 					fetchMessageByUserRole({
 						userId: getInforUser?.data?.userId,
 						location: getInforUser?.data?.location,
-						isPage: 'admin_page',
+						isPage: CONST_TYPE_KEY_VALUE.Admin_page,
 					})
 				)
 				if (payload) {
@@ -344,6 +340,7 @@ const AvatarComponent: React.FC = () => {
 					}, 2000)
 				}
 			}
+
 			await dispatch(
 				fetchAllOrder({
 					location: getInforUser?.data.location,
@@ -377,20 +374,20 @@ const AvatarComponent: React.FC = () => {
 			} else {
 				roomName = 'room'
 			}
-			socket.emit('joinRoom', roomName)
-			socket.on('response', async (response: Array<[]>) => {
+			socket.emit(CONST_TYPE_SOCKET.JoinRoom, roomName)
+			socket.on(CONST_TYPE_SOCKET.Response, async (response: Array<[]>) => {
 				if (response) {
 					await dispatch(setMessage(response))
 				}
 				playNotification()
 			})
-			socket.on('responseEmployee', async (response: Array<[]>) => {
+			socket.on(CONST_TYPE_SOCKET.ResponseEmployee, async (response: Array<[]>) => {
 				if (response) {
 					await dispatch(setMessageEmployee(response))
 				}
 				playNotification()
 			})
-			socket.on('ResponseAfterUserLogin', async (response: Array<[]>) => {
+			socket.on(CONST_TYPE_SOCKET.ResponseAfterUserLogin, async (response: Array<[]>) => {
 				if (response) {
 					setLoadingConfirmOrder(false)
 					setCheckConfirm('')
@@ -398,7 +395,7 @@ const AvatarComponent: React.FC = () => {
 				}
 				playNotification()
 			})
-			socket.on('resAllOrderByStatus', async (response: Array<[]>) => {
+			socket.on(CONST_TYPE_SOCKET.ResAllOrderByStatus, async (response: Array<[]>) => {
 				if (response) {
 					await dispatch(setOrderByNumberTable(response))
 				}
@@ -422,40 +419,6 @@ const AvatarComponent: React.FC = () => {
 		)
 	}
 
-	const handleShowOptionMenuAdmin = () => {
-		return messageAdmin?.length > 0 ? (
-			messageAdmin.map((ele, index) => (
-				<Menu.Item key={index} className={`${showMessageAdmin ? '' : 'show-readed-message'}`}>
-					<DownCircleOutlined style={{ fontSize: '16px', color: 'rgb(43 215 0)' }} />
-					<a style={{ marginLeft: '5px', fontWeight: '600' }}>
-						<span style={{ color: 'blue' }}>{ele?.userId?.username}</span> vừa mới đăng nhập
-					</a>
-					<div style={{ fontSize: '12px' }}>
-						<b>Ca: {ele?.workShiftId?.nameWork || 'trống'}</b>
-					</div>
-					<div style={{ fontSize: '12px' }}>
-						<span>
-							<b>Thời gian:</b>{' '}
-						</span>
-						<span>
-							<b>{moment(ele.dateTime).format('YYYY-MM-DD HH:mm:ss')}</b>
-						</span>
-					</div>
-					<p style={{ fontSize: '12px' }}>
-						<b>Địa điểm: {ele.location}</b>
-					</p>
-					<Link
-						style={{ fontSize: '12px', color: 'blue' }}
-						href={`/order/detail/${JSON.stringify(router.query)}`}
-					>
-						xem chi tiết
-					</Link>
-				</Menu.Item>
-			))
-		) : (
-			<Menu.Item>{handleTextL10N(L10N['message.avatar.menuItem.nodata.text'], null)}</Menu.Item>
-		)
-	}
 	const renderMenuMessage = () => {
 		if (isOrderPage) {
 			return (
@@ -465,7 +428,7 @@ const AvatarComponent: React.FC = () => {
 					countMessage={countMessage}
 					orderSummary={orderSummary}
 					handleUpdateSeenMessage={handleUpdateSeenMessage}
-					condition="userOrder"
+					condition={CONST_TYPE_KEY_VALUE.UserOrder}
 					elementBellOrder={elementBellOrder}
 					handleConfirmOrder={handleConfirmOrder}
 				/>
@@ -478,52 +441,27 @@ const AvatarComponent: React.FC = () => {
 					countMessage={countMessage}
 					orderSummary={orderSummary}
 					handleUpdateSeenMessage={handleUpdateSeenMessage}
-					condition="employee"
+					condition={CONST_TYPE_KEY_VALUE.Employee}
 					elementBellOrder={elementBellOrderEmployee}
 					handleConfirmOrder={handleConfirmOrder}
 				/>
 			)
 		} else {
 			return (
-				<Dropdown
-					dropdownRender={(menu) => (
-						<Menu className="showScroll">
-							<Menu.Item>
-								<h5>{handleTextL10N(L10N['message.avatar.menuItem.item.title'], [])}</h5>
-							</Menu.Item>
-							{handleShowOptionMenuAdmin()}
-						</Menu>
-					)}
-					trigger={['click']}
-					onClick={() => handleUpdateSeenMessage(true)}
-				>
-					<a onClick={(e) => e.preventDefault()}>
-						<Space>
-							{messageAdmin?.length > 0 ? (
-								<Tooltip
-									placement="bottomLeft"
-									title={handleTextL10N(L10N['message.avatar.modal.tooltip.title'], [])}
-									color={'red'}
-									key={'red'}
-									open={showMessageAdmin}
-								>
-									<Badge count={countMessage > 10 ? `${10}+` : countMessage}>
-										<BellOutlined ref={elementBellAdmin} className="bell style_bell" />
-									</Badge>
-								</Tooltip>
-							) : (
-								<Badge style={{ display: 'flex' }}>
-									<BellOutlined className="style_bell " />
-								</Badge>
-							)}
-						</Space>
-					</a>
-				</Dropdown>
+				<HelperMessageToolTip
+					dataMessage={messageAdmin}
+					showMessage={showMessageAdmin}
+					countMessage={countMessage}
+					orderSummary={orderSummary}
+					handleUpdateSeenMessage={handleUpdateSeenMessage}
+					condition={CONST_TYPE_KEY_VALUE.Admin}
+					elementBellOrder={elementBellAdmin}
+					handleConfirmOrder={handleConfirmOrder}
+				/>
 			)
 		}
 	}
 
-	// console.log(showMenuEmployee, 'showMenu?.length')
 	const handleUpdateSeenMessage = async () => {
 		if (isOrderPage) {
 			const element = elementBellOrder.current
@@ -540,10 +478,8 @@ const AvatarComponent: React.FC = () => {
 	}
 
 	return (
-		<div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', alignItems: 'center' }}>
-			<div
-				style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', alignItems: 'center' }}
-			>
+		<div className="flex-box-basic">
+			<div className="flex-box-basic">
 				<Tooltip title="Tìm kiếm khu vực tại đây" color={'red'} key={'red'}>
 					<EnvironmentOutlined style={{ fontSize: '22px', width: '30px', display: 'flex' }} />
 				</Tooltip>
