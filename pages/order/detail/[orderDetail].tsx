@@ -1,15 +1,34 @@
-import React from 'react'
-// import { useRouter } from 'next/router'
-// import Products from '@/components/main/products'
-// import { decodeNumber, encodeNumber } from '@/components/common/hashCode'
-import RenderedComponent from '@/components/common/renderComponent'
+// employee.tsx
+import React, { useState } from 'react'
+import { itemsEmployee, itemsOrder } from '@/components/jsonData/menuData'
+import MasterLayout from '@/components/masterLayout/masterLayout'
+import DetailOrder from '@/components/main/detailOrder'
 
-const App: React.FC = () => {
+interface OrderDetailProps {}
+
+const OrderDetail: React.FC<OrderDetailProps> = () => {
+	return <DetailOrder />
+}
+
+OrderDetail.Layout = function getLayout(page) {
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
+
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
+
 	return (
-		<>
-			<RenderedComponent />
-		</>
+		<MasterLayout
+			itemsSiderBar={itemsOrder}
+			isPage="employee"
+			selectedItemKey={selectedItemKey}
+			handleMenuClick={handleMenuClick}
+		>
+			{page}
+		</MasterLayout>
 	)
 }
 
-export default App
+export default OrderDetail

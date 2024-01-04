@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 // import Products from '@/components/main/products'
 // import { decodeNumber, encodeNumber } from '@/components/common/hashCode'
-import RenderedComponent from '@/components/common/renderComponent'
 import ComfirmLocationOrder from '@/components/srcConfirmLocation/confirmLocation'
 import { processRouterQuery } from '@/components/common/parseNumber'
+import MasterLayout from '@/components/masterLayout/masterLayout'
+import { itemsOrder } from '@/components/jsonData/menuData'
+import Products from '@/components/main/products'
 
-const App: React.FC = () => {
+const OrderPage: React.FC = () => {
 	const [idTable, setIdTable] = useState<any>(0)
 	const [show, setShow] = useState(true)
 	const router = useRouter()
@@ -39,9 +41,29 @@ const App: React.FC = () => {
 				/>
 			) : null}
 
-			<RenderedComponent />
+			<Products />
 		</>
 	)
 }
+OrderPage.Layout = function getLayout(page) {
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
 
-export default App
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
+
+	return (
+		<MasterLayout
+			itemsSiderBar={itemsOrder}
+			isPage="employee"
+			selectedItemKey={selectedItemKey}
+			handleMenuClick={handleMenuClick}
+		>
+			{page}
+		</MasterLayout>
+	)
+}
+
+export default OrderPage

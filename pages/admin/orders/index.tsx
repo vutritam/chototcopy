@@ -11,6 +11,9 @@ import { io } from 'socket.io-client'
 import CommonTable from '@/components/common/commonTable/commonTableListOrder'
 import { Button } from 'antd'
 import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
+import MasterLayout from '@/components/masterLayout/masterLayout'
+import { itemsAdmin } from '@/components/jsonData/menuData'
+import PrivateRoute from '@/components/common/privateRoute'
 interface DataType {
 	gender?: string
 	name: {
@@ -161,5 +164,26 @@ const OrderByAllUser: React.FC = () => {
 		</>
 	)
 }
+OrderByAllUser.Layout = function getLayout(page) {
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
 
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
+
+	return (
+		<PrivateRoute allowedRoles={['admin']}>
+			<MasterLayout
+				itemsSiderBar={itemsAdmin}
+				isPage="employee"
+				selectedItemKey={selectedItemKey}
+				handleMenuClick={handleMenuClick}
+			>
+				{page}
+			</MasterLayout>
+		</PrivateRoute>
+	)
+}
 export default OrderByAllUser

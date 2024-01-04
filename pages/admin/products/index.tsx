@@ -4,6 +4,9 @@ import FileUpload from '@/components/common/upload'
 import { useDispatch } from 'react-redux'
 import { fetchCreateProduct } from '@/redux/componentSlice/productSlice'
 import Toasty from '@/components/common/toasty'
+import MasterLayout from '@/components/masterLayout/masterLayout'
+import { itemsAdmin } from '@/components/jsonData/menuData'
+import PrivateRoute from '@/components/common/privateRoute'
 
 type RequiredMark = boolean | 'optional'
 
@@ -125,5 +128,26 @@ const Products: React.FC = () => {
 		</Form>
 	)
 }
+Products.Layout = function getLayout(page) {
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
 
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
+
+	return (
+		<PrivateRoute allowedRoles={['admin']}>
+			<MasterLayout
+				itemsSiderBar={itemsAdmin}
+				isPage="employee"
+				selectedItemKey={selectedItemKey}
+				handleMenuClick={handleMenuClick}
+			>
+				{page}
+			</MasterLayout>
+		</PrivateRoute>
+	)
+}
 export default Products

@@ -17,6 +17,9 @@ import { deleteAllRecordNotification } from '@/redux/componentSlice/messageSocke
 import BillExport from '@/components/srcExportBill/modalBillExport'
 import CartItem from '@/components/main/cartItem'
 import { ReloadOutlined } from '@ant-design/icons'
+import MasterLayout from '@/components/masterLayout/masterLayout'
+import { itemsEmployee } from '@/components/jsonData/menuData'
+import PrivateRoute from '@/components/common/privateRoute'
 interface DataType {
 	gender?: string
 	name: {
@@ -93,7 +96,7 @@ const OrderByUser: React.FC = () => {
 
 	useEffect(() => {
 		if (socket) {
-			socket.emit('joinRoom', `room-${getLocationEmployee.data.location}`)
+			socket.emit('joinRoom', `room-${getLocationEmployee?.data?.location}`)
 			socket.on('resProductOrder', async (response) => {
 				await dispatch(setOrderByNumberTable(response))
 				setData(response.data)
@@ -194,6 +197,28 @@ const OrderByUser: React.FC = () => {
 				loadingDataTable={loadingDataTable}
 			/>
 		</>
+	)
+}
+OrderByUser.Layout = function getLayout(page) {
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
+
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
+
+	return (
+		<PrivateRoute allowedRoles={['client']}>
+			<MasterLayout
+				itemsSiderBar={itemsEmployee}
+				isPage="employee"
+				selectedItemKey={selectedItemKey}
+				handleMenuClick={handleMenuClick}
+			>
+				{page}
+			</MasterLayout>
+		</PrivateRoute>
 	)
 }
 

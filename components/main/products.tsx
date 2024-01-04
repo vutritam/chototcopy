@@ -16,7 +16,7 @@ import { fetchAllProduct, fetchProductByFilterCondition } from '@/redux/componen
 import Toasty from '../common/toasty'
 import { useRouter } from 'next/router'
 export interface IAppProps {}
-import L10N from '../L10N/en.json'
+import L10N from '../../L10N/en.json'
 export default function Products(props: IAppProps) {
 	// const [state, setState] = React.useState({
 	// 	name: 'Chọn tên',

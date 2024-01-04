@@ -1,16 +1,16 @@
-// employee.tsx
+// AdminLayout.tsx
 import React, { useState } from 'react'
-import { itemsAdmin } from '@/components/jsonData/menuData'
-import MasterLayout from '@/components/masterLayout/masterLayout'
 import PrivateRoute from '@/components/common/privateRoute'
+import MasterLayout from '@/components/masterLayout/masterLayout'
 
-interface AdminProps {}
-
-const AdminPage: React.FC<AdminProps> = () => {
-	return <>AdminPage</>
+interface LayoutProps {
+	children: React.ReactNode
+	allowedRoles: string[]
+	itemData: any
+	isPage: string
 }
 
-AdminPage.Layout = function getLayout(page) {
+const Layout: React.FC<LayoutProps> = ({ children, allowedRoles, itemData, isPage }) => {
 	const [selectedItemKey, setSelectedItemKey] = useState(null)
 
 	const handleMenuClick = (item) => {
@@ -20,17 +20,17 @@ AdminPage.Layout = function getLayout(page) {
 	}
 
 	return (
-		<PrivateRoute allowedRoles={['admin']}>
+		<PrivateRoute allowedRoles={allowedRoles}>
 			<MasterLayout
-				itemsSiderBar={itemsAdmin}
-				isPage="admin"
+				itemsSiderBar={itemData}
+				isPage={isPage}
 				selectedItemKey={selectedItemKey}
 				handleMenuClick={handleMenuClick}
 			>
-				{page}
+				{children}
 			</MasterLayout>
 		</PrivateRoute>
 	)
 }
 
-export default AdminPage
+export default Layout

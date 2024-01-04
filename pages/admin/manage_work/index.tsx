@@ -1,5 +1,8 @@
+import PrivateRoute from '@/components/common/privateRoute'
+import { itemsAdmin } from '@/components/jsonData/menuData'
 import ListItem from '@/components/main/listItem'
 import ManageMoney from '@/components/main/manageMoney'
+import MasterLayout from '@/components/masterLayout/masterLayout'
 import { Button, Tabs } from 'antd'
 import React from 'react'
 // import ListItem from './listItem'
@@ -7,7 +10,7 @@ import React from 'react'
 
 type Props = {}
 
-export default function ManageWork({}: Props) {
+function ManageWork({}: Props) {
 	const onChange = (key: string) => {
 		// console.log(key)
 	}
@@ -73,3 +76,26 @@ export default function ManageWork({}: Props) {
 		</div>
 	)
 }
+ManageWork.Layout = function getLayout(page) {
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
+
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
+
+	return (
+		<PrivateRoute allowedRoles={['admin']}>
+			<MasterLayout
+				itemsSiderBar={itemsAdmin}
+				isPage="employee"
+				selectedItemKey={selectedItemKey}
+				handleMenuClick={handleMenuClick}
+			>
+				{page}
+			</MasterLayout>
+		</PrivateRoute>
+	)
+}
+export default ManageWork

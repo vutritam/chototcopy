@@ -1,6 +1,9 @@
 // import ListItem from '@/components/main/listItem'
 // import ManageMoney from '@/components/main/manageMoney'
+import PrivateRoute from '@/components/common/privateRoute'
+import { itemsAdmin } from '@/components/jsonData/menuData'
 import List_manage_employee from '@/components/main/listManage_Employee'
+import MasterLayout from '@/components/masterLayout/masterLayout'
 import { fetchAllUser } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { Dropdown, Space, Table, Tag } from 'antd'
@@ -18,7 +21,7 @@ interface DataType {
 	age: number
 	address: string
 }
-export default function ManageWork({}: Props) {
+function ManageEmployee({}: Props) {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 	const [listUser, setListUser] = useState<React.Key[]>([])
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
@@ -38,122 +41,32 @@ export default function ManageWork({}: Props) {
 		fetchDataUser()
 	}, [])
 
-	// const onChange = (key: string) => {
-	// 	// console.log(key)
-	// }
-	const columns: ColumnsType<DataType> = [
-		{
-			title: 'Số bàn',
-			dataIndex: 'tableNumber',
-			key: 'tableNumber',
-			fixed: 'left',
-			sorter: true,
-			width: 100,
-			// responsive: ['sm'],
-		},
-		{
-			title: 'Địa điểm',
-			dataIndex: 'location',
-			key: 'location',
-			// fixed: 'left',
-			sorter: true,
-			// responsive: ['sm'],
-		},
-		{
-			title: 'Tên món',
-			dataIndex: 'productId',
-			key: 'productId',
-			// fixed: 'left',
-			sorter: true,
-			render: (productId) => (
-				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-					<div>
-						{' '}
-						<Tag color={'green'}>{productId.name.toUpperCase()}</Tag>
-					</div>
-					<img
-						width={40}
-						height={40}
-						style={{ borderRadius: '50px' }}
-						alt="logo"
-						src={`http://localhost:3000/images/${productId.file}`}
-					/>
-				</div>
-			),
-			// responsive: ['sm'],
-		},
-		{
-			title: 'Số lượng',
-			dataIndex: 'quantity',
-			key: 'quantity',
-			width: 150,
-			// fixed: 'left',
-			sorter: true,
-		},
-		{
-			title: 'Action',
-			dataIndex: '_id',
-			key: 'operation',
-			fixed: 'right',
-			width: 100,
-			// responsive: ['sm'],
-			render: (_id) => (
-				<Space direction="vertical">
-					<Dropdown.Button
-						// menu={{ items }}
-						placement="bottomRight"
-						trigger={['click']}
-						// icon={
-						// 	<FormOutlined
-						// 		style={{ fontSize: '20px', display: 'flex' }}
-						// 		onClick={() => setIdItem(_id)}
-						// 	/>
-						// }
-					></Dropdown.Button>
-				</Space>
-			),
-		},
-	]
-	const rowSelection: TableRowSelection<DataType> = {
-		selectedRowKeys,
-		onChange: onSelectChange,
-		selections: [
-			Table.SELECTION_ALL,
-			Table.SELECTION_INVERT,
-			Table.SELECTION_NONE,
-			{
-				key: 'odd',
-				text: 'Select Odd Row',
-				onSelect: (changeableRowKeys) => {
-					let newSelectedRowKeys = []
-					newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-						if (index % 2 !== 0) {
-							return false
-						}
-						return true
-					})
-					setSelectedRowKeys(newSelectedRowKeys)
-				},
-			},
-			{
-				key: 'even',
-				text: 'Select Even Row',
-				onSelect: (changeableRowKeys) => {
-					let newSelectedRowKeys = []
-					newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
-						if (index % 2 !== 0) {
-							return true
-						}
-						return false
-					})
-					setSelectedRowKeys(newSelectedRowKeys)
-				},
-			},
-		],
-	}
 	return (
 		<div>
 			<List_manage_employee item={listUser} />
 		</div>
 	)
 }
+ManageEmployee.Layout = function getLayout(page) {
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
+
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
+
+	return (
+		<PrivateRoute allowedRoles={['admin']}>
+			<MasterLayout
+				itemsSiderBar={itemsAdmin}
+				isPage="employee"
+				selectedItemKey={selectedItemKey}
+				handleMenuClick={handleMenuClick}
+			>
+				{page}
+			</MasterLayout>
+		</PrivateRoute>
+	)
+}
+export default ManageEmployee
