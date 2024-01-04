@@ -5,12 +5,10 @@ import {
 	LoginOutlined,
 	LogoutOutlined,
 	SettingOutlined,
-	DownCircleOutlined,
-	BellOutlined,
 	EnvironmentOutlined,
 } from '@ant-design/icons'
-import { Avatar, Badge, Button, Menu, MenuProps } from 'antd'
-import { Dropdown, Space, Input, Tooltip } from 'antd'
+import { Avatar, MenuProps } from 'antd'
+import { Dropdown, Space, Tooltip } from 'antd'
 import CartItem from '../main/cartItem'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/router'
@@ -21,9 +19,7 @@ import Link from 'next/link'
 import { fetchUserById } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { fetchMessageByUserRole } from '@/redux/componentSlice/messageSocketSlice'
-import L10N from '../../L10N/en.json'
 import { processRouterQuery } from '../common/parseNumber'
-import moment from 'moment'
 import { io } from 'socket.io-client'
 import {
 	fetchAllOrderByNumberTableAndLocationUser,
@@ -35,7 +31,6 @@ import {
 	setMessageEmployee,
 	setMessageAdmin,
 } from '@/redux/componentSlice/orderSlice'
-import { handleTextL10N } from '../utils/utils'
 import useSound from 'use-sound'
 const notificationSoundPath = '/sound/am-thanh-thong-bao-messenger-www_hieuung_com.mp3'
 import HelperMessageToolTip from './helper/avatarTooltip'

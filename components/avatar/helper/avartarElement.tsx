@@ -1,7 +1,7 @@
 import moment from 'moment'
 import React from 'react'
 import { CONST_TYPE_ELEMENT } from '@/constanst/constanst.const'
-import L10N from '../../L10N/en.json'
+import L10N from '../../../L10N/en.json'
 
 interface inputProps {
 	item?: any

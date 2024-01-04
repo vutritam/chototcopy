@@ -1,7 +1,7 @@
 import { Button, Menu } from 'antd'
 import { DownCircleOutlined, CheckOutlined } from '@ant-design/icons'
 import { handleTextL10N, sortByStatus } from '@/components/utils/utils'
-import L10N from '../../L10N/en.json'
+import L10N from '../../../L10N/en.json'
 import AvatarElementHelper from './avartarElement'
 import { CONST_TYPE_ELEMENT } from '@/constanst/constanst.const'
 import moment from 'moment'
