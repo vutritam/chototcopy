@@ -10,25 +10,4 @@ const OrderDetail: React.FC<OrderDetailProps> = () => {
 	return <DetailOrder />
 }
 
-OrderDetail.Layout = function getLayout(page) {
-	const [selectedItemKey, setSelectedItemKey] = useState(null)
-
-	const handleMenuClick = (item) => {
-		if (item) {
-			sessionStorage.setItem('clickItemChecked', item.key)
-		}
-	}
-
-	return (
-		<MasterLayout
-			itemsSiderBar={itemsOrder}
-			isPage="employee"
-			selectedItemKey={selectedItemKey}
-			handleMenuClick={handleMenuClick}
-		>
-			{page}
-		</MasterLayout>
-	)
-}
-
 export default OrderDetail

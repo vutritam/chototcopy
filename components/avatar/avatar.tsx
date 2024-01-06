@@ -55,6 +55,15 @@ const itemsRender: MenuProps['items'] = [
 		),
 		key: '1',
 	},
+	{
+		label: (
+			<Link className="style-menu" href="/employee/account">
+				<UserOutlined />
+				Tài khoản cá nhân
+			</Link>
+		),
+		key: '2',
+	},
 ]
 
 interface propsData {
@@ -196,24 +205,7 @@ const AvatarComponent: React.FC = () => {
 	}, [ENV_HOST])
 
 	// useEffect để theo dõi sự thay đổi của orderConfirmed
-	useEffect(() => {
-		const handleBeforeUnload = (event) => {
-			if (isOrderConfirmed) {
-				const message =
-					'Bạn có chắc muốn đóng trang web? Tất cả các món chưa được xác nhận sẽ bị mất.'
-				event.returnValue = message // Cho các trình duyệt cũ
-				return message // Cho các trình duyệt mới
-			}
-		}
-
-		// Thêm event listener khi component được mount
-		window.addEventListener('beforeunload', handleBeforeUnload)
-
-		// Clean up để tránh memory leaks khi component unmount
-		return () => {
-			window.removeEventListener('beforeunload', handleBeforeUnload)
-		}
-	}, [isOrderConfirmed])
+	//
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -412,6 +404,8 @@ const AvatarComponent: React.FC = () => {
 				location: getInforUser?.data?.location,
 			})
 		)
+		router.push('/employee/order')
+		sessionStorage.setItem('clickItemChecked', '3')
 	}
 
 	const renderMenuMessage = () => {

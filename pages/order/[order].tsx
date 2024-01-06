@@ -10,7 +10,7 @@ import Products from '@/components/main/products'
 
 const OrderPage: React.FC = () => {
 	const [idTable, setIdTable] = useState<any>(0)
-	const [show, setShow] = useState(true)
+	const [show, setShow] = useState(false)
 	const router = useRouter()
 	const handleShow = () => {
 		setShow(false)
@@ -18,51 +18,31 @@ const OrderPage: React.FC = () => {
 
 	useEffect(() => {
 		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
-		if (getLocationOrder && getLocationOrder.location) {
-			setShow(false)
-		}
-	}, [])
-	useEffect(() => {
-		// setLoading(true)
-
 		const convertedValue = processRouterQuery(router?.query)
+		if (getLocationOrder !== null) {
+			if (getLocationOrder?.tableNumber !== convertedValue && !getLocationOrder.location) {
+				setShow(true)
+			} else {
+				setShow(false)
+			}
+		} else {
+			setShow(true)
+		}
 		setIdTable(convertedValue)
-	}, [router?.query])
+	}, [router?.query.order])
 
 	return (
 		<>
-			{show ? (
-				<ComfirmLocationOrder
-					label="Xác nhận nơi đặt"
-					tittle="Xác nhận nơi đặt"
-					open={show}
-					handleShow={handleShow}
-					idTable={idTable}
-				/>
-			) : null}
+			<ComfirmLocationOrder
+				label="Xác nhận nơi đặt"
+				tittle="Xác nhận nơi đặt"
+				open={show}
+				handleShow={handleShow}
+				idTable={idTable}
+			/>
 
 			<Products />
 		</>
-	)
-}
-OrderPage.Layout = function getLayout(page) {
-	const [selectedItemKey, setSelectedItemKey] = useState(null)
-
-	const handleMenuClick = (item) => {
-		if (item) {
-			sessionStorage.setItem('clickItemChecked', item.key)
-		}
-	}
-
-	return (
-		<MasterLayout
-			itemsSiderBar={itemsOrder}
-			isPage="employee"
-			selectedItemKey={selectedItemKey}
-			handleMenuClick={handleMenuClick}
-		>
-			{page}
-		</MasterLayout>
 	)
 }
 

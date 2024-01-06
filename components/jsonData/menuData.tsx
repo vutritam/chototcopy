@@ -40,7 +40,7 @@ export const itemsAdmin = [
 export const itemsEmployee = [
 	getItem(<div>Quản lý ca</div>, '1', <PieChartOutlined />),
 	getItem(<Link href="/employee/contact">Quản lý kết nối</Link>, '2', <DesktopOutlined />),
-	getItem('Quản lý đặt bàn', 'sub1', <UserOutlined />, [
+	getItem('Quản lý đặt bàn', 'sub1', <DesktopOutlined />, [
 		getItem(<Link href="/employee/order">Đơn tại bàn</Link>, '3', <PieChartOutlined />),
 		getItem('Bill', '4'),
 		getItem('Alex', '5'),

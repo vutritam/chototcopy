@@ -6,25 +6,18 @@ import AvatarComponent from '../avatar/avatar'
 import { useRouter } from 'next/router'
 import ComfirmLocationOrder from '../srcConfirmLocation/confirmLocation'
 import Head from 'next/head'
+import { itemsAdmin, itemsEmployee, itemsOrder } from '../jsonData/menuData'
 
 type MyComponentProps = {
 	children: React.ReactNode
-	itemsSiderBar: React.ReactNode
-	selectedItemKey: any
-	handleMenuClick?: any
-	isPage: string
+	rolesAccess: string[]
 }
-const MasterLayout: React.FC<MyComponentProps> = ({
-	children,
-	itemsSiderBar,
-	selectedItemKey,
-	handleMenuClick,
-	isPage,
-}: MyComponentProps) => {
+const MasterLayout: React.FC<MyComponentProps> = ({ children, rolesAccess }: MyComponentProps) => {
 	const router = useRouter()
 	const [collapsed, setCollapsed] = useState(false)
 	const [triggerWidthSiderBar, setTriggerWidth] = useState(0)
 	const [openShowConfirmLocation, setShowConfirmLocation] = useState(false)
+	const [selectedItemKey, setSelectedItemKey] = useState(null)
 
 	const [loading, setLoading] = useState(false)
 
@@ -49,7 +42,26 @@ const MasterLayout: React.FC<MyComponentProps> = ({
 	const handleClickCollapse = (value: boolean) => {
 		setCollapsed(value)
 	}
+	const renderSiderBar = (rolesAccess: string[]) => {
+		console.log(rolesAccess, 'roless')
 
+		switch (rolesAccess[0]) {
+			case 'admin':
+				return itemsAdmin
+			case 'employee':
+				return itemsEmployee
+			case 'order':
+				return itemsOrder
+			default:
+				return
+		}
+	}
+
+	const handleMenuClick = (item) => {
+		if (item) {
+			sessionStorage.setItem('clickItemChecked', item.key)
+		}
+	}
 	return (
 		<>
 			<Head>
@@ -76,9 +88,8 @@ const MasterLayout: React.FC<MyComponentProps> = ({
 					<div className="show-desktop-menu">
 						<SideBar
 							collapsed={collapsed}
-							isPage={isPage}
 							handleClickCollapse={handleClickCollapse}
-							items={itemsSiderBar}
+							items={renderSiderBar(rolesAccess)}
 							selectedItemKey={selectedItemKey}
 							handleMenuClick={handleMenuClick}
 						/>

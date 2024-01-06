@@ -199,27 +199,5 @@ const OrderByUser: React.FC = () => {
 		</>
 	)
 }
-OrderByUser.Layout = function getLayout(page) {
-	const [selectedItemKey, setSelectedItemKey] = useState(null)
-
-	const handleMenuClick = (item) => {
-		if (item) {
-			sessionStorage.setItem('clickItemChecked', item.key)
-		}
-	}
-
-	return (
-		<PrivateRoute allowedRoles={['client']}>
-			<MasterLayout
-				itemsSiderBar={itemsEmployee}
-				isPage="employee"
-				selectedItemKey={selectedItemKey}
-				handleMenuClick={handleMenuClick}
-			>
-				{page}
-			</MasterLayout>
-		</PrivateRoute>
-	)
-}
 
 export default OrderByUser

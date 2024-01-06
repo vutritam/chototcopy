@@ -11,13 +11,12 @@ interface items {
 	selectedItemKey?: any
 	handleMenuClick?: any
 	handleClickCollapse: any
-	isPage: string
+	isPage?: string
 	className?: string
 }
 
 export function SideBar(props: items) {
-	const { collapsed, handleClickCollapse, isPage, className } = props
-	// const [collapsed, setCollapsed] = useState(false)
+	const { collapsed, handleClickCollapse, className } = props
 	const [currentURL, setcurrentURL] = useState('/')
 	const router = useRouter()
 	const getKeyActived = sessionStorage.getItem('clickItemChecked')
@@ -28,7 +27,6 @@ export function SideBar(props: items) {
 			// Lấy toàn bộ URL
 			const currentURLChange = window.location.href
 			setcurrentURL(currentURLChange)
-			// console.log(currentURL, 'currentURL') // In ra URL trong console hoặc sử dụng URL theo nhu cầu của bạn
 		}
 	}, [router])
 
@@ -72,7 +70,7 @@ export function SideBar(props: items) {
 				mode={'inline'}
 				theme={'light'}
 				onClick={props.handleMenuClick}
-				// selectedKeys={[props.selectedItemKey]}
+				selectedKeys={[getKeyActived]}
 				defaultSelectedKeys={[getKeyActived]}
 				items={props.items}
 			/>

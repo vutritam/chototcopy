@@ -24,3 +24,4 @@ export const CONST_TYPE_SOCKET = {
 	ResponseAfterUserLogin: 'responseAfterUserLogin',
 	ResAllOrderByStatus: 'resAllOrderByStatus',
 }
+export const CHECK_TYPE_INPUT = ['admin', 'employee']
