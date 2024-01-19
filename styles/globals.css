@@ -27,6 +27,23 @@
   width: 90%;
 
 }
+.flex-basic {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+
+}
+.button-warning {
+  border: 1px solid #ffbc00;
+  color: white;
+  background: #ffce11;
+}
+.flex-basic p{
+ margin: 0;
+ padding: 0;
+
+}
 /* .show-cart {
   display: none;
 } */

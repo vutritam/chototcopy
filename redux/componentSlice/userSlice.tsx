@@ -28,12 +28,59 @@ export const fetchAllUser = createAsyncThunk<any, string>('api/fetchAllUser', as
 	return response.data
 })
 
+export const updateProfileUser = createAsyncThunk<any, string>(
+	'api/updateProfileUser',
+	async (options) => {
+		let response = await axiosConfig.post('/users/update/profile', options, {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		})
+		return response.data
+	}
+)
+export const updatePasswordUser = createAsyncThunk<any, string>(
+	'api/updatePasswordUser',
+	async (options) => {
+		let response = await axiosConfig.post('/users/update/password', options, {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		})
+		return response.data
+	}
+)
+
+export const updateIsChangeRequestUser = createAsyncThunk<any, string>(
+	'api/updateIsChangeRequestUser',
+	async (options) => {
+		let response = await axiosConfig.post('/userRequest/update/request', options)
+		return response.data
+	}
+)
+
+export const approvedChangeRequestUser = createAsyncThunk<any, string>(
+	'api/approvedChangeRequestUser',
+	async (options) => {
+		let response = await axiosConfig.post('/userRequest/approve', options)
+		return response.data
+	}
+)
+export const getAllUserRequest = createAsyncThunk<any, string>(
+	'api/getAllUserRequest',
+	async () => {
+		let response = await axiosConfig.get('/userRequest/request')
+		return response.data
+	}
+)
+
 const userSlice = createSlice({
 	name: 'user',
 	initialState: {
 		account: { user: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataList: { dataItem: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		allUser: { data: [], loading: false, error: '' },
+		isAcceptRequestUsers: { data: [], loading: false, error: '' },
 	},
 	reducers: {
 		setUser: (state, action) => {
@@ -41,6 +88,9 @@ const userSlice = createSlice({
 		},
 		setAllUser: (state, action) => {
 			state.allUser.data = action.payload
+		},
+		setAcceptRequestUsers: (state, action) => {
+			state.isAcceptRequestUsers.data = action.payload
 		},
 	},
 	extraReducers: (builder) => {
@@ -96,6 +146,6 @@ const userSlice = createSlice({
 
 const { reducer, actions } = userSlice
 
-export const { setUser, setAllUser } = actions
+export const { setUser, setAllUser, setAcceptRequestUsers } = actions
 
 export default reducer

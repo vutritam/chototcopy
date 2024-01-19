@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Layout, Menu, Image } from 'antd'
+import { Layout, Menu, Image, MenuProps } from 'antd'
 const { Sider } = Layout
 import { useRouter } from 'next/router'
 

@@ -92,7 +92,7 @@ const LoginForm: React.FC = () => {
 					progress: undefined,
 					type: 'error',
 				})
-				if (passwordInputRef !== null && payload.fieldError === 'username') {
+				if (passwordInputRef !== null && payload && payload.fieldError === 'username') {
 					usernameInputRef.current.focus()
 					usernameInputRef.current.select()
 				} else {
@@ -278,7 +278,6 @@ const LoginForm: React.FC = () => {
 						onChange={onChange}
 						type="card"
 						items={items.map((ele, i) => {
-							// const id = String(i + 1)
 							return {
 								label: ele.label,
 								key: ele.key,

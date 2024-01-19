@@ -1,7 +1,7 @@
 // MenuItemsFactory.js
 import React from 'react'
 import MenuItem from './menuItem'
-import { MenuProps } from 'antd'
+import { Badge, MenuProps } from 'antd'
 
 type MenuItem = Required<MenuProps>['items'][number]
 
@@ -22,7 +22,7 @@ interface inputProps {
 	title: any
 	key: string
 	icon: any
-	children: any
+	children?: any
 	link: any
 }
 
@@ -31,9 +31,7 @@ const ItemData = (props: inputProps): JSX.Element => {
 	return (
 		<MenuItem title={title} key={key} icon={icon} link={link}>
 			{children &&
-				children.map((item: any) =>
-					getItem(item.title, item.key, item.icon, item.children, item.link)
-				)}
+				children.map((item: any) => getItem(item.title, item.key, item.children, item.link))}
 		</MenuItem>
 	)
 }

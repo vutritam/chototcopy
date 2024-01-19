@@ -223,6 +223,8 @@ const AvatarComponent: React.FC = () => {
 						try {
 							if (!isOrderPage) {
 								const { payload } = await dispatch(fetchUserById(userInfo.userId))
+								console.log(payload, 'payloadnef')
+
 								if (payload?.success) {
 									setUserRequest(payload.username)
 									return
@@ -493,7 +495,11 @@ const AvatarComponent: React.FC = () => {
 						<Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
 							<a onClick={(e) => e.preventDefault()} style={{ color: '#050354' }}>
 								<Space>
-									<Avatar style={{ backgroundColor: '#87d068' }} icon={<UserOutlined />} />
+									<Avatar
+										style={{ backgroundColor: '#87d068' }}
+										icon={<UserOutlined />}
+										src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${user?.data?.file}`}
+									/>
 									{user?.data?.username || userRequest}
 									<DownOutlined />
 								</Space>

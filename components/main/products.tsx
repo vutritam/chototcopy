@@ -205,7 +205,7 @@ export default function Products(props: IAppProps) {
 	React.useEffect(() => {
 		let sessionOrder = sessionStorage.getItem('warning_text_order')
 
-		if (sessionOrder) {
+		if (sessionOrder !== null) {
 			try {
 				sessionOrder = JSON.parse(sessionOrder)
 				setDataTotalOrderAndConfirm({
@@ -239,7 +239,7 @@ export default function Products(props: IAppProps) {
 		return isOrderPage &&
 			dataTotalOrderAndConfirm.confirmedItems + dataTotalOrderAndConfirm.canceledItems !==
 				dataTotalOrderAndConfirm.totalOrderedItems ? (
-			<div className="marquee-container screen-mobile">
+			<div className="marquee-container ">
 				<div className="marquee-content">
 					<span style={{ color: 'yellow', marginRight: '5px' }}>
 						<FireFilled color="yellow" />
@@ -252,7 +252,7 @@ export default function Products(props: IAppProps) {
 			</div>
 		) : (
 			<>
-				<div className="marquee-container screen-mobile">
+				<div className="marquee-container">
 					<div className="marquee-content">
 						<DownCircleOutlined />{' '}
 						<span style={{ fontSize: '16px', color: 'green' }}>
@@ -298,7 +298,7 @@ export default function Products(props: IAppProps) {
 					</div>
 				</Space>
 
-				{renderNotiItemOrder()}
+				{/* {renderNotiItemOrder()} */}
 			</div>
 			<Space className="filter-mobile">
 				{itemFilterChecked ? (

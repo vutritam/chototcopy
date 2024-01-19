@@ -1,31 +1,24 @@
 import React, { useState } from 'react'
 import { UploadOutlined } from '@ant-design/icons'
 import { Button, Upload } from 'antd'
+import { isArray } from 'lodash'
 import type { UploadFile } from 'antd/es/upload/interface'
 
-const fileList: UploadFile[] = []
-
-const FileUpload: React.FC = ({ setUpload }) => {
+const FileUpload: React.FC = ({ setUpload, dataImage }) => {
 	const [upImage, setUpImage] = useState<UploadFile[]>([])
-	// const onChangeList = (value: any) => {
-	// 	// console.log({ ...value, file: { ...value.file, status: 'done' } })
-	// }
-	// console.log(upImage, 'file list')
+	const fileList: UploadFile[] = [
+		{
+			uid: '1',
+			name: dataImage,
+			status: 'done',
+			url: process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${dataImage}`,
+		},
+	]
 
 	const handleUpload = (value: any) => {
-		// let data = {
-		// 	uid: file.file.uid,
-		// 	name: file.file.name,
-		// 	status: 'done',
-		// 	thumbUrl: file.file.thumbUrl,
-		// }
-		console.log(value, 'upImage')
-
 		setUpImage(value)
-
 		setUpload({ image: value })
 	}
-	console.log(upImage, 'upImage')
 	return (
 		<>
 			<Upload

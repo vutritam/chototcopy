@@ -5,6 +5,14 @@ import CommonFilter from '../common/commonInput/commonFilter'
 import InputDateTime from '../common/commonInput/inputDateTime'
 import { FileSearchOutlined } from '@ant-design/icons'
 import type { DatePickerProps, RangePickerProps } from 'antd/es/date-picker'
+import { useDispatch, useSelector } from 'react-redux'
+import { ThunkDispatch } from '@reduxjs/toolkit'
+import {
+	approvedChangeRequestUser,
+	getAllUserRequest,
+	setAcceptRequestUsers,
+} from '@/redux/componentSlice/userSlice'
+import Toasty from '../common/toasty'
 
 interface DataType {
 	gender?: string
@@ -27,12 +35,14 @@ const count = 3
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`
 
 const List_manage_employee: React.FC = (props) => {
-	const { item } = props
+	const { item, IsPage } = props
+	const userListAcceptRequestUsers = useSelector((state: any) => state.user.isAcceptRequestUsers)
 	const [initLoading, setInitLoading] = useState(true)
 	const [loading, setLoading] = useState(false)
 	const [showHistory, setShowHistory] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
 	useEffect(() => {
 		fetch(fakeDataUrl)
@@ -44,8 +54,6 @@ const List_manage_employee: React.FC = (props) => {
 			})
 	}, [])
 	useEffect(() => {
-		console.log(item, 'loading')
-
 		if (item.length > 0) {
 			setLoading(false)
 		} else {
@@ -53,53 +61,20 @@ const List_manage_employee: React.FC = (props) => {
 		}
 	}, [item])
 
-	// const onLoadMore = () => {
-	// 	setLoading(true)
-	// 	setList(
-	// 		data.concat([...new Array(count)].map(() => ({ loading: true, name: {}, picture: {} })))
-	// 	)
-	// 	fetch(fakeDataUrl)
-	// 		.then((res) => res.json())
-	// 		.then((res) => {
-	// 			const newData = data.concat(res.results)
-	// 			setData(newData)
-	// 			setList(newData)
-	// 			setLoading(false)
-	// 			// Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-	// 			// In real scene, you can using public method of react-virtualized:
-	// 			// https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-	// 			window.dispatchEvent(new Event('resize'))
-	// 		})
-	// }
 	const handleShowModalHistory = () => {
 		setShowHistory(!showHistory)
 	}
 	const [modal2Open, setModal2Open] = useState(false)
 	const [titleModal, setTitleModal] = useState('')
 	const handleModal = (event: any, value: boolean, title: string) => {
-		console.log('ok vào nhé')
 		setTimeout(() => {
 			setModal2Open(value)
 		}, 100)
 		setTitleModal(title)
 	}
 	const handleDropdown = (e: any, value: boolean) => {
-		console.log('ok vào nhé')
 		setModal2Open(value)
 	}
-	// const loadMore =
-	// 	!initLoading && !loading ? (
-	// 		<div
-	// 			style={{
-	// 				textAlign: 'center',
-	// 				marginTop: 12,
-	// 				height: 32,
-	// 				lineHeight: '32px',
-	// 			}}
-	// 		>
-	// 			<Button onClick={onLoadMore}>loading more</Button>
-	// 		</div>
-	// 	) : null
 
 	// nơi làm việc
 	const items: MenuProps['items'] = [
@@ -167,8 +142,6 @@ const List_manage_employee: React.FC = (props) => {
 		dateString: [string, string] | string
 	) => {
 		setState({ ...state, dateTime: dateString })
-		console.log('Selected Time: ', value)
-		console.log('Formatted Selected Time: ', dateString)
 	}
 	const handleSubmit = () => {
 		setInitLoading(true)
@@ -177,42 +150,85 @@ const List_manage_employee: React.FC = (props) => {
 			setInitLoading(false)
 		}, 1000)
 	}
-	console.log(item, 'lo')
 
+	const handleUpdateStatus = async (idUser) => {
+		const { payload } = await dispatch(
+			approvedChangeRequestUser({
+				_id: idUser,
+				status: 'request_accepted',
+			})
+		)
+
+		if (payload?.success) {
+			const data = await dispatch(getAllUserRequest())
+
+			if (data?.payload.success) {
+				await dispatch(setAcceptRequestUsers(data.payload.data))
+			}
+			Toasty.success(data.payload.message)
+		} else {
+			Toasty.error(payload.message)
+		}
+	}
+
+	const renderButtonAccept = (userData) => {
+		const statusItem = userListAcceptRequestUsers.data.filter(
+			(item) => item.userId._id === userData._id
+		)[0]?.status
+
+		return statusItem === 'request_pending'
+			? [
+					<Button
+						key="list-loadmore-edit"
+						type="primary"
+						onClick={() => handleUpdateStatus(userData._id)}
+					>
+						Chấp nhận
+					</Button>,
+					<Button key="list-loadmore-more" type="default">
+						Từ chối
+					</Button>,
+			  ]
+			: statusItem === 'request_accepted'
+			? ['Đã chấp nhận']
+			: ['Không chấp nhận']
+	}
 	return (
 		<>
-			<div
-				style={{
-					position: 'sticky',
-					top: '10%',
-					zIndex: 11,
-					background: 'rgb(255 255 255)',
-					padding: '8px',
-					boxShadow:
-						'rgba(17, 18, 18, 0.18) 0px 1px 8px 0px, rgba(103, 151, 255, 0.11) 0px 2px 18px 0px',
-				}}
-			>
-				<Space direction="vertical">
-					<Space wrap>
-						<InputDateTime onChangeTime={onChangeDateTime} />
-						<CommonFilter
-							fieldName="locationWork"
-							items={items}
-							state={state.locationWork}
-							handleLocationChange={handleLocationChange}
-						/>
-						<CommonFilter
-							fieldName="timeWork"
-							items={works}
-							state={state.timeWork}
-							handleLocationChange={handleLocationChange}
-						/>
-						<Button type="primary" icon={<FileSearchOutlined />} onClick={handleSubmit}>
-							Tìm kiếm
-						</Button>
+			{IsPage !== 'request' && (
+				<div
+					style={{
+						position: 'sticky',
+						top: '10%',
+						zIndex: 11,
+						background: 'rgb(255 255 255)',
+						padding: '8px',
+						boxShadow:
+							'rgba(17, 18, 18, 0.18) 0px 1px 8px 0px, rgba(103, 151, 255, 0.11) 0px 2px 18px 0px',
+					}}
+				>
+					<Space direction="vertical">
+						<Space wrap>
+							<InputDateTime onChangeTime={onChangeDateTime} />
+							<CommonFilter
+								fieldName="locationWork"
+								items={items}
+								state={state.locationWork}
+								handleLocationChange={handleLocationChange}
+							/>
+							<CommonFilter
+								fieldName="timeWork"
+								items={works}
+								state={state.timeWork}
+								handleLocationChange={handleLocationChange}
+							/>
+							<Button type="primary" icon={<FileSearchOutlined />} onClick={handleSubmit}>
+								Tìm kiếm
+							</Button>
+						</Space>
 					</Space>
-				</Space>
-			</div>
+				</div>
+			)}
 
 			<List
 				className="demo-loadmore-list"
@@ -227,9 +243,7 @@ const List_manage_employee: React.FC = (props) => {
 				// loadMore={loadMore}
 				dataSource={item}
 				renderItem={(item) => {
-					console.log(item, 'item employee')
-
-					return (
+					return IsPage !== 'request' ? (
 						<List.Item
 							actions={[
 								<a key="list-loadmore-edit">Chỉnh sửa</a>,
@@ -248,13 +262,13 @@ const List_manage_employee: React.FC = (props) => {
 											<span className="online-avatar"></span>
 										</>
 									}
-									title={<a href="https://ant.design">{item.username}</a>}
+									title={<a href="https://ant.design">{item?.username}</a>}
 									description={
 										<>
 											<p>19/09/2023</p>
 
 											<span>
-												<b>Vai trò</b>: {item.roles.includes('client') ? 'Nhân viên' : 'Admin'}
+												<b>Vai trò</b>: {item?.roles?.includes('client') ? 'Nhân viên' : 'Admin'}
 											</span>
 											<span>
 												<div style={{ display: 'flex', gap: '10px' }}>
@@ -264,13 +278,14 @@ const List_manage_employee: React.FC = (props) => {
 															className="online-active-employee "
 															style={{ width: '10px' }}
 														></div>
-														<span>{item.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}</span>
+														<span>{item?.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}</span>
 													</div>
 												</div>
 											</span>
 										</>
 									}
 								/>
+
 								<div>
 									<CommonShowHistory
 										label="Lịch sử hoạt động"
@@ -279,6 +294,50 @@ const List_manage_employee: React.FC = (props) => {
 										handleShow={handleShowModalHistory}
 									/>
 								</div>
+							</Skeleton>
+						</List.Item>
+					) : (
+						<List.Item actions={renderButtonAccept(item?.userId)}>
+							<Skeleton avatar title={false} loading={loading} active>
+								<List.Item.Meta
+									avatar={
+										<>
+											<Avatar
+												src={
+													'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'
+												}
+											/>
+											<span className="online-avatar"></span>
+										</>
+									}
+									title={<a href="https://ant.design">{item?.userId && item?.userId.username}</a>}
+									description={
+										<>
+											<p>19/09/2023</p>
+
+											<span>
+												<b>Vai trò</b>:{' '}
+												{item?.userId && item.userId.roles?.includes('client')
+													? 'Nhân viên'
+													: 'Admin'}
+											</span>
+											<span>
+												<div style={{ display: 'flex', gap: '10px' }}>
+													<b>Trạng thái hoạt động: </b>
+													<div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+														<div
+															className="online-active-employee "
+															style={{ width: '10px' }}
+														></div>
+														<span>
+															{item?.userId?.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+														</span>
+													</div>
+												</div>
+											</span>
+										</>
+									}
+								/>
 							</Skeleton>
 						</List.Item>
 					)
