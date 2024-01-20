@@ -20,6 +20,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { Label } from 'semantic-ui-react'
 import { ThunkDispatch } from '@reduxjs/toolkit'
+import CoffeeBill from '../exportBill/exportBill'
+import ModalBill from '../exportBill/component/modalBill'
 type MenuItem = Required<MenuProps>['items'][number]
 
 function getItem(
@@ -39,6 +41,7 @@ const CartItem: React.FC = (props) => {
 	const { className } = props
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [open, setOpen] = React.useState<Boolean>(false)
+	const [openModalBill, setOpenBill] = React.useState<Boolean>(false)
 	const [backModal, setBackModal] = React.useState<Boolean>(false)
 	const [typeBill, setTypeBill] = React.useState<string>('')
 	const [itemRender, setItemRender] = React.useState<any>([])
@@ -157,6 +160,10 @@ const CartItem: React.FC = (props) => {
 		setOpen(true)
 	}
 
+	const handleShowBill = () => {
+		setOpenBill(!openModalBill)
+	}
+
 	const onClose = () => {
 		setOpen(false)
 		setItemRender([])
@@ -230,9 +237,12 @@ const CartItem: React.FC = (props) => {
 												<h2>Tổng tiền</h2>
 												<h3>{totalPrice}Đ</h3>
 											</div>
-											<Button type="primary" block>
-												Thanh toán
-											</Button>
+											<ModalBill
+												open={openModalBill}
+												handleShowBill={handleShowBill}
+												dataSubmit={dataSubmit}
+												totalPrice={totalPrice}
+											/>
 										</div>
 									</div>
 								) : (

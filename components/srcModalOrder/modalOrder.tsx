@@ -101,7 +101,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 
 	return (
 		<>
-			<Button type="default" className="button-styles" onClick={showModal}>
+			<Button type="default" onClick={showModal}>
 				{props.label}
 			</Button>
 			<Modal

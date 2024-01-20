@@ -8,7 +8,7 @@ import {
 	FireFilled,
 	DownCircleOutlined,
 } from '@ant-design/icons'
-import { Button, Dropdown, Space, Tooltip } from 'antd'
+import { Button, notification, Space, Tooltip } from 'antd'
 import type { MenuProps } from 'antd'
 import CommonFilter from '../common/commonInput/commonFilter'
 import { useDispatch, useSelector } from 'react-redux'
@@ -17,6 +17,9 @@ import Toasty from '../common/toasty'
 import { useRouter } from 'next/router'
 export interface IAppProps {}
 import L10N from '../../L10N/en.json'
+import NotificationTitle from '../notificationTitle/notificationTitle'
+import { processRouterQuery } from '../common/parseNumber'
+import ComfirmLocationOrder from '../srcConfirmLocation/confirmLocation'
 export default function Products(props: IAppProps) {
 	// const [state, setState] = React.useState({
 	// 	name: 'Chọn tên',
@@ -40,6 +43,26 @@ export default function Products(props: IAppProps) {
 	const [itemFilterValueChecked, setItemFilterValueChecked] = React.useState(initItem)
 	const [disableFilter, setDisableFilter] = React.useState(true)
 	const [allProduct, setAllProduct] = React.useState([])
+	const [idTable, setIdTable] = React.useState<any>(0)
+	const [show, setShow] = React.useState(false)
+	const handleShow = () => {
+		setShow(false)
+	}
+
+	React.useEffect(() => {
+		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
+		const convertedValue = processRouterQuery(router?.query)
+		if (getLocationOrder !== null) {
+			if (getLocationOrder?.tableNumber !== convertedValue && !getLocationOrder.location) {
+				setShow(true)
+			} else {
+				setShow(false)
+			}
+		} else {
+			setShow(true)
+		}
+		setIdTable(convertedValue)
+	}, [router?.query.order])
 
 	const handleFilterItem = (fieldName, value) => {
 		setItemFilterValueChecked({ ...itemFilterValueChecked, [fieldName]: value })
@@ -177,6 +200,42 @@ export default function Products(props: IAppProps) {
 			}, 2000)
 		}
 	}, [itemFilterChecked])
+	const renderNotiItemOrder = () => {
+		const messageTitle = 'Thông báo quan trọng'
+		const caculatorItem =
+			Number(dataTotalOrderAndConfirm.totalOrderedItems) -
+			Number(dataTotalOrderAndConfirm.confirmedItems)
+		const totalData =
+			dataTotalOrderAndConfirm.confirmedItems + dataTotalOrderAndConfirm.canceledItems !==
+			dataTotalOrderAndConfirm.totalOrderedItems
+		const contents = `Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${caculatorItem} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`
+		const atLeastOneValueGreaterThanZero =
+			dataTotalOrderAndConfirm.totalOrderedItems > 0 ||
+			dataTotalOrderAndConfirm.confirmedItems > 0 ||
+			dataTotalOrderAndConfirm.canceledItems > 0
+		return isOrderPage && allProduct.length > 0 && totalData ? (
+			<NotificationTitle message={messageTitle} description={contents} />
+		) : isOrderPage && allProduct.length > 0 && atLeastOneValueGreaterThanZero ? (
+			<>
+				<NotificationTitle
+					message={messageTitle}
+					description={
+						<div>
+							<DownCircleOutlined />{' '}
+							<span style={{ fontSize: '16px', color: 'green' }}>
+								{L10N['message.product.orderConfirm.marquee.content']}
+							</span>{' '}
+							(
+							<span style={{ color: 'red' }}>
+								{L10N['message.product.orderConfirm.marquee.content.warning']}
+							</span>
+							)
+						</div>
+					}
+				/>
+			</>
+		) : null
+	}
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const { payload } = await dispatch(fetchAllProduct())
@@ -187,7 +246,7 @@ export default function Products(props: IAppProps) {
 		fetchData()
 	}, [])
 
-	const handleSelectedFilterItem = (value: boolean) => {
+	const handleSelectedFilterItem = () => {
 		setItemFilter(!itemFilterChecked)
 	}
 
@@ -205,17 +264,20 @@ export default function Products(props: IAppProps) {
 	React.useEffect(() => {
 		let sessionOrder = sessionStorage.getItem('warning_text_order')
 
-		if (sessionOrder !== null) {
-			try {
-				sessionOrder = JSON.parse(sessionOrder)
+		try {
+			sessionOrder = JSON.parse(sessionOrder)
+
+			if (sessionOrder !== null) {
 				setDataTotalOrderAndConfirm({
 					totalOrderedItems: sessionOrder.totalOrderedItems,
 					confirmedItems: sessionOrder.confirmedItems,
 					canceledItems: sessionOrder.canceledItems,
 				})
-			} catch (error) {
-				console.error('Error parsing JSON:', error)
+			} else {
+				console.error('sessionOrder is null.')
 			}
+		} catch (error) {
+			console.error('Error parsing JSON:', error)
 		}
 	}, [JSON.stringify(dataOrderByNumberTable)])
 
@@ -235,49 +297,21 @@ export default function Products(props: IAppProps) {
 		setDisableFilter(true)
 	}
 
-	const renderNotiItemOrder = () => {
-		return isOrderPage &&
-			dataTotalOrderAndConfirm.confirmedItems + dataTotalOrderAndConfirm.canceledItems !==
-				dataTotalOrderAndConfirm.totalOrderedItems ? (
-			<div className="marquee-container ">
-				<div className="marquee-content">
-					<span style={{ color: 'yellow', marginRight: '5px' }}>
-						<FireFilled color="yellow" />
-					</span>
-					{`Bạn có ${dataTotalOrderAndConfirm.confirmedItems} món đã xác nhận và ${
-						Number(dataTotalOrderAndConfirm.totalOrderedItems) -
-						Number(dataTotalOrderAndConfirm.confirmedItems)
-					} món chưa xác nhận. Vui lòng chờ đến khi nhân viên xác nhận!`}
-				</div>
-			</div>
-		) : (
-			<>
-				<div className="marquee-container">
-					<div className="marquee-content">
-						<DownCircleOutlined />{' '}
-						<span style={{ fontSize: '16px', color: 'green' }}>
-							{L10N['message.product.orderConfirm.marquee.content']}
-						</span>{' '}
-						(
-						<span style={{ color: 'red' }}>
-							{L10N['message.product.orderConfirm.marquee.content.warning']}
-						</span>
-						)
-					</div>
-				</div>
-			</>
-		)
-	}
-
 	return (
 		<div>
 			{renderNotiItemOrder()}
+			<ComfirmLocationOrder
+				label="Xác nhận nơi đặt"
+				tittle="Xác nhận nơi đặt"
+				open={show}
+				handleShow={handleShow}
+				idTable={idTable}
+			/>
 			<div
 				className="catelories"
 				style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '10px' }}
 			>
 				<Space direction="vertical">
-					{/* <Dropdown menu={{ items }} placement="bottomLeft"> */}
 					{itemFilterChecked ? (
 						<Tooltip title="Hủy bỏ tìm kiếm" color={'red'} key={'red'} open={showCancelTooltip}>
 							<StopOutlined
@@ -297,8 +331,6 @@ export default function Products(props: IAppProps) {
 						<b style={{ fontSize: '17px' }}>Danh mục sản phẩm ({allProduct.length})</b>
 					</div>
 				</Space>
-
-				{/* {renderNotiItemOrder()} */}
 			</div>
 			<Space className="filter-mobile">
 				{itemFilterChecked ? (
@@ -339,9 +371,6 @@ export default function Products(props: IAppProps) {
 					</Space>
 				)}
 			</Space>
-			<div>
-				<ListItem />
-			</div>
 		</div>
 	)
 }

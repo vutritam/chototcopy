@@ -37,6 +37,7 @@ function Manage_account() {
 	const reNewPasswordInputRef = useRef(null)
 	const [socket, setSocket] = useState<any>(null)
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 	useEffect(() => {
 		const fetchDataUser = async () => {
 			try {
@@ -62,6 +63,8 @@ function Manage_account() {
 		} else if (user?.data?.userRequestId?.isRequest === 'unChange_location' && statusItem === '') {
 			setLocation(user?.data?.location)
 			setDisabledLocation(false)
+		} else if (getInforUser?.data?.location !== user?.data?.userRequestId?.location) {
+			router.push('/login')
 		} else {
 			setLocation(user?.data?.location)
 			setDisabledLocation(false)

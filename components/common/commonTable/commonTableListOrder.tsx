@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Dropdown, MenuProps, Space, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
-import { FormOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
+import { UnorderedListOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
 import { useDispatch } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { useRouter } from 'next/router'
@@ -80,34 +80,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		return () => clearTimeout(timer) // Hủy bỏ timer khi component unmounts hoặc timer được clear
 	}, [item])
 
-	// useEffect(() => {
-	// 	const localDataWithCustomData =
-	// 		item !== null && typeof item === 'object' && !Array.isArray(item)
-	// 			? item?.data?.map((record: any) => ({
-	// 					...record,
-	// 					customData: {
-	// 						tableNumber: record.tableNumber,
-	// 						status: record.status,
-	// 						_id: record._id,
-	// 						location: record.location,
-	// 						productId: record.productId,
-	// 					},
-	// 			  }))
-	// 			: item?.map((record: any) => ({
-	// 					...record,
-	// 					customData: {
-	// 						tableNumber: record.tableNumber,
-	// 						status: record.status,
-	// 						_id: record._id,
-	// 						location: record.location,
-	// 						productId: record.productId,
-	// 					},
-	// 			  }))
-
-	// 	// Cập nhật state để giữ record có ngày mới nhất
-	// 	setLocalData(localDataWithCustomData)
-	// }, [])
-
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
 	const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -126,7 +98,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		{
 			key: '2',
 			label: (
-				<Button type="primary" onClick={() => handleConfirmOrder(idItem)}>
+				<Button type="primary" onClick={(e) => handleConfirmOrder(e, idItem)}>
 					Xác nhận
 				</Button>
 			),
@@ -185,17 +157,9 @@ const CommonTable = (props: inputProps): JSX.Element => {
 			)
 		} else {
 			return isEmployeePage ? (
-				<Dropdown.Button
-					menu={{ items }}
-					placement="bottomRight"
-					trigger={['click']}
-					icon={
-						<FormOutlined
-							style={{ fontSize: '20px', display: 'flex' }}
-							onClick={() => setIdItem(customData)}
-						/>
-					}
-				></Dropdown.Button>
+				<Dropdown menu={{ items }} placement="bottomRight">
+					<Button icon={<UnorderedListOutlined />} onClick={() => setIdItem(customData)}></Button>
+				</Dropdown>
 			) : (
 				'Đang chờ nhân viên'
 			)

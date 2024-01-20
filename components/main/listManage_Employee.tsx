@@ -229,6 +229,7 @@ const List_manage_employee: React.FC = (props) => {
 					</Space>
 				</div>
 			)}
+			<h3>Danh sách yêu cầu</h3>
 
 			<List
 				className="demo-loadmore-list"
@@ -268,7 +269,7 @@ const List_manage_employee: React.FC = (props) => {
 											<p>19/09/2023</p>
 
 											<span>
-												<b>Vai trò</b>: {item?.roles?.includes('client') ? 'Nhân viên' : 'Admin'}
+												<b>Vai trò</b>: {item?.roles?.includes('employee') ? 'Nhân viên' : 'Admin'}
 											</span>
 											<span>
 												<div style={{ display: 'flex', gap: '10px' }}>
@@ -297,49 +298,41 @@ const List_manage_employee: React.FC = (props) => {
 							</Skeleton>
 						</List.Item>
 					) : (
-						<List.Item actions={renderButtonAccept(item?.userId)}>
-							<Skeleton avatar title={false} loading={loading} active>
-								<List.Item.Meta
-									avatar={
-										<>
-											<Avatar
-												src={
-													'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'
-												}
-											/>
-											<span className="online-avatar"></span>
-										</>
-									}
-									title={<a href="https://ant.design">{item?.userId && item?.userId.username}</a>}
-									description={
-										<>
-											<p>19/09/2023</p>
-
-											<span>
-												<b>Vai trò</b>:{' '}
-												{item?.userId && item.userId.roles?.includes('client')
-													? 'Nhân viên'
-													: 'Admin'}
-											</span>
-											<span>
-												<div style={{ display: 'flex', gap: '10px' }}>
-													<b>Trạng thái hoạt động: </b>
-													<div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-														<div
-															className="online-active-employee "
-															style={{ width: '10px' }}
-														></div>
-														<span>
-															{item?.userId?.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}
-														</span>
-													</div>
+						<div>
+							<List.Item actions={renderButtonAccept(item?.userId)}>
+								<Skeleton avatar title={false} loading={loading} active>
+									<List.Item.Meta
+										avatar={
+											<>
+												<Avatar
+													src={
+														'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'
+													}
+												/>
+												<span className="online-avatar"></span>
+											</>
+										}
+										title={<a href="https://ant.design">{item?.userId && item?.userId.username}</a>}
+										description={
+											<>
+												<span>
+													<b>Vai trò</b>:{' '}
+													{item?.userId && item.userId.roles?.includes('employee')
+														? 'Nhân viên'
+														: 'Admin'}
+												</span>
+												<div>
+													<b>Lý do</b>: {item?.reason}
 												</div>
-											</span>
-										</>
-									}
-								/>
-							</Skeleton>
-						</List.Item>
+												<div>
+													<b>Địa điểm muốn đổi</b>: {item?.location}
+												</div>
+											</>
+										}
+									/>
+								</Skeleton>
+							</List.Item>
+						</div>
 					)
 				}}
 			/>

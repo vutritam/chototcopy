@@ -474,6 +474,7 @@ const AvatarComponent: React.FC = () => {
 				<Tooltip title="Tìm kiếm khu vực tại đây" color={'red'} key={'red'}>
 					<EnvironmentOutlined style={{ fontSize: '22px', width: '30px', display: 'flex' }} />
 				</Tooltip>
+				Địa điểm
 			</div>
 
 			<Space wrap className="screen-mobile">
@@ -483,10 +484,12 @@ const AvatarComponent: React.FC = () => {
 				<CartItem className="screen-mobile" />
 			</Space>
 			<div className="show-desktop-menu">
-				<SelectSearch />
-				<Space wrap>{renderMenuMessage()}</Space>
+				{/* <SelectSearch /> */}
+
+				<Space wrap>{renderMenuMessage()} Thông báo</Space>
 				<Space wrap>
 					<CartItem />
+					Giỏ hàng
 				</Space>
 				{isOrderPage ? (
 					''

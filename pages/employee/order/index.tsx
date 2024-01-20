@@ -104,7 +104,10 @@ const OrderByUser: React.FC = () => {
 		}
 	}, [socket])
 
-	const handleConfirmOrder = async (item) => {
+	const handleConfirmOrder = async (e, item) => {
+		e.isDefaultPrevented()
+		console.log(e, 'ee')
+
 		if (item) {
 			setLoadingDataTable(true)
 			const { payload } = await dispatch(
