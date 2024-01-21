@@ -29,6 +29,8 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 		handleConfirmOrder,
 	} = props
 	const isDataMessage = dataMessage && dataMessage
+	console.log(dataMessage, 'dataMessage')
+
 	const isUserOrder = condition === CONST_TYPE_KEY_VALUE.UserOrder
 	const isAdmin = condition === CONST_TYPE_KEY_VALUE.Admin
 

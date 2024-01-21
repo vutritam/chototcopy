@@ -1,11 +1,11 @@
 // employee.tsx
-import React, { useState } from 'react'
+import React from 'react'
 import ListItem from '@/components/main/listItem'
 
 interface EmployeeProps {}
 
-const Employee: React.FC<EmployeeProps> = () => {
+const EmployeeWareHouse: React.FC<EmployeeProps> = () => {
 	return <ListItem isPage="employee" />
 }
 
-export default Employee
+export default EmployeeWareHouse

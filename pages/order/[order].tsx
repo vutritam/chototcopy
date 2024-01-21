@@ -13,7 +13,7 @@ const OrderPage: React.FC = () => {
 	return (
 		<>
 			<OrderComponent />
-			<ListItem />
+			<ListItem isPage="order" />
 		</>
 	)
 }

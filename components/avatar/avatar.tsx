@@ -35,6 +35,7 @@ import useSound from 'use-sound'
 const notificationSoundPath = '/sound/am-thanh-thong-bao-messenger-www_hieuung_com.mp3'
 import HelperMessageToolTip from './helper/avatarTooltip'
 import { CONST_TYPE_KEY_VALUE, CONST_TYPE_SOCKET } from '@/constanst/constanst.const'
+import Toasty from '../common/toasty'
 
 const itemsRender: MenuProps['items'] = [
 	{
@@ -77,6 +78,7 @@ const AvatarComponent: React.FC = () => {
 	const router = useRouter()
 	// const audio = new Audio(notificationSoundPath)
 	const [idTable, setIdTable] = React.useState<any>(0)
+	const [messageOrder, setMessageOrder] = React.useState<string>('')
 	const user = useSelector((state: any) => state.user.account.user)
 	const isOrderPage = router.pathname.startsWith('/order')
 	const isEmployeePage = router.pathname.startsWith('/employee')
@@ -204,8 +206,11 @@ const AvatarComponent: React.FC = () => {
 		initSocket()
 	}, [ENV_HOST])
 
-	// useEffect để theo dõi sự thay đổi của orderConfirmed
-	//
+	useEffect(() => {
+		if (messageOrder) {
+			Toasty.error(messageOrder)
+		}
+	}, [messageOrder])
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -364,19 +369,21 @@ const AvatarComponent: React.FC = () => {
 				roomName = 'room'
 			}
 			socket.emit(CONST_TYPE_SOCKET.JoinRoom, roomName)
-			socket.on(CONST_TYPE_SOCKET.Response, async (response: Array<[]>) => {
-				if (response) {
-					await dispatch(setMessage(response))
+			socket.on(CONST_TYPE_SOCKET.Response, async (response) => {
+				if (response.data.length > 0) {
+					await dispatch(setMessage(response.data))
+					playNotification()
+				} else {
+					setMessageOrder(response.message)
 				}
-				playNotification()
 			})
-			socket.on(CONST_TYPE_SOCKET.ResponseEmployee, async (response: Array<[]>) => {
-				if (response) {
-					await dispatch(setMessageEmployee(response))
+			socket.on(CONST_TYPE_SOCKET.ResponseEmployee, async (response) => {
+				if (response.data.length > 0) {
+					await dispatch(setMessageEmployee(response.data))
+					playNotification()
 				}
-				playNotification()
 			})
-			socket.on(CONST_TYPE_SOCKET.ResponseAfterUserLogin, async (response: Array<[]>) => {
+			socket.on(CONST_TYPE_SOCKET.ResponseAfterUserLogin, async (response) => {
 				if (response) {
 					setLoadingConfirmOrder(false)
 					setCheckConfirm('')
@@ -384,7 +391,7 @@ const AvatarComponent: React.FC = () => {
 				}
 				playNotification()
 			})
-			socket.on(CONST_TYPE_SOCKET.ResAllOrderByStatus, async (response: Array<[]>) => {
+			socket.on(CONST_TYPE_SOCKET.ResAllOrderByStatus, async (response) => {
 				if (response) {
 					await dispatch(setOrderByNumberTable(response))
 				}

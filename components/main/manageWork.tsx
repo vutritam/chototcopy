@@ -13,7 +13,7 @@ export default function ManageWork({}: Props) {
 		{
 			label: `Danh sách đơn hàng`,
 			key: 1,
-			children: <ListItem />,
+			children: <ListItem isPage="fullPage" />,
 		},
 		{
 			label: `Quản lý thu và chi`,

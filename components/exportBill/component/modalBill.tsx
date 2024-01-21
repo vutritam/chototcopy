@@ -10,6 +10,9 @@ const ModalBill: React.FC = ({ open, handleShowBill, dataSubmit, totalPrice }) =
 	const getContentForExport = (
 		<div ref={elementRef}>
 			<ListUser data={dataSubmit} />
+			<div>
+				<b>Tổng tiền thanh toán: {totalPrice}đ</b>
+			</div>
 		</div>
 	)
 

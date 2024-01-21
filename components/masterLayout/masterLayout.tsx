@@ -147,7 +147,7 @@ const MasterLayout: React.FC<MyComponentProps> = ({ children, rolesAccess }: MyC
 							)}
 						</div>
 					</Content>
-					<Footer style={{ textAlign: 'center' }}>Bản quyền thuộc team GOLD COFFEE</Footer>
+					<Footer style={{ textAlign: 'center' }}>Bản quyền thuộc vũ trí tâm</Footer>
 				</Layout>
 			</Layout>
 		</>

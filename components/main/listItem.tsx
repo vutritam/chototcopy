@@ -1,5 +1,5 @@
 import { MessageOutlined, StarOutlined } from '@ant-design/icons'
-import { Image, List, Space, Spin } from 'antd'
+import { Button, Image, List, Space, Spin } from 'antd'
 import React, { useState, useEffect } from 'react'
 import CommonModal from '../srcModalOrder/modalOrder'
 import { useRouter } from 'next/router'
@@ -24,10 +24,14 @@ const IconText = ({
 		</Space>
 	)
 }
-
-const ListItem: React.FC = () => {
+interface inputProps {
+	isPage: string
+}
+const ListItem = (props: inputProps) => {
+	const { isPage } = props
 	let router = useRouter()
 	const [loading, setLoading] = useState(true)
+	const [page, setPage] = useState('')
 	const [dataList, setDataList] = useState([])
 	const dataStore = useSelector((state) => state.products.products.data)
 	const dispatch = useDispatch()
@@ -48,6 +52,34 @@ const ListItem: React.FC = () => {
 			setDataList(dataStore?.data)
 		}
 	}, [dataStore])
+
+	const renderBtn = (isPage, item = null) => {
+		switch (isPage) {
+			case 'order':
+				return (
+					item.quantity > 0 && (
+						<CommonModal tittle="Xác nhận chọn món này ?" label="chọn ngay" item={item} />
+					)
+				)
+			case 'admin':
+				return (
+					<>
+						<Button>Kiểm kê kho</Button>
+						<Button>Xem báo cáo/thống kế</Button>
+					</>
+				)
+			case 'employee':
+				return (
+					<>
+						<Button>Lịch sử giao dịch</Button>
+						<Button>Chi tiết sản phẩm</Button>
+					</>
+				)
+
+			default:
+				break
+		}
+	}
 	return (
 		<>
 			<List
@@ -97,11 +129,7 @@ const ListItem: React.FC = () => {
 						actions={[
 							<IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
 							<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
-							router.pathname.includes('/order') ? (
-								<CommonModal tittle="Xác nhận chọn món này ?" label="chọn ngay" item={item} />
-							) : (
-								''
-							),
+							renderBtn(isPage, item),
 						]}
 						extra={
 							<div className="show-desktop-menu">
@@ -127,12 +155,22 @@ const ListItem: React.FC = () => {
 							}
 							title={item.name}
 							description={
-								<span>
-									Giá:
-									<span style={{ color: 'blue', marginLeft: '10px' }}>
-										<span className="">{item.price}</span>
+								<>
+									<span>
+										Giá:
+										<span style={{ color: 'blue', marginLeft: '10px' }}>
+											<span className="">{item.price}</span>
+										</span>
 									</span>
-								</span>
+									<div>
+										Số lượng:{' '}
+										{item.quantity > 0 ? (
+											item.quantity
+										) : (
+											<span style={{ color: 'red' }}>Đã hết hàng</span>
+										)}
+									</div>
+								</>
 							}
 						/>
 						{item.Description}
