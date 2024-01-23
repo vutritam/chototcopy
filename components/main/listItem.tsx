@@ -5,6 +5,7 @@ import CommonModal from '../srcModalOrder/modalOrder'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
+import Link from 'next/link'
 
 const IconText = ({
 	icon,
@@ -72,7 +73,9 @@ const ListItem = (props: inputProps) => {
 				return (
 					<>
 						<Button>Lịch sử giao dịch</Button>
-						<Button>Chi tiết sản phẩm</Button>
+						<Button>
+							<Link href={'/employee/product-detail'}>Chi tiết sản phẩm</Link>
+						</Button>
 					</>
 				)
 

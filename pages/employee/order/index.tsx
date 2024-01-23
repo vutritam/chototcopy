@@ -106,8 +106,6 @@ const OrderByUser: React.FC = () => {
 
 	const handleConfirmOrder = async (e, item) => {
 		e.isDefaultPrevented()
-		console.log(e, 'ee')
-
 		if (item) {
 			setLoadingDataTable(true)
 			const { payload } = await dispatch(

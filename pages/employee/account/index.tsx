@@ -1,4 +1,4 @@
-import { Button, Form, Image, Input, Row, Select, Tooltip } from 'antd'
+import { Button, Form, Image, Input, Modal, Row, Select, Tooltip } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { CameraOutlined, EditOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Label, TextArea } from 'semantic-ui-react'
@@ -30,6 +30,7 @@ function Manage_account() {
 	const [loadings, setLoadings] = useState<boolean>(false)
 	const [loadingConfirm, setLoadingConfirm] = useState<boolean>(false)
 	const [open, setOpen] = useState<boolean>(false)
+	const [openAcceptRequest, setOpenAcceptRequest] = useState<boolean>(false)
 	const [reason, setReason] = useState<string>('')
 	const [UploadImg, setUpload] = useState({ image: '' })
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
@@ -64,7 +65,10 @@ function Manage_account() {
 			setLocation(user?.data?.location)
 			setDisabledLocation(false)
 		} else if (getInforUser?.data?.location !== user?.data?.userRequestId?.location) {
-			router.push('/login')
+			console.log('rrrtrtr')
+
+			setOpenAcceptRequest(true)
+			// router.push('/login')
 		} else {
 			setLocation(user?.data?.location)
 			setDisabledLocation(false)
@@ -360,12 +364,28 @@ function Manage_account() {
 				break
 		}
 	}
+	const handleOk = () => {
+		setOpenAcceptRequest(false)
+		router.push('/login')
+	}
+
 	return (
 		<div>
 			<h2 style={{ marginBottom: '30px' }}>
 				<UserOutlined />
 				Thông tin cá nhân
 			</h2>
+			<Modal
+				title="Thông báo"
+				open={openAcceptRequest}
+				footer={
+					<Button type="primary" onClick={handleOk}>
+						Xác nhận
+					</Button>
+				}
+			>
+				<p>Yêu cầu đổi địa điểm của bạn đã được chấp nhận (vui lòng đăng nhập lại)</p>
+			</Modal>
 			{editMode !== '' ? (
 				renderComponent(editMode)
 			) : (
