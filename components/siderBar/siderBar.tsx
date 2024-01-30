@@ -16,6 +16,8 @@ interface items {
 }
 
 export function SideBar(props: items) {
+	console.log(props.items[0]?.key, 'items')
+
 	const { collapsed, handleClickCollapse, className } = props
 	const [currentURL, setcurrentURL] = useState('/')
 	const router = useRouter()
@@ -71,7 +73,7 @@ export function SideBar(props: items) {
 				theme={'light'}
 				onClick={props.handleMenuClick}
 				selectedKeys={[getKeyActived]}
-				defaultSelectedKeys={[getKeyActived]}
+				defaultSelectedKeys={[props.items[0]?.key]}
 				items={props.items}
 			/>
 		</Sider>

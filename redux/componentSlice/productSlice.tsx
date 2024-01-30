@@ -13,6 +13,15 @@ export const fetchCreateProduct = createAsyncThunk<any, string>(
 		return response.data
 	}
 )
+
+export const fetchProductById = createAsyncThunk<any, string>(
+	'api/fetchProductById',
+	async (options) => {
+		let response = await axiosConfig.post(`/products/getProductById/${options}`)
+		return response.data
+	}
+)
+
 export const fetchProductByFilterCondition = createAsyncThunk<any, string>(
 	'api/fetchProductByFilterCondition',
 	async (options) => {

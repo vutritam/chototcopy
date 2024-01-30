@@ -42,7 +42,7 @@ const CartItem: React.FC = (props) => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [open, setOpen] = React.useState<Boolean>(false)
 	const [openModalBill, setOpenBill] = React.useState<Boolean>(false)
-	const [backModal, setBackModal] = React.useState<Boolean>(false)
+	const [items, setMappedData] = useState([])
 	const [typeBill, setTypeBill] = React.useState<string>('')
 	const [itemRender, setItemRender] = React.useState<any>([])
 	const [dataSubmit, setDataSubmit] = React.useState<any>([])
@@ -90,17 +90,7 @@ const CartItem: React.FC = (props) => {
 			title: 'Ant Design Title red bill',
 		},
 	]
-	// call api get all order by tableNumber and location
-	// const items = [
-	// 	{
-	// 		key: '1',
-	// 		label: <p onClick={() => setConfirmTableNumber(1)}>Bàn 1</p>,
-	// 	},
-	// 	{
-	// 		key: '2',
-	// 		label: <p onClick={() => setConfirmTableNumber(2)}>Bàn 2</p>,
-	// 	},
-	// ]
+
 	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 	useEffect(() => {
 		if (confirmTableNumber !== null) {
@@ -127,7 +117,6 @@ const CartItem: React.FC = (props) => {
 		}, 0)
 		setTotalPrice(totalPrice)
 	}, [dataSubmit])
-	const [items, setMappedData] = useState([])
 	useEffect(() => {
 		const data =
 			itemAllOrder !== null && typeof itemAllOrder === 'object' && !Array.isArray(itemAllOrder)
@@ -141,12 +130,14 @@ const CartItem: React.FC = (props) => {
 			return acc
 		}, [])
 
-		const dataList = filteredData?.map((item, index) => ({
-			key: index,
-			label: (
-				<p onClick={() => setConfirmTableNumber(item.tableNumber)}>{`Bàn ${item.tableNumber}`}</p>
-			),
-		}))
+		const dataList = filteredData
+			?.sort((a, b) => a.tableNumber - b.tableNumber)
+			.map((item, index) => ({
+				key: index,
+				label: (
+					<p onClick={() => setConfirmTableNumber(item.tableNumber)}>{`Bàn ${item.tableNumber}`}</p>
+				),
+			}))
 		setMappedData(dataList)
 	}, [itemAllOrder])
 

@@ -28,10 +28,6 @@ const MasterLayout: React.FC<MyComponentProps> = ({ children, rolesAccess }: MyC
 	const isOrderPage = router.pathname.startsWith('/order')
 	useEffect(() => {
 		isOrderPage ? setShowConfirmLocation(true) : setShowConfirmLocation(false)
-		setLoading(true)
-		setTimeout(() => {
-			setLoading(false)
-		}, 1000)
 	}, [router.asPath])
 
 	useEffect(() => {
@@ -43,8 +39,6 @@ const MasterLayout: React.FC<MyComponentProps> = ({ children, rolesAccess }: MyC
 		setCollapsed(value)
 	}
 	const renderSiderBar = (rolesAccess: string[]) => {
-		console.log(rolesAccess, 'roless')
-
 		switch (rolesAccess[0]) {
 			case 'admin':
 				return itemsAdmin
@@ -131,20 +125,7 @@ const MasterLayout: React.FC<MyComponentProps> = ({ children, rolesAccess }: MyC
 								background: colorBgContainer,
 							}}
 						>
-							{!loading ? (
-								children
-							) : (
-								<Space
-									style={{
-										width: '100%',
-										display: 'flex',
-										justifyContent: 'center',
-										height: '300px',
-									}}
-								>
-									<Spin tip="Loading..."></Spin>
-								</Space>
-							)}
+							{children}
 						</div>
 					</Content>
 					<Footer style={{ textAlign: 'center' }}>Bản quyền thuộc vũ trí tâm</Footer>

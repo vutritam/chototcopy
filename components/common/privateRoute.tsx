@@ -9,7 +9,6 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles, children }) => {
 	const router = useRouter()
 	let userRoles = sessionStorage.getItem('user')
-	console.log(userRoles, 'user')
 
 	useEffect(() => {
 		// Kiểm tra xem người dùng có quyền truy cập hay không

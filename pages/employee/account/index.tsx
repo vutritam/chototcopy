@@ -64,7 +64,10 @@ function Manage_account() {
 		} else if (user?.data?.userRequestId?.isRequest === 'unChange_location' && statusItem === '') {
 			setLocation(user?.data?.location)
 			setDisabledLocation(false)
-		} else if (getInforUser?.data?.location !== user?.data?.userRequestId?.location) {
+		} else if (
+			getInforUser?.data?.location !== user?.data?.userRequestId?.location &&
+			statusItem === 'request_accepted'
+		) {
 			console.log('rrrtrtr')
 
 			setOpenAcceptRequest(true)

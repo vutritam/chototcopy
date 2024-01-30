@@ -23,9 +23,7 @@ const ListUser: React.FC = (props) => {
 								<p>{item?.productId?.Description}</p>
 								<span>
 									Giá:
-									<span style={{ color: 'blue', marginLeft: '10px' }}>
-										<span className="strike-through-bold">{item.productId.price}</span>
-									</span>
+									<span style={{ color: 'blue', marginLeft: '10px' }}>{item.productId.price}</span>
 								</span>
 							</>
 						}

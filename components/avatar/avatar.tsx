@@ -213,6 +213,74 @@ const AvatarComponent: React.FC = () => {
 	}, [messageOrder])
 
 	useEffect(() => {
+		const idTableQuery = processRouterQuery(router?.query)
+		if (idTableQuery) {
+			setIdTable(idTableQuery)
+		}
+	}, [router.query])
+
+	const handleCallApiRender = async (idTable) => {
+		if (isOrderPage) {
+			const item = sessionStorage.getItem('warning_text_order')
+			if (item && message?.length <= 0) {
+				sessionStorage.removeItem('warning_text_order')
+			}
+			const { payload } = await dispatch(
+				fetchAllOrderByNumberTableAndLocationUser({
+					tableNumber: idTable,
+					location: getLocationOrderUser?.location,
+				})
+			)
+
+			if (payload) {
+				setShowMessage(true)
+				await dispatch(setMessage(payload.data))
+				// setShowMenu(payload.data)
+				setCountMessage(payload.data.length)
+
+				setTimeout(() => {
+					setShowMessage(false)
+				}, 2000)
+			}
+		} else if (isEmployeePage) {
+			const { payload } = await dispatch(
+				fetchAllOrder({
+					location: getInforUser?.data.location,
+				})
+			)
+
+			if (payload) {
+				setShowMessageEmployee(true)
+				// setShowMenuEmployee(payload.data)
+				await dispatch(setMessageEmployee(payload.data))
+				setCountMessageEmployee(payload.data.length)
+				setCountMessage(payload.data.length)
+				setTimeout(() => {
+					setShowMessageEmployee(false)
+				}, 2000)
+			}
+		} else {
+			const { payload } = await dispatch(
+				fetchMessageByUserRole({
+					userId: getInforUser?.data?.userId,
+					location: getInforUser?.data?.location,
+					isPage: CONST_TYPE_KEY_VALUE.Admin_page,
+				})
+			)
+			if (payload) {
+				setShowMessageAdmin(true)
+				await dispatch(setMessageAdmin(payload.data))
+				// setShowMenuAdmin(payload.data)
+				setCountMessage(payload.data.length)
+				setCountMessageAdmin(payload.data.length)
+				setTimeout(() => {
+					setShowMessageAdmin(false)
+				}, 2000)
+			}
+		}
+	}
+
+	useEffect(() => {
 		const fetchData = async () => {
 			let obj = {
 				userInfo: {},
@@ -252,95 +320,9 @@ const AvatarComponent: React.FC = () => {
 					}
 				})
 			}
-			await dispatch(
-				fetchAllOrderByNumberTableAndLocationUser({
-					tableNumber: idTable,
-					location: getLocationOrderUser?.location,
-				})
-			)
-			await dispatch(
-				fetchAllOrder({
-					location: getInforUser?.data.location,
-				})
-			)
+			handleCallApiRender(idTable)
 		}
 		fetchData()
-	}, [])
-
-	useEffect(() => {
-		const idTable = processRouterQuery(router?.query)
-		if (idTable) {
-			setIdTable(idTable)
-		}
-	}, [router?.query])
-
-	useEffect(() => {
-		;(async () => {
-			if (isOrderPage) {
-				const item = sessionStorage.getItem('warning_text_order')
-				if (item && message?.length <= 0) {
-					sessionStorage.removeItem('warning_text_order')
-				}
-				const { payload } = await dispatch(
-					fetchAllOrderByNumberTableAndLocationUser({
-						tableNumber: idTable,
-						location: getLocationOrderUser?.location,
-					})
-				)
-
-				if (payload) {
-					setShowMessage(true)
-					await dispatch(setMessage(payload.data))
-					// setShowMenu(payload.data)
-					setCountMessage(payload.data.length)
-
-					setTimeout(() => {
-						setShowMessage(false)
-					}, 2000)
-				}
-			} else if (isEmployeePage) {
-				const { payload } = await dispatch(
-					fetchAllOrder({
-						location: getInforUser?.data.location,
-					})
-				)
-
-				if (payload) {
-					setShowMessageEmployee(true)
-					// setShowMenuEmployee(payload.data)
-					await dispatch(setMessageEmployee(payload.data))
-					setCountMessageEmployee(payload.data.length)
-					setCountMessage(payload.data.length)
-					setTimeout(() => {
-						setShowMessageEmployee(false)
-					}, 2000)
-				}
-			} else {
-				const { payload } = await dispatch(
-					fetchMessageByUserRole({
-						userId: getInforUser?.data?.userId,
-						location: getInforUser?.data?.location,
-						isPage: CONST_TYPE_KEY_VALUE.Admin_page,
-					})
-				)
-				if (payload) {
-					setShowMessageAdmin(true)
-					await dispatch(setMessageAdmin(payload.data))
-					// setShowMenuAdmin(payload.data)
-					setCountMessage(payload.data.length)
-					setCountMessageAdmin(payload.data.length)
-					setTimeout(() => {
-						setShowMessageAdmin(false)
-					}, 2000)
-				}
-			}
-
-			await dispatch(
-				fetchAllOrder({
-					location: getInforUser?.data.location,
-				})
-			)
-		})()
 	}, [
 		JSON.stringify(message),
 		JSON.stringify(messageEmployee),

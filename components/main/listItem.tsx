@@ -6,6 +6,8 @@ import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Link from 'next/link'
+import ProductDetail from '@/pages/employee/product-detail/[detail]'
+import SearchParam from '@/utils/searchParamQuery'
 
 const IconText = ({
 	icon,
@@ -36,11 +38,13 @@ const ListItem = (props: inputProps) => {
 	const [dataList, setDataList] = useState([])
 	const dataStore = useSelector((state) => state.products.products.data)
 	const dispatch = useDispatch()
+	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 
 	useEffect(() => {
 		setLoading(true)
 		;(async () => {
 			const allProduct = await dispatch(fetchAllProduct())
+			setLoading(true)
 			if (allProduct?.payload?.success) {
 				setLoading(false)
 				setDataList(allProduct?.payload?.data)
@@ -74,7 +78,13 @@ const ListItem = (props: inputProps) => {
 					<>
 						<Button>Lịch sử giao dịch</Button>
 						<Button>
-							<Link href={'/employee/product-detail'}>Chi tiết sản phẩm</Link>
+							{/* <SearchParam
+								pathUrl={'detail'}
+								pathName="/employee/product-detail"
+								param={item.id}
+								title={'ádasd'}
+							/> */}
+							<Link href={`/employee/product-detail/${item.id}`}>Chi tiết sản phẩm</Link>
 						</Button>
 					</>
 				)
@@ -94,6 +104,7 @@ const ListItem = (props: inputProps) => {
 					xl: 4,
 					xxl: 4,
 				}}
+				loading={loading}
 				itemLayout="vertical"
 				size="large"
 				pagination={{

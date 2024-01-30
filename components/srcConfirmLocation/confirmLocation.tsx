@@ -17,6 +17,8 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 
 	const handleOk = async () => {
 		props.handleShow()
+		console.log(props.idTable, 'kkkjdkasd')
+
 		sessionStorage.setItem(
 			'location_user',
 			JSON.stringify({

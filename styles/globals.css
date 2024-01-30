@@ -27,6 +27,25 @@
   width: 90%;
 
 }
+.parent_show {
+  display: flex;
+  align-items: center;
+
+}
+.parent_show:hover .btn_show {
+  display: block;
+  transition: 0.3s;
+}
+.btn_show {
+  display: none;
+}
+.limit_text {
+  white-space: norwap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .flex-basic {
   display: flex;
   align-items: center;

@@ -43,6 +43,8 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 	}
 
 	const renderOrderSummary = (orderSummary: OrderSummary, itemOrder: ItemOrder) => {
+		console.log(orderSummary, itemOrder, 'order')
+
 		return (
 			orderSummary[itemOrder.tableNumber]?.confirmedItems +
 				orderSummary[itemOrder.tableNumber]?.canceledItems ===
@@ -98,6 +100,10 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 		isCheckUserOrderData.map((ele, index) => {
 			if (!isAdmin) {
 				const isOrderSumary = renderOrderSummary(orderSummary, ele)
+				console.log(ele, 'element')
+
+				console.log(orderSummary[ele.tableNumber]?.totalOrderedItems, 'isOrderSumary')
+
 				return (
 					<Menu.Item key={index} className={`${showMessage ? '' : 'show-readed-message'}`}>
 						{renderTitleHeading(isOrderSumary, ele)}

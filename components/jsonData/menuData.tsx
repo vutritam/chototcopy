@@ -4,6 +4,7 @@ import {
 	PieChartOutlined,
 	TeamOutlined,
 	UserOutlined,
+	OrderedListOutlined,
 } from '@ant-design/icons'
 import { MenuProps } from 'antd'
 import Link from 'next/link'
@@ -42,11 +43,9 @@ export const itemsAdmin = [
 ]
 
 export const itemsEmployee = [
-	getItem(<Link href="/employee/workshift">Quản lý ca</Link>, '1', <PieChartOutlined />),
-	getItem(<Link href="/employee/contact">Quản lý kết nối</Link>, '2', <DesktopOutlined />),
-	getItem('Quản lý đặt bàn', 'sub1', <DesktopOutlined />, [
-		getItem(<Link href="/employee/order">Đơn tại bàn</Link>, '3', <PieChartOutlined />),
-	]),
+	// getItem(<Link href="/employee/workshift">Quản lý ca</Link>, '1', <PieChartOutlined />),
+	// getItem(<Link href="/employee/contact">Quản lý kết nối</Link>, '2', <DesktopOutlined />),
+	getItem(<Link href="/employee/order">Đơn tại bàn</Link>, '1', <OrderedListOutlined />),
 	getItem('Quản lý báo cáo', 'sub2', <TeamOutlined />, [
 		getItem(<Link href="/employee/warehouse">Kho hàng</Link>, 'sub2-1', <PieChartOutlined />),
 		getItem(<Link href="/employee/report">Báo cáo</Link>, 'sub2-2', <PieChartOutlined />),

@@ -21,14 +21,6 @@ import NotificationTitle from '../notificationTitle/notificationTitle'
 import { processRouterQuery } from '../common/parseNumber'
 import ComfirmLocationOrder from '../srcConfirmLocation/confirmLocation'
 export default function Products(props: IAppProps) {
-	// const [state, setState] = React.useState({
-	// 	name: 'Chọn tên',
-	// 	price: 'Chọn giá',
-	// 	orther: 'Chọn đồ ăn vặt',
-	// 	condition: 'Và',
-	// 	comparition: '=',
-	// 	dateTime: '',
-	// })
 	const router = useRouter()
 	const initItem = {
 		name: 'all',
@@ -53,15 +45,19 @@ export default function Products(props: IAppProps) {
 		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
 		const convertedValue = processRouterQuery(router?.query)
 		if (getLocationOrder !== null) {
-			if (getLocationOrder?.tableNumber !== convertedValue && !getLocationOrder.location) {
-				setShow(true)
-			} else {
-				setShow(false)
+			// console.log(Boolean(convertedValue), 'bollen')
+
+			if (Number(convertedValue)) {
+				if (getLocationOrder?.tableNumber === convertedValue) {
+					setShow(false)
+				} else {
+					setShow(true)
+				}
+				setIdTable(convertedValue)
 			}
 		} else {
 			setShow(true)
 		}
-		setIdTable(convertedValue)
 	}, [router?.query.order])
 
 	const handleFilterItem = (fieldName, value) => {
@@ -200,6 +196,7 @@ export default function Products(props: IAppProps) {
 			}, 2000)
 		}
 	}, [itemFilterChecked])
+
 	const renderNotiItemOrder = () => {
 		const messageTitle = 'Thông báo quan trọng'
 		const caculatorItem =

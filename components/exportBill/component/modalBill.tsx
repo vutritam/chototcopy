@@ -1,20 +1,9 @@
 import React, { useRef } from 'react'
 import { Button, Modal } from 'antd'
-import { EyeOutlined } from '@ant-design/icons'
-import ExportHTMLToPDF from '../exportBill'
-import ListUser from '@/components/main/listUser'
+import { EyeOutlined, CopyOutlined } from '@ant-design/icons'
+import PrintToExport from './printExport'
 
 const ModalBill: React.FC = ({ open, handleShowBill, dataSubmit, totalPrice }) => {
-	const elementRef = useRef(null)
-
-	const getContentForExport = (
-		<div ref={elementRef}>
-			<ListUser data={dataSubmit} />
-			<div>
-				<b>Tổng tiền thanh toán: {totalPrice}đ</b>
-			</div>
-		</div>
-	)
 
 	return (
 		<>
@@ -26,10 +15,10 @@ const ModalBill: React.FC = ({ open, handleShowBill, dataSubmit, totalPrice }) =
 				open={open}
 				onCancel={handleShowBill}
 				footer={
-					<ExportHTMLToPDF getContentForExport={elementRef} handleShowBill={handleShowBill} />
+					<PrintToExport dataSubmit={dataSubmit} totalPrice={totalPrice}/>
+					// <ExportHTMLToPDF getContentForExport={elementRef} handleShowBill={handleShowBill} />
 				}
 			>
-				{getContentForExport}
 			</Modal>
 		</>
 	)

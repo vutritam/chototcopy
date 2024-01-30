@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas'
 import { CopyOutlined } from '@ant-design/icons'
 import { jsPDF } from 'jspdf'
 import { Button } from 'antd'
+import PrintToExport from './component/printExport'
 
 const ExportHTMLToPDF = ({ getContentForExport, handleShowBill }) => {
 	const ExportHTMLToPDF = () => {
@@ -20,6 +21,7 @@ const ExportHTMLToPDF = ({ getContentForExport, handleShowBill }) => {
 
 	return (
 		<div>
+			<PrintToExport />
 			<Button
 				onClick={() => ExportHTMLToPDF()}
 				icon={<CopyOutlined />}
