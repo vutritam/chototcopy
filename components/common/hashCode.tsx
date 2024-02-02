@@ -1,38 +1,26 @@
-// encode a number
-const encodeNumber = (num: number) => {
-	const alphabet = 'abcdefghijklmnopqrstuvwxyz'
-	const base = alphabet.length
-	let encoded = ''
+// Import thư viện crypto-js
+import CryptoJS from 'crypto-js'
 
-	// Convert number to a string in base-26
-	while (num > 0) {
-		const remainder = num % base
-		num = Math.floor(num / base)
-		encoded = alphabet[remainder] + encoded
-	}
-
-	// Append original number to the end of the encoded string
-	encoded += num.toString()
-
-	return encoded
+// Mã hóa số bàn thành chuỗi
+const encodeTableNumber = (tableNumber: number) => {
+	const encryptedString = encodeURIComponent(
+		CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(tableNumber.toString()))
+	)
+	return encryptedString
 }
 
-// decode a string
-const decodeNumber = (encoded: string) => {
-	const alphabet = 'abcdefghijklmnopqrstuvwxyz'
-	const base = alphabet.length
-
-	// Extract original number from end of the encoded string
-	const num = parseInt(encoded.slice(-1))
-	let decoded = 0
-
-	// Convert base-26 string to a number
-	for (let i = 0; i < encoded.length - 1; i++) {
-		const exponent = encoded.length - i - 2
-		const digit = alphabet.indexOf(encoded[i])
-		decoded += digit * Math.pow(base, exponent)
-	}
-
-	return [decoded, num]
+// Giải mã chuỗi thành số bàn
+const decodeTableNumber = (encodedString: string) => {
+	const decryptedNumber = parseInt(
+		CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(decodeURIComponent(encodedString))),
+		10
+	)
+	return decryptedNumber
 }
-export { encodeNumber, decodeNumber }
+export { encodeTableNumber, decodeTableNumber }
+// // Sử dụng
+// const tableNumber = 42;
+// const encodedString = encodeTableNumber(tableNumber);
+// console.log(encodedString); // Chuỗi đã mã hóa
+// const decodedNumber = decodeTableNumber(encodedString);
+// console.log(decodedNumber); // Số bàn đã giải mã

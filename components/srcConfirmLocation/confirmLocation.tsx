@@ -10,6 +10,8 @@ interface inputProps {
 	idTable?: any
 }
 const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
+	console.log(props, 'props')
+
 	const [dataInput, setDataInput] = useState({
 		location: '',
 	})
@@ -17,7 +19,6 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 
 	const handleOk = async () => {
 		props.handleShow()
-		console.log(props.idTable, 'kkkjdkasd')
 
 		sessionStorage.setItem(
 			'location_user',
@@ -32,7 +33,7 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 				location: dataInput.location,
 			})
 		)
-		window.location.reload()
+		// window.location.reload()
 	}
 	const onChangeLocation = useCallback(
 		(label: any) => {

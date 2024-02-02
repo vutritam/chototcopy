@@ -115,6 +115,7 @@ const AvatarComponent: React.FC = () => {
 
 	let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
+
 	const handleLogOut = () => {
 		if (sessionStorage.getItem('user') !== null) {
 			sessionStorage.removeItem('user')
@@ -213,7 +214,7 @@ const AvatarComponent: React.FC = () => {
 	}, [messageOrder])
 
 	useEffect(() => {
-		const idTableQuery = processRouterQuery(router?.query)
+		const idTableQuery = processRouterQuery(router?.query?.order)
 		if (idTableQuery) {
 			setIdTable(idTableQuery)
 		}

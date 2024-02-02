@@ -1,16 +1,14 @@
-import { decodeNumber, encodeNumber } from './hashCode'
-
+// import { decodeNumber, encodeNumber } from './hashCode'
+import _ from 'lodash'
+import { decodeTableNumber, encodeTableNumber } from './hashCode'
 // logic.js
 export function processRouterQuery(routerQuery) {
-	let num = routerQuery?.order || null
+	let num = routerQuery || {}
 	let convert
-
-	if (isNaN(num)) {
-		const [decoded, originalNum] = decodeNumber(num)
-		convert = decoded
-	} else {
-		convert = encodeNumber(Number(num))
+	if (!_.isNil(num) && !_.isObject(num)) {
+		convert = decodeTableNumber(num)
 	}
+	console.log(convert, 'ggg')
 
 	return convert
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import ListItem from './listItem'
+import _ from 'lodash'
 import {
 	FilterOutlined,
 	FileSearchOutlined,
@@ -8,19 +8,19 @@ import {
 	FireFilled,
 	DownCircleOutlined,
 } from '@ant-design/icons'
-import { Button, notification, Space, Tooltip } from 'antd'
+import { Button, Space, Tooltip } from 'antd'
 import type { MenuProps } from 'antd'
 import CommonFilter from '../common/commonInput/commonFilter'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct, fetchProductByFilterCondition } from '@/redux/componentSlice/productSlice'
 import Toasty from '../common/toasty'
 import { useRouter } from 'next/router'
-export interface IAppProps {}
 import L10N from '../../L10N/en.json'
 import NotificationTitle from '../notificationTitle/notificationTitle'
 import { processRouterQuery } from '../common/parseNumber'
 import ComfirmLocationOrder from '../srcConfirmLocation/confirmLocation'
-export default function Products(props: IAppProps) {
+
+export default function OrderProducts() {
 	const router = useRouter()
 	const initItem = {
 		name: 'all',
@@ -37,28 +37,41 @@ export default function Products(props: IAppProps) {
 	const [allProduct, setAllProduct] = React.useState([])
 	const [idTable, setIdTable] = React.useState<any>(0)
 	const [show, setShow] = React.useState(false)
+
 	const handleShow = () => {
 		setShow(false)
 	}
 
-	React.useEffect(() => {
-		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
-		const convertedValue = processRouterQuery(router?.query)
-		if (getLocationOrder !== null) {
-			// console.log(Boolean(convertedValue), 'bollen')
-
-			if (Number(convertedValue)) {
-				if (getLocationOrder?.tableNumber === convertedValue) {
-					setShow(false)
-				} else {
-					setShow(true)
-				}
-				setIdTable(convertedValue)
+	const handleIdTableNumber = (convertedValue, getLocationOrder) => {
+		if (!_.isNil(convertedValue) && getLocationOrder !== null) {
+			// Kiểm tra trước khi so sánh
+			if (getLocationOrder?.tableNumber === convertedValue) {
+				setShow(false)
+			} else {
+				setShow(true)
 			}
-		} else {
+		} else if (getLocationOrder == null && !getLocationOrder?.location) {
 			setShow(true)
 		}
-	}, [router?.query.order])
+		setIdTable(convertedValue)
+	}
+
+	const handleCheckPathName = (convertedValue, getLocationOrder) => {
+		const pathString = sessionStorage.getItem('routerAsPath')
+		if (!isNaN(convertedValue) && !_.isNil(convertedValue)) {
+			sessionStorage.setItem('routerAsPath', router.asPath)
+			handleIdTableNumber(convertedValue, getLocationOrder)
+		} else if (_.isNil(convertedValue) && pathString !== null) {
+			router.push(pathString)
+		} else {
+		}
+	}
+
+	React.useEffect(() => {
+		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
+		const convertedValue = processRouterQuery(router?.query?.order) // kiểm tra xem string có được decode ra đúng số hay ko
+		handleCheckPathName(convertedValue, getLocationOrder)
+	}, [router?.query?.order])
 
 	const handleFilterItem = (fieldName, value) => {
 		setItemFilterValueChecked({ ...itemFilterValueChecked, [fieldName]: value })
@@ -176,7 +189,6 @@ export default function Products(props: IAppProps) {
 	]
 
 	const renderItemSelected = (itemsFilter, state, fieldName) => {
-		// let itemValue = state === 'all' ? 'Tất cả' : state
 		return (
 			<div style={{ width: '100%' }}>
 				<CommonFilter
@@ -188,6 +200,7 @@ export default function Products(props: IAppProps) {
 			</div>
 		)
 	}
+
 	React.useEffect(() => {
 		if (itemFilterChecked) {
 			setCancelTooltip(true)
@@ -233,6 +246,7 @@ export default function Products(props: IAppProps) {
 			</>
 		) : null
 	}
+
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const { payload } = await dispatch(fetchAllProduct())
@@ -254,10 +268,12 @@ export default function Products(props: IAppProps) {
 		confirmedItems: 0,
 		canceledItems: 0,
 	})
+
 	//message redux store
 	const dataOrderByNumberTable = useSelector(
 		(state: any) => state.dataOrder?.dataOrderByNumberTable?.data
 	)
+
 	React.useEffect(() => {
 		let sessionOrder = sessionStorage.getItem('warning_text_order')
 

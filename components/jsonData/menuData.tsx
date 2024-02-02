@@ -36,6 +36,7 @@ export const itemsAdmin = [
 			'sub1-2',
 			<HelperMenu icon={<PieChartOutlined />} />
 		),
+		getItem(<Link href="/admin/qrcode">Qr code</Link>, 'sub1-3', <PieChartOutlined />),
 	]),
 	getItem('Căn tin', 'sub2', <TeamOutlined />, [getItem('Team 1', '9'), getItem('Team 2', '10')]),
 	getItem('Thực đơn', '10', <FileOutlined />),
@@ -45,13 +46,13 @@ export const itemsAdmin = [
 export const itemsEmployee = [
 	// getItem(<Link href="/employee/workshift">Quản lý ca</Link>, '1', <PieChartOutlined />),
 	// getItem(<Link href="/employee/contact">Quản lý kết nối</Link>, '2', <DesktopOutlined />),
-	getItem(<Link href="/employee/order">Đơn tại bàn</Link>, '1', <OrderedListOutlined />),
-	getItem('Quản lý báo cáo', 'sub2', <TeamOutlined />, [
-		getItem(<Link href="/employee/warehouse">Kho hàng</Link>, 'sub2-1', <PieChartOutlined />),
-		getItem(<Link href="/employee/report">Báo cáo</Link>, 'sub2-2', <PieChartOutlined />),
+	getItem('Thực đơn', '1', <FileOutlined />),
+	getItem(<Link href="/employee/order">Đơn tại bàn</Link>, '2', <OrderedListOutlined />),
+	getItem('Quản lý báo cáo', 'sub1', <TeamOutlined />, [
+		getItem(<Link href="/employee/warehouse">Kho hàng</Link>, 'sub1-1', <PieChartOutlined />),
+		getItem(<Link href="/employee/report">Báo cáo</Link>, 'sub1-2', <FileOutlined />),
 	]),
-	getItem('Thực đơn', '9', <FileOutlined />),
-	getItem(<div>Bán hàng</div>, '10', <PieChartOutlined />),
+	getItem(<Link href="/employee/manage-table">Quản lý bàn</Link>, '3', <OrderedListOutlined />),
 ]
 
 export const itemsOrder = [

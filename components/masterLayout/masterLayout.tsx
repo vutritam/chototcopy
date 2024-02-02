@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import ComfirmLocationOrder from '../srcConfirmLocation/confirmLocation'
 import Head from 'next/head'
 import { itemsAdmin, itemsEmployee, itemsOrder } from '../jsonData/menuData'
+import { BreadcrumbItem } from '../common/breadcrumb'
 
 type MyComponentProps = {
 	children: React.ReactNode
@@ -113,10 +114,7 @@ const MasterLayout: React.FC<MyComponentProps> = ({ children, rolesAccess }: MyC
 						<AvatarComponent />
 					</Header>
 					<Content style={{ margin: '0 16px' }}>
-						<Breadcrumb style={{ margin: '16px 0' }}>
-							<Breadcrumb.Item>User</Breadcrumb.Item>
-							<Breadcrumb.Item>Quản lí ca</Breadcrumb.Item>
-						</Breadcrumb>
+						<BreadcrumbItem />
 
 						<div
 							style={{

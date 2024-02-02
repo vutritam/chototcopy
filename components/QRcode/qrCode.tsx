@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import QRCode from 'react-qr-code'
-import { encodeNumber, decodeNumber } from '@/components/common/hashCode'
+import { encodeTableNumber } from '@/components/common/hashCode'
 
 const QRcode: React.FC = () => {
 	const [dataQR, setData] = useState<Array<object>>([])
@@ -18,7 +18,8 @@ const QRcode: React.FC = () => {
 			let table = {
 				tittle: `bàn số ${index}`,
 				tableNumber: index,
-				linkOrder: `http://localhost:3000/order/${encodeNumber(index)}`,
+				linkOrder: `http://localhost:3000/order/${encodeTableNumber(index)}`,
+				code: encodeTableNumber(index),
 			}
 
 			if (!array.includes(table)) {
@@ -40,6 +41,7 @@ const QRcode: React.FC = () => {
 			{dataQR?.map((e, index) => (
 				<>
 					<h2>Bàn số: {index + 1}</h2>
+					<div>Code: {e?.code}</div>
 					<QRCode key={index} value={e?.linkOrder} size={250} />
 					<br />
 				</>

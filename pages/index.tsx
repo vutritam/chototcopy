@@ -48,13 +48,10 @@ const App: React.FC = () => {
 						/>
 						<h2>GOLD COFFEE</h2>
 						<Button icon={<UserSwitchOutlined />}>
-							<Link href={process.env.NEXT_PUBLIC_HOST_CLIENT + '/employee'}>Nhân viên</Link>
+							<Link href={process.env.NEXT_PUBLIC_HOST_CLIENT + '/login'}>
+								Dành cho hệ thống gold
+							</Link>
 						</Button>
-						<Button type="default" icon={<UserSwitchOutlined />}>
-							<Link href={process.env.NEXT_PUBLIC_HOST_CLIENT + '/admin'}>Admin</Link>
-						</Button>
-						{/* </>
-			)} */}
 						<Button type="primary" icon={<UserSwitchOutlined />} onClick={() => handleClick()}>
 							Đặt món
 						</Button>

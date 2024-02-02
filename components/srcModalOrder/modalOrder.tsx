@@ -13,8 +13,6 @@ interface inputProps {
 	item: any
 }
 const CommonModal = (props: inputProps): JSX.Element => {
-	const [idTable, setIdTable] = useState<any>(0)
-	let router = useRouter()
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const [getLocationOrderUser, setGetLocationOrderUser] = useState(null)
@@ -52,12 +50,6 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		}
 	}, [])
 
-	useEffect(() => {
-		// setLoading(true)
-		const convertedValue = processRouterQuery(router?.query)
-		setIdTable(convertedValue)
-	}, [router?.query])
-
 	const handleOk = () => {
 		// setTimeout(async () => {
 		setOpen(false)
@@ -66,7 +58,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		if (socket) {
 			// Gửi sự kiện tới Socket.IO server
 			socket.emit('myEvent', {
-				tableNumber: idTable,
+				tableNumber: getLocationOrderUser?.tableNumber,
 				productId: props.item.id,
 				location: getLocationOrderUser?.location,
 				quantity: dataInput.quantity,

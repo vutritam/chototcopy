@@ -76,7 +76,9 @@ const ListItem = (props: inputProps) => {
 			case 'employee':
 				return (
 					<>
-						<Button>Lịch sử giao dịch</Button>
+						<Button>
+							<Link href="/employee/warehouse/history-transactions">Lịch sử giao dịch</Link>
+						</Button>
 						<Button>
 							{/* <SearchParam
 								pathUrl={'detail'}

@@ -68,10 +68,7 @@ function Manage_account() {
 			getInforUser?.data?.location !== user?.data?.userRequestId?.location &&
 			statusItem === 'request_accepted'
 		) {
-			console.log('rrrtrtr')
-
 			setOpenAcceptRequest(true)
-			// router.push('/login')
 		} else {
 			setLocation(user?.data?.location)
 			setDisabledLocation(false)
