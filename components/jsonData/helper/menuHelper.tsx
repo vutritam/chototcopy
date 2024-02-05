@@ -15,7 +15,7 @@ const HelperMenu = (props: inputProps) => {
 	useEffect(() => {
 		;(async () => {
 			const { payload } = await dispatch(getAllUserRequest())
-			if (payload.success) {
+			if (payload?.success) {
 				await dispatch(setAcceptRequestUsers(payload.data))
 			}
 		})()

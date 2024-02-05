@@ -3,9 +3,9 @@ import { Avatar, Button, InputNumber, List, Modal, Select, Space, Spin, Tooltip 
 import { LikeOutlined, MessageOutlined } from '@ant-design/icons'
 import { TextArea } from 'semantic-ui-react'
 import io from 'socket.io-client'
-import { useRouter } from 'next/router'
-import { processRouterQuery } from '../common/parseNumber'
+import axiosConfig from '../../pages/api/axiosConfigs'
 import L10N from '../../L10N/en.json'
+import Toasty from '../common/toasty'
 
 interface inputProps {
 	label: string
@@ -15,7 +15,7 @@ interface inputProps {
 const CommonModal = (props: inputProps): JSX.Element => {
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
-	const [getLocationOrderUser, setGetLocationOrderUser] = useState(null)
+	const [getLocationOrderUser, setGetLocationOrderUser] = useState({})
 	const [dataInput, setDataInput] = useState({
 		quantity: 1,
 		description: '',
@@ -31,36 +31,48 @@ const CommonModal = (props: inputProps): JSX.Element => {
 		</Space>
 	)
 	const [socket, setSocket] = useState(null)
+	const fetchLocation = async () => {
+		const locationUser = JSON.parse(sessionStorage.getItem('location_user'))
+		let response = await axiosConfig.post(`/location/getLocationById/${locationUser?.locationId}`)
+
+		if (response.data.success) {
+			setGetLocationOrderUser({
+				tableNumber: locationUser?.tableNumber,
+				location: response.data.data,
+			})
+		} else {
+			Toasty.error(response.data.message)
+		}
+	}
 
 	useEffect(() => {
 		if (
 			sessionStorage.getItem('location_user') !== null ||
 			sessionStorage.getItem('user') !== null
 		) {
-			setGetLocationOrderUser(JSON.parse(sessionStorage.getItem('location_user')))
+			fetchLocation()
 		}
 	}, [open])
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+
 	useEffect(() => {
-		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
 		const newSocket = io(ENV_HOST)
 		setSocket(newSocket)
 
 		return () => {
 			newSocket.disconnect()
 		}
-	}, [])
+	}, [ENV_HOST])
 
 	const handleOk = () => {
-		// setTimeout(async () => {
 		setOpen(false)
-
 		setConfirmLoading(false)
 		if (socket) {
 			// Gửi sự kiện tới Socket.IO server
 			socket.emit('myEvent', {
 				tableNumber: getLocationOrderUser?.tableNumber,
 				productId: props.item.id,
-				location: getLocationOrderUser?.location,
+				locationId: getLocationOrderUser?.location?._id,
 				quantity: dataInput.quantity,
 				description: dataInput.description,
 				status: 'order_inprogess',
@@ -68,7 +80,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 
 			socket.emit('getProductOrder', {
 				message: 'Gửi sự kiện lấy sản phẩm',
-				location: getLocationOrderUser?.location,
+				locationId: getLocationOrderUser?.location?._id,
 			})
 		}
 	}
@@ -86,8 +98,6 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	}
 
 	const onChangeDescription = (event: any) => {
-		console.log(event?.target?.value, 'event?.target?.value')
-
 		setDataInput({ ...dataInput, description: event?.target?.value })
 	}
 
@@ -111,7 +121,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 						type="primary"
 						loading={confirmLoading}
 						onClick={handleOk}
-						disabled={!getLocationOrderUser?.location || dataInput.quantity <= 0}
+						disabled={!getLocationOrderUser?.location?._id || dataInput.quantity <= 0}
 					>
 						Đặt ngay
 					</Button>,
@@ -164,7 +174,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 								placeholder="Search to Select"
 								optionFilterProp="children"
 								disabled
-								value={getLocationOrderUser?.location}
+								value={getLocationOrderUser?.location?.nameLocation}
 								filterOption={(input, option) => (option?.label ?? '').includes(input)}
 								filterSort={(optionA, optionB) =>
 									(optionA?.label ?? '')

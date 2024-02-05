@@ -162,7 +162,7 @@ const List_manage_employee: React.FC = (props) => {
 		if (payload?.success) {
 			const data = await dispatch(getAllUserRequest())
 
-			if (data?.payload.success) {
+			if (data?.payload?.success) {
 				await dispatch(setAcceptRequestUsers(data.payload.data))
 			}
 			Toasty.success(data.payload.message)
@@ -325,7 +325,7 @@ const List_manage_employee: React.FC = (props) => {
 													<b>Lý do</b>: {item?.reason}
 												</div>
 												<div>
-													<b>Địa điểm muốn đổi</b>: {item?.location}
+													<b>Địa điểm muốn đổi</b>: {item?.locationId?.nameLocation}
 												</div>
 											</>
 										}

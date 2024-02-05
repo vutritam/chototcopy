@@ -24,7 +24,7 @@ function ManageRequest({}: Props) {
 			try {
 				const { payload } = await dispatch(getAllUserRequest())
 
-				if (payload.success) {
+				if (payload?.success) {
 					let filterUserUnRequest = payload.data.filter((item) => item.status !== '')
 					setListUser(filterUserUnRequest)
 				}

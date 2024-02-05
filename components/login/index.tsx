@@ -7,26 +7,34 @@ import { ThunkDispatch } from '@reduxjs/toolkit'
 import { useRouter } from 'next/router'
 import { toast } from 'react-toastify'
 import Toasty from '@/components/common/toasty'
-import UseAuthentication from '../common/useAuth'
 import { io } from 'socket.io-client'
+import axiosConfig from '../../pages/api/axiosConfigs'
+
 const LoginForm: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [loadings, setLoadings] = useState<boolean>(false)
 	const [keyTab, setKeyTab] = useState<number>(1)
+	const [listLocation, setListLocation] = useState([])
 	const [socket, setSocket] = useState(null)
 	const passwordInputRef = useRef(null)
 	const usernameInputRef = useRef(null)
 	// const user = JSON.parse(sessionStorage.getItem('user'))
 	let router = useRouter()
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
 	useEffect(() => {
-		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-		const newSocket = io(ENV_HOST)
-		setSocket(newSocket)
-
-		return () => {
-			newSocket.disconnect()
+		const initSocket = () => {
+			const newSocket = io(ENV_HOST)
+			newSocket.on('connect', () => {
+				console.log('Socket connected')
+			})
+			newSocket.on('disconnect', () => {
+				console.log('Socket disconnected')
+			})
+			setSocket(newSocket)
 		}
-	}, [])
+		initSocket()
+	}, [ENV_HOST])
+
 	useEffect(() => {
 		if (
 			usernameInputRef.current &&
@@ -41,8 +49,6 @@ const LoginForm: React.FC = () => {
 		setLoadings(true)
 		if (keyTab === 1) {
 			const { payload } = await dispatch(fetchCreatePost(options))
-			console.log(payload, 'login nè')
-
 			if (payload?.success) {
 				sessionStorage.setItem('user', JSON.stringify(payload))
 
@@ -59,7 +65,7 @@ const LoginForm: React.FC = () => {
 							// Gửi sự kiện tới Socket.IO server
 							socket.emit('afterUserLogin', {
 								message: 'Hello from client',
-								location: getUserId?.data?.location,
+								locationId: getUserId?.data?.locationId,
 								time: new Date(),
 								tableNumber: null,
 								productId: null,
@@ -70,10 +76,7 @@ const LoginForm: React.FC = () => {
 							router.push('/employee')
 						}
 					}
-					// dispatch(setUser(payload))
 				}, 1000)
-				// console.log(payload, 'pay')
-
 				dispatch(setUser(payload))
 
 				return
@@ -105,7 +108,6 @@ const LoginForm: React.FC = () => {
 			if (payload?.success) {
 				setTimeout(() => {
 					setLoadings(false)
-					// dispatch(setUser(payload))
 					Toasty.success(payload?.message)
 					setKeyTab(1)
 				}, 1000)
@@ -132,14 +134,22 @@ const LoginForm: React.FC = () => {
 		setKeyTab(key)
 	}
 	const [loading, setLoading] = useState(true)
+
 	useEffect(() => {
-		// localStorage.removeItem('user')
-		// setLoading(true)
+		const fetchData = async () => {
+			let response = await axiosConfig.get(`/location/getAllLocation`)
+			if (response.data.success) {
+				setListLocation(response.data.data)
+			} else {
+				Toasty.error(response.data.message)
+			}
+		}
 		setTimeout(() => {
-			// localStorage.removeItem('user')
+			fetchData()
 			setLoading(false)
 		}, 1000)
 	}, [])
+
 	const items = [
 		{
 			label: `Đăng nhập`,
@@ -231,18 +241,20 @@ const LoginForm: React.FC = () => {
 							/>
 						</Form.Item>
 						<Form.Item
-							name="location"
+							name="locationId"
 							rules={[{ required: true, message: 'Please input your Location!' }]}
 						>
 							<Select
 								suffixIcon={<LockOutlined className="site-form-item-icon" />}
 								placeholder="Nhập địa điểm làm việc"
 							>
-								<Select.Option value="409/99 Tân chánh hiệp 12 quận 12 TP.HCM">
-									409/99 Tân chánh hiệp 12 quận 12 TP.HCM
-								</Select.Option>
-								<Select.Option value="Trường chinh, tân bình">Trường chinh, tân bình</Select.Option>
-								<Select.Option value="Hóc môn quận 12">Hóc môn quận 12</Select.Option>
+								{listLocation?.map((item, index) => (
+									<>
+										<Select.Option key={index} value={item._id}>
+											{item.nameLocation}
+										</Select.Option>
+									</>
+								))}
 							</Select>
 						</Form.Item>
 						<Form.Item>

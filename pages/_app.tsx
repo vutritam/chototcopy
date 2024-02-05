@@ -6,8 +6,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, store } from '@/redux/store/store'
-import { ReactElement, ReactNode, useEffect } from 'react'
-import MenuItem from '@/components/jsonData/menuItem'
+import { ReactElement, ReactNode } from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import PrivateRoute from '@/components/common/privateRoute'
@@ -27,16 +26,6 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 	const handleRoles = getRole(router.pathname)
 	const checkPage =
 		router.pathname && CHECK_TYPE_INPUT.some((item) => router.pathname.includes(item))
-
-	const MyMenu = ({ data }) => (
-		<div>
-			{data.map((item) => (
-				<MenuItem key={item.key} title={item.title} icon={item.icon} link={item.link}>
-					{item.children && <MyMenu data={item.children} />}
-				</MenuItem>
-			))}
-		</div>
-	)
 	const renderComponent = () => {
 		return (
 			<>

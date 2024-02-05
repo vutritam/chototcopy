@@ -114,7 +114,7 @@ const OrderByAllUser: React.FC = () => {
 				})
 			}
 
-			if (payload.success) {
+			if (payload?.success) {
 				if (socket) {
 					// gửi sự kiện get sản phẩm
 					socket.emit('getAllOrderByStatus', {

@@ -7,13 +7,6 @@ import { useDispatch } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { useRouter } from 'next/router'
 
-interface DataType {
-	key: React.Key
-	name: string
-	age: number
-	address: string
-}
-
 interface inputProps {
 	handleSubmit?: (itemId: any, flag: boolean) => void
 	handleConfirmOrder?: (Id: any) => void
@@ -21,16 +14,6 @@ interface inputProps {
 	item: any
 	loadingDataTable?: boolean
 	dummyOrderConfirm?: any
-}
-
-const data: DataType[] = []
-for (let i = 0; i < 46; i++) {
-	data.push({
-		key: i,
-		name: `Edward King ${i}`,
-		age: 32,
-		address: `London, Park Lane no. ${i}`,
-	})
 }
 
 const CommonTable = (props: inputProps): JSX.Element => {
@@ -53,7 +36,8 @@ const CommonTable = (props: inputProps): JSX.Element => {
 							tableNumber: record.tableNumber,
 							status: record.status,
 							_id: record._id,
-							location: record.location,
+							location: record.locationId?.nameLocation,
+							locationId: record.locationId?._id,
 							productId: record.productId,
 						},
 				  }))
@@ -63,7 +47,8 @@ const CommonTable = (props: inputProps): JSX.Element => {
 							tableNumber: record.tableNumber,
 							status: record.status,
 							_id: record._id,
-							location: record.location,
+							location: record.locationId?.nameLocation,
+							locationId: record.locationId?._id,
 							productId: record.productId,
 						},
 				  }))
@@ -71,6 +56,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		const filterLocalDataWithCustomData = localDataWithCustomData?.filter((record: any) =>
 			isEmployeePage ? record.status !== 'order_deleted' : record
 		)
+
 		setLocalData(filterLocalDataWithCustomData)
 		setShowRedBackground(true)
 		const timer = setTimeout(() => {
@@ -107,6 +93,8 @@ const CommonTable = (props: inputProps): JSX.Element => {
 
 	const handleStatus = (customData: any) => {
 		const checkConfirmOrder = dummyOrderConfirm.filter((item) => item.id === customData._id)
+		console.log(customData, 'customData')
+
 		if (customData.status === 'order_success' || checkConfirmOrder.length > 0) {
 			return (
 				<Space direction="vertical">
@@ -177,15 +165,15 @@ const CommonTable = (props: inputProps): JSX.Element => {
 		},
 		{
 			title: 'Địa điểm',
-			dataIndex: 'customData',
-			key: 'location',
+			dataIndex: 'locationId',
+			key: 'locationId',
 			sorter: true,
 			render: (customData) => (
 				<div
 					className={`${customData?.status === 'order_deleted' ? 'text-error-message' : ''}`}
 					style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
 				>
-					{customData?.location}
+					{customData?.nameLocation}
 				</div>
 			),
 		},

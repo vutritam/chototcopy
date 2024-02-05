@@ -53,17 +53,23 @@ export default function OrderProducts() {
 		} else if (getLocationOrder == null && !getLocationOrder?.location) {
 			setShow(true)
 		}
-		setIdTable(convertedValue)
 	}
 
 	const handleCheckPathName = (convertedValue, getLocationOrder) => {
 		const pathString = sessionStorage.getItem('routerAsPath')
-		if (!isNaN(convertedValue) && !_.isNil(convertedValue)) {
+		if (
+			(!isNaN(convertedValue) && !_.isNil(convertedValue)) ||
+			(!_.isNil(idTable) && !_.isNil(getLocationOrder))
+		) {
 			sessionStorage.setItem('routerAsPath', router.asPath)
 			handleIdTableNumber(convertedValue, getLocationOrder)
-		} else if (_.isNil(convertedValue) && pathString !== null) {
+		} else if (
+			isNaN(convertedValue) &&
+			_.isNil(convertedValue) &&
+			pathString !== null &&
+			!_.isNil(getLocationOrder)
+		) {
 			router.push(pathString)
-		} else {
 		}
 	}
 
@@ -71,6 +77,10 @@ export default function OrderProducts() {
 		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
 		const convertedValue = processRouterQuery(router?.query?.order) // kiểm tra xem string có được decode ra đúng số hay ko
 		handleCheckPathName(convertedValue, getLocationOrder)
+
+		if (!_.isNil(convertedValue)) {
+			setIdTable(convertedValue)
+		}
 	}, [router?.query?.order])
 
 	const handleFilterItem = (fieldName, value) => {

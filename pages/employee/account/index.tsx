@@ -19,6 +19,7 @@ import Toasty from '@/components/common/toasty'
 import { useRouter } from 'next/router'
 import ModalConfirm from '@/components/common/commonModal/modalReasonChangeLocation'
 import { io } from 'socket.io-client'
+import axiosConfig from '../../api/axiosConfigs'
 
 function Manage_account() {
 	const user = useSelector((state: any) => state.user.account.user)
@@ -32,6 +33,7 @@ function Manage_account() {
 	const [open, setOpen] = useState<boolean>(false)
 	const [openAcceptRequest, setOpenAcceptRequest] = useState<boolean>(false)
 	const [reason, setReason] = useState<string>('')
+	const [listLocation, setListLocation] = useState([])
 	const [UploadImg, setUpload] = useState({ image: '' })
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const passwordInputRef = useRef(null)
@@ -43,11 +45,21 @@ function Manage_account() {
 		const fetchDataUser = async () => {
 			try {
 				const { payload } = await dispatch(getAllUserRequest())
-				if (payload.success) {
+				if (payload?.success) {
 					await dispatch(setAcceptRequestUsers(payload.data))
 				}
 			} catch (error) {}
 		}
+		const fetchLocation = async () => {
+			let response = await axiosConfig.get(`/location/getAllLocation`)
+
+			if (response?.data?.success) {
+				setListLocation(response.data.data)
+			} else {
+				Toasty.error(response.data.message)
+			}
+		}
+		fetchLocation()
 		fetchDataUser()
 	}, [])
 
@@ -55,22 +67,25 @@ function Manage_account() {
 		const statusItem = userListAcceptRequestUsers.data.filter(
 			(item) => item.userId._id === user?.data?._id
 		)[0]?.status
+		const nameLocation = userListAcceptRequestUsers.data.filter(
+			(item) => item.userId._id === user?.data?._id
+		)[0]?.locationId?.nameLocation
 		if (
 			user?.data?.userRequestId?.isRequest === 'change_location' &&
 			statusItem === 'request_pending'
 		) {
-			setLocation(user?.data?.userRequestId?.location)
+			setLocation(nameLocation)
 			setDisabledLocation(true)
 		} else if (user?.data?.userRequestId?.isRequest === 'unChange_location' && statusItem === '') {
-			setLocation(user?.data?.location)
+			setLocation(user?.data?.locationId?.nameLocation)
 			setDisabledLocation(false)
 		} else if (
-			getInforUser?.data?.location !== user?.data?.userRequestId?.location &&
+			getInforUser?.data?.locationId !== user?.data?.userRequestId?.locationId &&
 			statusItem === 'request_accepted'
 		) {
 			setOpenAcceptRequest(true)
 		} else {
-			setLocation(user?.data?.location)
+			setLocation(user?.data?.locationId?.nameLocation)
 			setDisabledLocation(false)
 		}
 	}, [editMode, userListAcceptRequestUsers.data])
@@ -85,11 +100,11 @@ function Manage_account() {
 					isRequest: 'change_location',
 					reason: reason,
 					_id: user?.data?._id,
-					location: selectedLocation,
+					locationId: selectedLocation,
 					status: 'request_pending',
 				})
 			)
-			if (payload.success) {
+			if (payload?.success) {
 				setDisabledLocation(true)
 				setLoadingConfirm(false)
 				setLocation(selectedLocation)
@@ -140,7 +155,7 @@ function Manage_account() {
 				// formData.append('location', selectedLocation)
 				formData.append('reNewPassword', values.reNewPassword)
 				const payloadPassword = await dispatch(updatePasswordUser(formData))
-				if (payloadPassword.payload.success) {
+				if (payloadPassword?.payload?.success) {
 					Toasty.success(payloadPassword.payload?.message)
 					router.push('/login')
 				} else {
@@ -154,7 +169,7 @@ function Manage_account() {
 				formData.append('file', dataImage?.originFileObj)
 				formData.append('address', values.address)
 				const { payload } = await dispatch(updateProfileUser(formData))
-				if (payload.success) {
+				if (payload?.success) {
 					await dispatch(fetchUserById(info.data.userId))
 					Toasty.success(payload?.message)
 					setEditMode('')
@@ -171,7 +186,9 @@ function Manage_account() {
 	}
 
 	const handleChangeLocation = (data) => {
-		if (data !== user?.data?.location) {
+		console.log(data, 'data nè')
+
+		if (data !== user?.data?.locationId?._id) {
 			handleShow(true)
 		}
 
@@ -245,22 +262,20 @@ function Manage_account() {
 		)
 	}
 	const handleUnRequest = async () => {
-		setLocation(user?.data.location)
+		setLocation(user?.data.locationId?.nameLocation)
 		let IsChangeRequest = 'unChange_location'
 		const { payload } = await dispatch(
 			updateIsChangeRequestUser({
 				isRequest: IsChangeRequest,
 				reason: reason,
 				_id: user?.data?._id,
-				location: '',
+				locationId: '',
 				status: '',
 			})
 		)
-		if (payload.success) {
+		if (payload?.success) {
 			console.log(payload, 'unchange request')
-			// await dispatch(setUser())
 		}
-		// setDisabledLocation(false)
 		setDisabledLocation(false)
 		Toasty.success(payload.message)
 	}
@@ -313,13 +328,15 @@ function Manage_account() {
 							suffixIcon={<LockOutlined className="site-form-item-icon" />}
 							placeholder="Nhập địa điểm làm việc"
 							onChange={handleChangeLocation}
-							value={selectedLocation !== '' ? selectedLocation : user?.data?.location}
+							value={
+								selectedLocation !== '' ? selectedLocation : user?.data?.locationId?.nameLocation
+							}
 						>
-							<Select.Option value="409/99 Tân chánh hiệp 12 quận 12 TP.HCM">
-								409/99 Tân chánh hiệp 12 quận 12 TP.HCM
-							</Select.Option>
-							<Select.Option value="Trường chinh, tân bình">Trường chinh, tân bình</Select.Option>
-							<Select.Option value="Hóc môn quận 12">Hóc môn quận 12</Select.Option>
+							{listLocation?.map((item, index) => (
+								<>
+									<Select.Option value={item?._id}>{item?.nameLocation}</Select.Option>
+								</>
+							))}
 						</Select>
 					)}
 
@@ -421,7 +438,7 @@ function Manage_account() {
 								<div style={{ display: 'flex', gap: '10px' }}>
 									<b>Nơi làm việc: </b>
 									<div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-										{user?.data?.location}
+										{user?.data?.locationId?.nameLocation}
 									</div>
 								</div>
 							</span>

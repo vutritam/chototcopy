@@ -63,7 +63,7 @@ const OrderByUser: React.FC = () => {
 		const fetchData = async () => {
 			const { payload } = await dispatch(
 				fetchAllOrderByUserRole({
-					location: getLocationEmployee?.data?.location,
+					locationId: getLocationEmployee?.data?.locationId,
 					userRole: getLocationEmployee?.data?.roles[0],
 				})
 			)
@@ -96,7 +96,7 @@ const OrderByUser: React.FC = () => {
 
 	useEffect(() => {
 		if (socket) {
-			socket.emit('joinRoom', `room-${getLocationEmployee?.data?.location}`)
+			socket.emit('joinRoom', `room-${getLocationEmployee?.data?.locationId}`)
 			socket.on('resProductOrder', async (response) => {
 				await dispatch(setOrderByNumberTable(response))
 				setData(response.data)
@@ -105,6 +105,8 @@ const OrderByUser: React.FC = () => {
 	}, [socket])
 
 	const handleConfirmOrder = async (e, item) => {
+		console.log(item, 'item order')
+
 		e.isDefaultPrevented()
 		if (item) {
 			setLoadingDataTable(true)
@@ -120,12 +122,12 @@ const OrderByUser: React.FC = () => {
 				})
 			}
 
-			if (payload.success) {
+			if (payload?.success) {
 				if (socket) {
 					// gửi sự kiện get sản phẩm
 					socket.emit('getAllOrderByStatus', {
 						tableNumber: item.tableNumber,
-						location: item.location,
+						locationId: item.locationId,
 					})
 					setLoadingDataTable(false)
 				}
@@ -137,7 +139,7 @@ const OrderByUser: React.FC = () => {
 		const { payload } = await dispatch(
 			deleteOrder({
 				id: idOrder,
-				location: getLocationEmployee?.data?.location,
+				locationId: getLocationEmployee?.data?.locationId,
 				status: 'order_deleted',
 			})
 		)
@@ -147,7 +149,7 @@ const OrderByUser: React.FC = () => {
 				// gửi sự kiện get sản phẩm
 				socket.emit('getAllOrderByStatus', {
 					tableNumber: orderData.tableNumber,
-					location: orderData.location,
+					locationId: orderData.locationId,
 				})
 				setLoadingDataTable(false)
 			}

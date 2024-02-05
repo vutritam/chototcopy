@@ -229,7 +229,7 @@ const AvatarComponent: React.FC = () => {
 			const { payload } = await dispatch(
 				fetchAllOrderByNumberTableAndLocationUser({
 					tableNumber: idTable,
-					location: getLocationOrderUser?.location,
+					locationId: getLocationOrderUser?.locationId,
 				})
 			)
 
@@ -246,13 +246,12 @@ const AvatarComponent: React.FC = () => {
 		} else if (isEmployeePage) {
 			const { payload } = await dispatch(
 				fetchAllOrder({
-					location: getInforUser?.data.location,
+					locationId: getInforUser?.data.locationId,
 				})
 			)
 
 			if (payload) {
 				setShowMessageEmployee(true)
-				// setShowMenuEmployee(payload.data)
 				await dispatch(setMessageEmployee(payload.data))
 				setCountMessageEmployee(payload.data.length)
 				setCountMessage(payload.data.length)
@@ -264,7 +263,7 @@ const AvatarComponent: React.FC = () => {
 			const { payload } = await dispatch(
 				fetchMessageByUserRole({
 					userId: getInforUser?.data?.userId,
-					location: getInforUser?.data?.location,
+					locationId: getInforUser?.data?.locationId,
 					isPage: CONST_TYPE_KEY_VALUE.Admin_page,
 				})
 			)
@@ -330,6 +329,7 @@ const AvatarComponent: React.FC = () => {
 		JSON.stringify(messageAdmin),
 		idTable,
 	])
+	console.log(messageEmployee, 'messageEmployee')
 
 	useEffect(() => {
 		let summary
@@ -345,9 +345,9 @@ const AvatarComponent: React.FC = () => {
 		if (socket) {
 			let roomName
 			if (isOrderPage) {
-				roomName = `room-${idTable}-${getLocationOrderUser?.location}`
+				roomName = `room-${idTable}-${getLocationOrderUser?.locationId}`
 			} else if (isEmployeePage) {
-				roomName = `room-${getInforUser?.data?.location}`
+				roomName = `room-${getInforUser?.data?.locationId}`
 			} else {
 				roomName = 'room'
 			}
@@ -381,8 +381,6 @@ const AvatarComponent: React.FC = () => {
 				playNotification()
 			})
 		}
-
-		// playNotification()
 	}, [socket, getLocationOrderUser, getInforUser])
 
 	const handleConfirmOrder = async (event, item: any) => {
@@ -393,7 +391,7 @@ const AvatarComponent: React.FC = () => {
 		await dispatch(
 			fetchOrderByNumberTable({
 				tableNumber: item.tableNumber,
-				location: getInforUser?.data?.location,
+				locationId: getInforUser?.data?.locationId,
 			})
 		)
 		router.push('/employee/order')

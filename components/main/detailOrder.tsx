@@ -143,7 +143,7 @@ const DetailOrder: React.FC = () => {
 									/>
 								}
 								title={`Bàn số ${item.tableNumber}`}
-								description={item.location}
+								description={item.locationId?.nameLocation}
 							/>
 							<div>{item.productId?.name || 'no data'}</div>
 							<div style={{ marginLeft: '40px' }}>{item.quantity || '0'}</div>

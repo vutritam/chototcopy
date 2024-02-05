@@ -11,10 +11,15 @@ const encodeTableNumber = (tableNumber: number) => {
 
 // Giải mã chuỗi thành số bàn
 const decodeTableNumber = (encodedString: string) => {
-	const decryptedNumber = parseInt(
-		CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(decodeURIComponent(encodedString))),
-		10
-	)
+	let decryptedNumber = null
+	try {
+		decryptedNumber = parseInt(
+			CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(encodedString)),
+			10
+		)
+	} catch (error) {
+		console.error('Error decoding:', error.message)
+	}
 	return decryptedNumber
 }
 export { encodeTableNumber, decodeTableNumber }

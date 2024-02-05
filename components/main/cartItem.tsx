@@ -98,10 +98,10 @@ const CartItem: React.FC = (props) => {
 				const { payload } = await dispatch(
 					fetchOrderByNumberTable({
 						tableNumber: confirmTableNumber,
-						location: getInforUser?.data?.location,
+						locationId: getInforUser?.data?.locationId,
 					})
 				)
-				if (payload.success) {
+				if (payload?.success) {
 					setDataSubmit(payload.data)
 				}
 			}

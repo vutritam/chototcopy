@@ -48,7 +48,6 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 					return acc
 			  }, [])
 			: dataMessage
-		console.log(sortItemByTableNumber, 'g')
 
 		setData(sortItemByTableNumber)
 	}, [dataMessage.length])

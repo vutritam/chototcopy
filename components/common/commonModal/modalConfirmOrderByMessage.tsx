@@ -40,13 +40,7 @@ const ModalCommonOrderByNumberTable: React.FC = (props: inputProps) => {
 				confirmLoading={confirmLoading}
 				onCancel={handleCancel}
 				footer={[
-					<Button
-						key="3"
-						type="primary"
-						loading={confirmLoading}
-						onClick={handleOk}
-						// disabled={!getLocationOrderUser?.location || dataInput.quantity <= 0}
-					>
+					<Button key="3" type="primary" loading={confirmLoading} onClick={handleOk}>
 						Tìm kiếm nhanh
 					</Button>,
 				]}

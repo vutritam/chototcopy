@@ -128,10 +128,26 @@ const RnderToPrint = (props: any, ref: any) => {
 								</tr>
 							)
 						})}
+						<tr>
+							<td>
+								<hr />
+							</td>
+							<td>
+								<hr />
+							</td>
+							<td>
+								<hr />
+							</td>
+							<td>
+								<hr />
+							</td>
 
+							<br />
+						</tr>
 						<tr>
 							<td>&nbsp;</td>
-							<td>Delivery</td>
+
+							<td>Phí vận chuyển</td>
 							<td>Charges</td>
 							<td>0</td>
 						</tr>
@@ -142,7 +158,7 @@ const RnderToPrint = (props: any, ref: any) => {
 								<hr />
 							</td>
 							<td>
-								Packaging
+								Thuế
 								<hr />
 							</td>
 							<td>
@@ -160,7 +176,7 @@ const RnderToPrint = (props: any, ref: any) => {
 								<hr />
 							</td>
 							<td>
-								Tổng thanh toán
+								<b>Tổng thanh toán</b>
 								<hr />
 							</td>
 							<td>
@@ -168,7 +184,7 @@ const RnderToPrint = (props: any, ref: any) => {
 								<hr />
 							</td>
 							<td>
-								{totalPrice}
+								<b>{totalPrice}</b>
 								<hr />
 							</td>
 						</tr>

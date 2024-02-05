@@ -25,8 +25,8 @@ function getItem(
 }
 
 export const itemsAdmin = [
-	getItem(<div>Quản lý ca</div>, '1', <PieChartOutlined />),
-	getItem(<Link href="/admin/manage_work">Quản lí kết nối</Link>, '2', <DesktopOutlined />),
+	getItem(<Link href="/admin/manage_work">Quản lý ca</Link>, '1', <PieChartOutlined />),
+	getItem(<Link href="/admin/manage_location">Quản lí địa điểm</Link>, '2', <DesktopOutlined />),
 	getItem(<Link href="/admin/products">Nhập sản phẩm</Link>, '3', <PieChartOutlined />),
 	getItem(<Link href="/admin/manage_employee">Quản lý nhân viên</Link>, '4', <DesktopOutlined />),
 	getItem('Quản lý đặt bàn', 'sub1', <HelperMenu icon={<UserOutlined />} />, [
@@ -40,7 +40,7 @@ export const itemsAdmin = [
 	]),
 	getItem('Căn tin', 'sub2', <TeamOutlined />, [getItem('Team 1', '9'), getItem('Team 2', '10')]),
 	getItem('Thực đơn', '10', <FileOutlined />),
-	getItem(<div>Bán hàng</div>, '11', <PieChartOutlined />),
+	// getItem(<div>Bán hàng</div>, '11', <PieChartOutlined />),
 ]
 
 export const itemsEmployee = [

@@ -1,8 +1,12 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button, Modal, Select, Space } from 'antd'
 import { useDispatch } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { fetchAllOrderByNumberTableAndLocationUser } from '@/redux/componentSlice/orderSlice'
+import Toasty from '../common/toasty'
+import axiosConfig from '../../pages/api/axiosConfigs'
+import _ from 'lodash'
+
 interface inputProps {
 	label?: string
 	tittle?: string
@@ -10,11 +14,10 @@ interface inputProps {
 	idTable?: any
 }
 const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
-	console.log(props, 'props')
-
 	const [dataInput, setDataInput] = useState({
-		location: '',
+		locationId: '',
 	})
+	const [listLocation, setListLocation] = useState([])
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
 	const handleOk = async () => {
@@ -24,27 +27,46 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 			'location_user',
 			JSON.stringify({
 				tableNumber: props.idTable,
-				location: dataInput.location,
+				locationId: dataInput.locationId,
 			})
 		)
 		await dispatch(
 			fetchAllOrderByNumberTableAndLocationUser({
 				tableNumber: props.idTable,
-				location: dataInput.location,
+				locationId: dataInput.locationId,
 			})
 		)
 		// window.location.reload()
 	}
+
 	const onChangeLocation = useCallback(
-		(label: any) => {
-			setDataInput({ ...dataInput, location: label })
+		(value: any) => {
+			setDataInput({ ...dataInput, locationId: value })
 		},
 		[dataInput]
 	)
+
 	const handleCancel = () => {
 		// console.log('Clicked cancel button')
 		// setOpen(false)
 	}
+
+	useEffect(() => {
+		const fetchData = async () => {
+			let response = await axiosConfig.get(`/location/getAllLocation`)
+
+			if (response.data.success) {
+				const countByClass = _.map(response.data.data, (location) => ({
+					value: location?._id,
+					label: location?.nameLocation,
+				}))
+				setListLocation(countByClass)
+			} else {
+				Toasty.error(response.data.message)
+			}
+		}
+		fetchData()
+	}, [])
 
 	return (
 		<>
@@ -54,7 +76,7 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 				onOk={handleOk}
 				onCancel={handleCancel}
 				footer={[
-					<Button key="3" type="primary" disabled={!dataInput.location} onClick={handleOk}>
+					<Button key="3" type="primary" disabled={!dataInput.locationId} onClick={handleOk}>
 						Xác nhận
 					</Button>,
 				]}
@@ -73,20 +95,7 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 								.toLowerCase()
 								.localeCompare((optionB?.label ?? '').toLowerCase())
 						}
-						options={[
-							{
-								value: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
-								label: '409/99 Tân chánh hiệp 12 quận 12 TP.HCM',
-							},
-							{
-								value: 'Trường chinh, tân bình',
-								label: 'Trường chinh, tân bình',
-							},
-							{
-								value: 'Hóc môn quận 12',
-								label: 'Hóc môn quận 12',
-							},
-						]}
+						options={listLocation}
 					/>
 				</Space>
 			</Modal>
