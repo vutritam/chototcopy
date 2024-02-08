@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Avatar, Button, List, MenuProps, Skeleton, Space } from 'antd'
-import CommonShowHistory from '../srcShowHistory/modalShowHistory'
+import CommonShowHistory from '../modalShowHistory/modalShowHistory'
 import CommonFilter from '../common/commonInput/commonFilter'
 import InputDateTime from '../common/commonInput/inputDateTime'
 import { FileSearchOutlined } from '@ant-design/icons'
@@ -151,11 +151,11 @@ const List_manage_employee: React.FC = (props) => {
 		}, 1000)
 	}
 
-	const handleUpdateStatus = async (idUser) => {
+	const handleUpdateStatus = async (idUser, statusRequest) => {
 		const { payload } = await dispatch(
 			approvedChangeRequestUser({
 				_id: idUser,
-				status: 'request_accepted',
+				status: statusRequest,
 			})
 		)
 
@@ -181,11 +181,15 @@ const List_manage_employee: React.FC = (props) => {
 					<Button
 						key="list-loadmore-edit"
 						type="primary"
-						onClick={() => handleUpdateStatus(userData._id)}
+						onClick={() => handleUpdateStatus(userData._id, 'request_accepted')}
 					>
 						Chấp nhận
 					</Button>,
-					<Button key="list-loadmore-more" type="default">
+					<Button
+						key="list-loadmore-more"
+						type="default"
+						onClick={() => handleUpdateStatus(userData._id, 'request_failure')}
+					>
 						Từ chối
 					</Button>,
 			  ]

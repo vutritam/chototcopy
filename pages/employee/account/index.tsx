@@ -84,6 +84,12 @@ function Manage_account() {
 			statusItem === 'request_accepted'
 		) {
 			setOpenAcceptRequest(true)
+		} else if (
+			getInforUser?.data?.locationId !== user?.data?.userRequestId?.locationId &&
+			statusItem === 'request_failure'
+		) {
+			setLocation(user?.data?.locationId?.nameLocation)
+			setDisabledLocation(false)
 		} else {
 			setLocation(user?.data?.locationId?.nameLocation)
 			setDisabledLocation(false)
@@ -181,19 +187,19 @@ function Manage_account() {
 				break
 		}
 	}
+
 	const handleChangeReason = (value: string) => {
 		setReason(value)
 	}
 
 	const handleChangeLocation = (data) => {
-		console.log(data, 'data nè')
-
 		if (data !== user?.data?.locationId?._id) {
 			handleShow(true)
 		}
 
 		setLocation(data)
 	}
+
 	useEffect(() => {
 		const initSocket = () => {
 			const newSocket = io(ENV_HOST)

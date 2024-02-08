@@ -3,10 +3,8 @@ import { Button, Dropdown, MenuProps, Space, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import { UnorderedListOutlined, CheckCircleOutlined, IssuesCloseOutlined } from '@ant-design/icons'
-import { useDispatch } from 'react-redux'
-import { ThunkDispatch } from '@reduxjs/toolkit'
 import { useRouter } from 'next/router'
-import { localDataWithCustomDataUtil } from '@/components/utils/customDataUtil'
+import { localDataWithCustomDataUtil } from '@/components/utilsComponent/customDataUtil'
 
 interface inputProps {
 	handleSubmit?: (itemId: any, flag: boolean) => void
@@ -19,13 +17,12 @@ interface inputProps {
 
 const CommonTable = (props: inputProps): JSX.Element => {
 	const { handleSubmit, handleConfirmOrder, item, loadingDataTable, dummyOrderConfirm } = props
-	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const router = useRouter()
 	const isEmployeePage = router.pathname.startsWith('/employee')
 	const [localData, setLocalData] = useState(null)
 	const [idItem, setIdItem] = useState(null)
-
 	const [showRedBackground, setShowRedBackground] = useState(false)
+	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
 	useEffect(() => {
 		// Cập nhật localData khi data props thay đổi
@@ -44,8 +41,6 @@ const CommonTable = (props: inputProps): JSX.Element => {
 
 		return () => clearTimeout(timer) // Hủy bỏ timer khi component unmounts hoặc timer được clear
 	}, [item])
-
-	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 
 	const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
 		setSelectedRowKeys(newSelectedRowKeys)
@@ -144,8 +139,10 @@ const CommonTable = (props: inputProps): JSX.Element => {
 				<Dropdown menu={{ items }} placement="bottomRight">
 					<Button icon={<UnorderedListOutlined />} onClick={() => setIdItem(customData)}></Button>
 				</Dropdown>
+			) : customData.status === 'order_success' && !customData.isPaid ? (
+				'Chưa thanh toán'
 			) : (
-				'Đang chờ nhân viên'
+				'Đã thanh toán'
 			)
 		}
 	}

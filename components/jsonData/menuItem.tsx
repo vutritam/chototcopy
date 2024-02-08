@@ -1,11 +1,5 @@
 import React, { useState } from 'react'
 import { Menu } from 'antd'
-import {
-	MailOutlined,
-	SettingOutlined,
-	AppstoreOutlined,
-	CalendarOutlined,
-} from '@ant-design/icons'
 import { Badge } from 'antd'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -31,10 +25,11 @@ const SiderBarMenuCustom = (props: inputProps) => {
 		// Ví dụ: hiển thị icon nếu có một điều kiện cụ thể
 		return item.label && item.label?.props?.children === 'Yêu cầu' // Thay 'sub1' bằng điều kiện của bạn
 	}
+
 	const handleChoosePath = (path, e) => {
-		// e.domEvent.defaultPrevented()
 		router.push(path)
 	}
+
 	const handleSelect = (a) => {
 		const { key, keyPath, selectedKeys, domEvent } = a
 

@@ -14,7 +14,7 @@ import ModalConfirm from '@/components/common/commonModal/modalConfirm'
 import CommonTable from '@/components/common/commonTable/commonTableListOrder'
 import CartItem from '@/components/main/cartItem'
 import { ReloadOutlined, FileTextOutlined } from '@ant-design/icons'
-import { localDataWithCustomDataUtil } from '@/components/utils/customDataUtil'
+import { localDataWithCustomDataUtil } from '@/components/utilsComponent/customDataUtil'
 import type { MenuProps } from 'antd'
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)

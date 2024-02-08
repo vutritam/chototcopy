@@ -75,7 +75,6 @@ const onSearch = (value: string) => console.log(value)
 const AvatarComponent: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const router = useRouter()
-	// const audio = new Audio(notificationSoundPath)
 	const [idTable, setIdTable] = React.useState<any>(0)
 	const [messageOrder, setMessageOrder] = React.useState<string>('')
 	const user = useSelector((state: any) => state.user.account.user)
@@ -89,13 +88,8 @@ const AvatarComponent: React.FC = () => {
 	const [userRequest, setUserRequest] = React.useState('')
 	const [showMessage, setShowMessage] = React.useState<Boolean>(false)
 	const [countMessage, setCountMessage] = React.useState<number>(0)
-	const [countMessageEmployee, setCountMessageEmployee] = React.useState<number>(0)
-	const [idCheckConfirm, setCheckConfirm] = React.useState<String>('')
 	const [showMessageEmployee, setShowMessageEmployee] = React.useState<Boolean>(false)
 	const [showMessageAdmin, setShowMessageAdmin] = React.useState<Boolean>(false)
-	const [countMessageAdmin, setCountMessageAdmin] = React.useState<number>(0)
-	const [loadingConfirmOrder, setLoadingConfirmOrder] = React.useState<Boolean>(false)
-	const [isOrderConfirmed, setIsOrderConfirmed] = React.useState<boolean>(false)
 	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
 	const [orderSummary, setOrderSummary] = React.useState({})
@@ -177,9 +171,6 @@ const AvatarComponent: React.FC = () => {
 				).length || 0
 			const canceledItems =
 				tableOrders.filter((order) => order.status === 'order_deleted').length || 0
-			if (totalOrderedItems !== confirmedItems) {
-				setIsOrderConfirmed(true)
-			}
 			sessionStorage.setItem(
 				'warning_text_order',
 				JSON.stringify({
@@ -254,7 +245,6 @@ const AvatarComponent: React.FC = () => {
 			if (payload) {
 				setShowMessageEmployee(true)
 				await dispatch(setMessageEmployee(payload.data))
-				setCountMessageEmployee(payload.data.length)
 				setCountMessage(payload.data.length)
 				setTimeout(() => {
 					setShowMessageEmployee(false)
@@ -271,9 +261,7 @@ const AvatarComponent: React.FC = () => {
 			if (payload) {
 				setShowMessageAdmin(true)
 				await dispatch(setMessageAdmin(payload.data))
-				// setShowMenuAdmin(payload.data)
 				setCountMessage(payload.data.length)
-				setCountMessageAdmin(payload.data.length)
 				setTimeout(() => {
 					setShowMessageAdmin(false)
 				}, 2000)
@@ -368,8 +356,6 @@ const AvatarComponent: React.FC = () => {
 			})
 			socket.on(CONST_TYPE_SOCKET.ResponseAfterUserLogin, async (response) => {
 				if (response) {
-					setLoadingConfirmOrder(false)
-					setCheckConfirm('')
 					await dispatch(setMessageAdmin(response))
 				}
 				playNotification()
@@ -385,9 +371,7 @@ const AvatarComponent: React.FC = () => {
 
 	const handleConfirmOrder = async (event, item: any) => {
 		event.stopPropagation()
-		setLoadingConfirmOrder(true)
 		await dispatch(setIdNotiConfirm(item._id))
-		setCheckConfirm(item._id)
 		await dispatch(
 			fetchOrderByNumberTable({
 				tableNumber: item.tableNumber,

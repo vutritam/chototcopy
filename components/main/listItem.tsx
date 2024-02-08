@@ -1,13 +1,13 @@
 import { MessageOutlined, StarOutlined } from '@ant-design/icons'
 import { Button, Image, List, Space, Spin } from 'antd'
 import React, { useState, useEffect } from 'react'
-import CommonModal from '../srcModalOrder/modalOrder'
+import CommonModal from '../modalUserOrder/modalOrder'
 import { useRouter } from 'next/router'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Link from 'next/link'
-import ProductDetail from '@/pages/employee/product-detail/[detail]'
-import SearchParam from '@/utils/searchParamQuery'
+// import ProductDetail from '@/pages/employee/product-detail/[detail]'
+// import SearchParam from '@/utils/searchParamQuery'
 
 const IconText = ({
 	icon,
@@ -32,13 +32,10 @@ interface inputProps {
 }
 const ListItem = (props: inputProps) => {
 	const { isPage } = props
-	let router = useRouter()
 	const [loading, setLoading] = useState(true)
-	const [page, setPage] = useState('')
 	const [dataList, setDataList] = useState([])
 	const dataStore = useSelector((state) => state.products.products.data)
 	const dispatch = useDispatch()
-	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 
 	useEffect(() => {
 		setLoading(true)
@@ -53,7 +50,7 @@ const ListItem = (props: inputProps) => {
 	}, [])
 
 	useEffect(() => {
-		if (!dataStore?.status) {
+		if (dataStore?.success) {
 			setDataList(dataStore?.data)
 		}
 	}, [dataStore])

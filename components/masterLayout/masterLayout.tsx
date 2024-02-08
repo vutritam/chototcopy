@@ -4,7 +4,7 @@ import { SideBar } from '../siderBar/siderBar'
 const { Header, Content, Footer } = Layout
 import AvatarComponent from '../avatar/avatar'
 import { useRouter } from 'next/router'
-import ComfirmLocationOrder from '../srcConfirmLocation/confirmLocation'
+import ComfirmLocationOrder from '../confirmLocation/confirmLocation'
 import Head from 'next/head'
 import { itemsAdmin, itemsEmployee, itemsOrder } from '../jsonData/menuData'
 import { BreadcrumbItem } from '../common/breadcrumb'

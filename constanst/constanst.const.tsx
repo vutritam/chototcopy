@@ -5,6 +5,7 @@ export const CONST_TYPE_ELEMENT = {
 	DeletedOrder: 'deletedOrder',
 	LocationOrder: 'locationOrder',
 	ElementL10n: 'elementL10n',
+	tableNumber: 'tableNumber',
 }
 
 export const CONST_TYPE_KEY_VALUE = {

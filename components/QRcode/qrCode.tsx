@@ -46,7 +46,7 @@ const QRcode: React.FC = () => {
 
 			const countByClass = _.map(groupedByTableNumber, (group, locationId) => ({
 				length: group.length,
-				location: locationId,
+				locationData: group?.find((item) => item?.locationId.nameLocation === locationId),
 			}))
 
 			let treeDataClone: TreeDataNode[] = [...treeDataQr]
@@ -54,8 +54,8 @@ const QRcode: React.FC = () => {
 				treeDataClone[0].key = '0-0'
 				treeDataClone[0].children = countByClass.map((item, index) => ({
 					title: (
-						<Link href={`${router.asPath}/${item?.location}`}>
-							Danh sách QR code {item.location}
+						<Link href={`${router.asPath}/list-qr-code/${item?.locationData?.locationId._id}`}>
+							Danh sách QR code {item?.locationData?.locationId.nameLocation}
 						</Link>
 					),
 					key: `0-0-${index}`,

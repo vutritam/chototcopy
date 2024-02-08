@@ -1,6 +1,6 @@
 import { Button, Menu } from 'antd'
 import { DownCircleOutlined, CheckOutlined } from '@ant-design/icons'
-import { handleTextL10N, sortByStatus } from '@/components/utils/utils'
+import { handleTextL10N, sortByStatus } from '@/components/utilsComponent/utils'
 import L10N from '../../../L10N/en.json'
 import AvatarElementHelper from './avartarElement'
 import { CONST_TYPE_ELEMENT } from '@/constanst/constanst.const'
@@ -30,6 +30,9 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 	const isUserOrder = condition === 'userOrder'
 	const isCheckUserOrderData = !isAdmin ? sortByStatus(dataMessage, 'order_inprogess') : dataMessage
 	const router = useRouter()
+	let sessionOrder =
+		sessionStorage.getItem('location_user') !== null &&
+		JSON.parse(sessionStorage.getItem('location_user'))
 	const getUserOrderMessage = (isOrderSumary: boolean) => {
 		return isOrderSumary !== null && !isOrderSumary
 			? 'Đang chờ nhân viên xác nhận'
@@ -93,6 +96,7 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 			</div>
 		)
 	}
+	console.log(sessionOrder, 'llll')
 
 	return isCheckUserOrderData.length > 0 ? (
 		isCheckUserOrderData.map((ele, index) => {
@@ -101,6 +105,10 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 				return (
 					<Menu.Item key={index} className={`${showMessage ? '' : 'show-readed-message'}`}>
 						{renderTitleHeading(isOrderSumary, ele)}
+						<AvatarElementHelper
+							item={sessionOrder?.tableNumber}
+							type={CONST_TYPE_ELEMENT.tableNumber}
+						/>
 						<AvatarElementHelper
 							item={ele}
 							type={CONST_TYPE_ELEMENT.Date}

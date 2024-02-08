@@ -11,7 +11,7 @@ import {
 	TeamOutlined,
 } from '@ant-design/icons'
 import { MenuProps, Menu } from 'antd'
-import BillExport from '../srcExportBill/modalBillExport'
+import BillExport from '../BtnExport/btnBillExport'
 import {
 	fetchAllOrder,
 	fetchAllOrderByNumberTableAndLocationUser,
@@ -24,7 +24,7 @@ import { Label } from 'semantic-ui-react'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import CoffeeBill from '../exportBill/exportBill'
 import ModalBill from '../exportBill/component/modalBill'
-import { localDataWithCustomDataForBillUtil } from '../utils/customDataUtil'
+import { localDataWithCustomDataForBillUtil } from '../utilsComponent/customDataUtil'
 type MenuItem = Required<MenuProps>['items'][number]
 
 function getItem(
@@ -107,7 +107,10 @@ const CartItem: React.FC = (props) => {
 					})
 				)
 				if (payload?.success) {
-					setDataSubmit(payload.data)
+					const filterData = payload?.data?.filter(
+						(item) => item?.status !== 'order_inprogess' && !item?.isPaid
+					)
+					setDataSubmit(filterData)
 				}
 			}
 			fetch()

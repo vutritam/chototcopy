@@ -135,7 +135,7 @@ const RnderToPrint = (props: any, ref: any) => {
 									</td>
 									<td>
 										<hr />
-										{item?.productId?.quantity}
+										{item?.quantity}
 									</td>
 									<td>
 										<hr />

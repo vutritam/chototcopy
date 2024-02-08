@@ -58,6 +58,24 @@ const AvatarElementHelper = (props: inputProps): JSX.Element => {
 					spanElementConfirmTitle,
 					spanElementConfirmOrder
 				)
+			case CONST_TYPE_ELEMENT.tableNumber:
+				const spanElementtableNumber = React.createElement(
+					'span',
+					{ style: { fontWeight: 'bold', color: 'blue' } },
+					null,
+					item
+				)
+				const spanElementtableNumberTitle = React.createElement(
+					'span',
+					null,
+					L10N['message.avatar.menuItem.element.tableNumber.title']
+				)
+				return React.createElement(
+					'div',
+					{ style: { fontSize: '14px' } },
+					spanElementtableNumberTitle,
+					spanElementtableNumber
+				)
 			case CONST_TYPE_ELEMENT.DeletedOrder:
 				const spanElementDeletedOrderTitle = React.createElement(
 					'span',
