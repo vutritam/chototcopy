@@ -4,6 +4,12 @@ import { Button, Input } from 'antd'
 const RnderToPrint = (props: any, ref: any) => {
 	const { dataSubmit, edit, totalPrice, userData, handleChangeData, handleForcusOut, handleEdit } =
 		props
+	const amountProduct = dataSubmit.reduce(
+		(accumulator, currentValue) => accumulator + currentValue?.quantity,
+		0
+	)
+
+	console.log(amountProduct, 'amountProduct') // Output: 15
 
 	return (
 		<div>
@@ -28,6 +34,15 @@ const RnderToPrint = (props: any, ref: any) => {
 						}}
 					></div>
 					<span>Tổng bill: {totalPrice}</span>
+					<div>
+						<span className="limit_text">Loại hóa đơn: Hóa đơn thường</span>{' '}
+						<Button
+							className="btn_show"
+							icon={<EditOutlined />}
+							onClick={() => handleEdit('name')}
+							style={{ marginLeft: '10px' }}
+						/>
+					</div>
 					{edit.name === 'phone' && edit.isShow ? (
 						<Input
 							onChange={(e) => handleChangeData('phone', e?.target?.value)}
@@ -98,7 +113,7 @@ const RnderToPrint = (props: any, ref: any) => {
 					)}
 				</div>
 
-				<table>
+				<table style={{ width: '100%' }}>
 					<thead>
 						<th style={{ textAlign: 'start', fontSize: 14 }}>STT</th>
 						<th style={{ textAlign: 'start' }}>Sản phẩm</th>
@@ -111,6 +126,7 @@ const RnderToPrint = (props: any, ref: any) => {
 								<tr key={index}>
 									<td>
 										<hr />
+										{index}
 										&nbsp;
 									</td>
 									<td>
@@ -119,7 +135,7 @@ const RnderToPrint = (props: any, ref: any) => {
 									</td>
 									<td>
 										<hr />
-										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-
+										{item?.productId?.quantity}
 									</td>
 									<td>
 										<hr />
@@ -143,6 +159,13 @@ const RnderToPrint = (props: any, ref: any) => {
 							</td>
 
 							<br />
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+
+							<td>Tổng số lượng:</td>
+							<td>{amountProduct}</td>
+							<td>{totalPrice}</td>
 						</tr>
 						<tr>
 							<td>&nbsp;</td>
@@ -171,21 +194,13 @@ const RnderToPrint = (props: any, ref: any) => {
 						</tr>
 
 						<tr>
-							<td>
-								&nbsp;
-								<hr />
-							</td>
+							<td></td>
 							<td>
 								<b>Tổng thanh toán</b>
-								<hr />
 							</td>
-							<td>
-								&nbsp;
-								<hr />
-							</td>
+							<td>&nbsp;</td>
 							<td>
 								<b>{totalPrice}</b>
-								<hr />
 							</td>
 						</tr>
 					</tbody>

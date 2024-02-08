@@ -11,31 +11,12 @@ import { io } from 'socket.io-client'
 import CommonTable from '@/components/common/commonTable/commonTableListOrder'
 import { Button } from 'antd'
 import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
-import MasterLayout from '@/components/masterLayout/masterLayout'
-import { itemsAdmin } from '@/components/jsonData/menuData'
-import PrivateRoute from '@/components/common/privateRoute'
-interface DataType {
-	gender?: string
-	name: {
-		title?: string
-		first?: string
-		last?: string
-	}
-	email?: string
-	picture: {
-		large?: string
-		medium?: string
-		thumbnail?: string
-	}
-	nat?: string
-	loading: boolean
-}
 
 const OrderByAllUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
 	const dispatch = useDispatch()
 	// const [loading, setLoading] = useState(false)
-	const [data, setData] = useState<DataType[]>([])
+	const [data, setData] = useState([])
 	let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
 	const [open, setOpen] = useState(false)
 	const [idOrder, setIdOrder] = useState(null)
@@ -52,7 +33,7 @@ const OrderByAllUser: React.FC = () => {
 		const newSocket = io(ENV_HOST)
 		setSocket(newSocket)
 		let obj = {
-			location: getLocationEmployee?.data?.location,
+			location: getLocationEmployee?.data?.locationId,
 			userRole: getLocationEmployee?.data?.roles[0],
 		}
 
@@ -62,16 +43,12 @@ const OrderByAllUser: React.FC = () => {
 				Toasty.error(payload?.message)
 			} else {
 				setInitLoading(false)
-				let filterOrderDoNotComfirm = payload.data.reduce(
-					(accumulator, currentValue) => {
-						if (currentValue.status === 'order_inprogess') {
-							return accumulator + 1
-						}
-						return accumulator
-					},
-
-					0
-				)
+				let filterOrderDoNotComfirm = payload.data.reduce((accumulator, currentValue) => {
+					if (currentValue.status === 'order_inprogess') {
+						return accumulator + 1
+					}
+					return accumulator
+				}, 0)
 				setCountOrderDontConfirm(filterOrderDoNotComfirm)
 				setData(payload.data)
 				setInitLoading(false)
@@ -86,7 +63,7 @@ const OrderByAllUser: React.FC = () => {
 
 	useEffect(() => {
 		if (socket) {
-			socket.emit('joinRoom', `room-${getLocationEmployee.data.location}`)
+			socket.emit('joinRoom', `room-${getLocationEmployee.data.locationId}`)
 			socket.on('resProductOrder', async (response) => {
 				await dispatch(setOrderByNumberTable(response))
 				setData(response.data)
@@ -119,7 +96,7 @@ const OrderByAllUser: React.FC = () => {
 					// gửi sự kiện get sản phẩm
 					socket.emit('getAllOrderByStatus', {
 						tableNumber: item.tableNumber,
-						location: item.location,
+						locationId: item.locationId,
 					})
 					setLoadingDataTable(false)
 				}

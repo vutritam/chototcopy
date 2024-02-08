@@ -1,49 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Spin } from 'antd'
+import { Button, Dropdown } from 'antd'
 import { io } from 'socket.io-client'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-	deleteAllRecordOrder,
 	deleteOrder,
 	fetchAllOrderByUserRole,
-	fetchOrderByNumberTable,
 	setOrderByNumberTable,
+	updatePaymentForTableNumber,
 	updateStatusOrder,
 } from '@/redux/componentSlice/orderSlice'
 import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/commonModal/modalConfirm'
 import CommonTable from '@/components/common/commonTable/commonTableListOrder'
-import { deleteAllRecordNotification } from '@/redux/componentSlice/messageSocketSlice'
-import BillExport from '@/components/srcExportBill/modalBillExport'
 import CartItem from '@/components/main/cartItem'
-import { ReloadOutlined } from '@ant-design/icons'
-import MasterLayout from '@/components/masterLayout/masterLayout'
-import { itemsEmployee } from '@/components/jsonData/menuData'
-import PrivateRoute from '@/components/common/privateRoute'
-interface DataType {
-	gender?: string
-	name: {
-		title?: string
-		first?: string
-		last?: string
-	}
-	email?: string
-	picture: {
-		large?: string
-		medium?: string
-		thumbnail?: string
-	}
-	nat?: string
-	loading: boolean
-}
-
+import { ReloadOutlined, FileTextOutlined } from '@ant-design/icons'
+import { localDataWithCustomDataUtil } from '@/components/utils/customDataUtil'
+import type { MenuProps } from 'antd'
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
 	const [open, setOpen] = useState(false)
 	const dispatch = useDispatch()
 	const [idOrder, setIdOrder] = useState(null)
 	const [orderData, setOrderData] = useState(null)
-	const [data, setData] = useState<DataType[]>([])
+	const [data, setData] = useState([])
 	const list = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const [socket, setSocket] = useState(null)
 	const [refreshPage, setRefresh] = useState(false)
@@ -53,12 +32,23 @@ const OrderByUser: React.FC = () => {
 	const getLocationEmployee =
 		sessionStorage.getItem('user') && JSON.parse(sessionStorage.getItem('user'))
 
-	useEffect(() => {
-		// setInitLoading(true)
-		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-		const newSocket = io(ENV_HOST)
-		setSocket(newSocket)
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
 
+	useEffect(() => {
+		const newSocket = io(ENV_HOST)
+		newSocket.on('connect', () => {
+			console.log('Socket connected')
+		})
+		newSocket.on('disconnect', () => {
+			console.log('Socket disconnected')
+		})
+		setSocket(newSocket)
+		return () => {
+			newSocket.disconnect()
+		}
+	}, [ENV_HOST])
+
+	useEffect(() => {
 		// Fetch dữ liệu ban đầu và cập nhật state
 		const fetchData = async () => {
 			const { payload } = await dispatch(
@@ -68,16 +58,6 @@ const OrderByUser: React.FC = () => {
 				})
 			)
 			if (payload?.success) {
-				let filterOrderDoNotComfirm = payload.data.reduce(
-					(accumulator, currentValue) => {
-						if (currentValue.status === 'order_success') {
-							return accumulator + 1
-						}
-						return accumulator
-					},
-
-					0
-				)
 				setInitLoading(false)
 				await dispatch(setOrderByNumberTable(payload.data))
 				setData(payload.data)
@@ -88,10 +68,6 @@ const OrderByUser: React.FC = () => {
 		}
 
 		fetchData()
-
-		return () => {
-			newSocket.disconnect()
-		}
 	}, [refreshPage])
 
 	useEffect(() => {
@@ -105,8 +81,6 @@ const OrderByUser: React.FC = () => {
 	}, [socket])
 
 	const handleConfirmOrder = async (e, item) => {
-		console.log(item, 'item order')
-
 		e.isDefaultPrevented()
 		if (item) {
 			setLoadingDataTable(true)

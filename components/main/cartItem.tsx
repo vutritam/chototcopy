@@ -15,13 +15,16 @@ import BillExport from '../srcExportBill/modalBillExport'
 import {
 	fetchAllOrder,
 	fetchAllOrderByNumberTableAndLocationUser,
+	fetchAllOrderByUserRole,
 	fetchOrderByNumberTable,
+	updatePaymentForTableNumber,
 } from '@/redux/componentSlice/orderSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { Label } from 'semantic-ui-react'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import CoffeeBill from '../exportBill/exportBill'
 import ModalBill from '../exportBill/component/modalBill'
+import { localDataWithCustomDataForBillUtil } from '../utils/customDataUtil'
 type MenuItem = Required<MenuProps>['items'][number]
 
 function getItem(
@@ -49,6 +52,8 @@ const CartItem: React.FC = (props) => {
 	const [totalPrice, setTotalPrice] = React.useState<any>(0)
 	const [confirmTableNumber, setConfirmTableNumber] = React.useState<any>(null)
 	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
+	let getLocationEmployee =
+		sessionStorage.getItem('user') !== null && JSON.parse(sessionStorage.getItem('user') || '')
 
 	const itemsOrder: MenuItem[] = [
 		getItem(
@@ -117,29 +122,37 @@ const CartItem: React.FC = (props) => {
 		}, 0)
 		setTotalPrice(totalPrice)
 	}, [dataSubmit])
-	useEffect(() => {
-		const data =
-			itemAllOrder !== null && typeof itemAllOrder === 'object' && !Array.isArray(itemAllOrder)
-				? itemAllOrder.data
-				: itemAllOrder
-		const filteredData = data?.reduce((acc, curr) => {
-			const index = acc.findIndex((item) => item.tableNumber === curr.tableNumber)
-			if (index === -1) {
-				acc.push(curr)
-			}
-			return acc
-		}, [])
 
-		const dataList = filteredData
-			?.sort((a, b) => a.tableNumber - b.tableNumber)
-			.map((item, index) => ({
-				key: index,
-				label: (
-					<p onClick={() => setConfirmTableNumber(item.tableNumber)}>{`Bàn ${item.tableNumber}`}</p>
-				),
-			}))
-		setMappedData(dataList)
-	}, [itemAllOrder])
+	const handleConfirmPayment = async (tableNumber) => {
+		const { payload } = await dispatch(
+			updatePaymentForTableNumber({
+				tableNumber: tableNumber,
+				objValues: { isPaid: true },
+			})
+		)
+		if (payload.success) {
+			let obj = {
+				locationId: getLocationEmployee?.data?.locationId,
+			}
+
+			const { payload } = await dispatch(fetchAllOrder(obj))
+			if (payload?.success) {
+			}
+			console.log(payload?.data, 'hhhhđ')
+
+			// setMappedData([])
+		}
+	}
+
+	useEffect(() => {
+		let data
+		if (open) {
+			data = localDataWithCustomDataForBillUtil(itemAllOrder, setConfirmTableNumber, open)
+		} else {
+			data = localDataWithCustomDataForBillUtil(itemAllOrder, handleConfirmPayment)
+		}
+		setMappedData(data)
+	}, [itemAllOrder, open])
 
 	const showDrawer = (condition) => {
 		if (!!condition && condition === 'billNormal') {
@@ -183,7 +196,7 @@ const CartItem: React.FC = (props) => {
 						onClick={showDrawer}
 					/>
 				) : className === 'exportBill' ? (
-					<BillExport showDrawer={showDrawer} />
+					<BillExport showDrawer={showDrawer} items={items} />
 				) : (
 					<ShoppingCartOutlined
 						className="style_cart"

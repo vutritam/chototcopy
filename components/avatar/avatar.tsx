@@ -12,7 +12,6 @@ import { Dropdown, Space, Tooltip } from 'antd'
 import CartItem from '../main/cartItem'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/router'
-import SelectSearch from '@/components/common/commonInput/inputSelectSearch'
 import { toast } from 'react-toastify'
 import _ from 'lodash'
 import Link from 'next/link'
@@ -173,7 +172,9 @@ const AvatarComponent: React.FC = () => {
 		const summary = _.mapValues(groupedOrders, (tableOrders) => {
 			const totalOrderedItems = tableOrders.length || 0
 			const confirmedItems =
-				tableOrders.filter((order) => order.status === 'order_success').length || 0
+				tableOrders.filter(
+					(order) => order.status === 'order_success' || order.status === 'order_done'
+				).length || 0
 			const canceledItems =
 				tableOrders.filter((order) => order.status === 'order_deleted').length || 0
 			if (totalOrderedItems !== confirmedItems) {
@@ -296,8 +297,6 @@ const AvatarComponent: React.FC = () => {
 						try {
 							if (!isOrderPage) {
 								const { payload } = await dispatch(fetchUserById(userInfo.userId))
-								console.log(payload, 'payloadnef')
-
 								if (payload?.success) {
 									setUserRequest(payload.username)
 									return
@@ -329,7 +328,6 @@ const AvatarComponent: React.FC = () => {
 		JSON.stringify(messageAdmin),
 		idTable,
 	])
-	console.log(messageEmployee, 'messageEmployee')
 
 	useEffect(() => {
 		let summary
@@ -353,6 +351,8 @@ const AvatarComponent: React.FC = () => {
 			}
 			socket.emit(CONST_TYPE_SOCKET.JoinRoom, roomName)
 			socket.on(CONST_TYPE_SOCKET.Response, async (response) => {
+				console.log(response.data, 'employee')
+
 				if (response.data.length > 0) {
 					await dispatch(setMessage(response.data))
 					playNotification()

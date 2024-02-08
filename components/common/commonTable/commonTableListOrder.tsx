@@ -6,6 +6,7 @@ import { UnorderedListOutlined, CheckCircleOutlined, IssuesCloseOutlined } from 
 import { useDispatch } from 'react-redux'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { useRouter } from 'next/router'
+import { localDataWithCustomDataUtil } from '@/components/utils/customDataUtil'
 
 interface inputProps {
 	handleSubmit?: (itemId: any, flag: boolean) => void
@@ -28,33 +29,11 @@ const CommonTable = (props: inputProps): JSX.Element => {
 
 	useEffect(() => {
 		// Cập nhật localData khi data props thay đổi
-		const localDataWithCustomData =
-			item !== null && typeof item === 'object' && !Array.isArray(item)
-				? item?.data?.map((record: any) => ({
-						...record,
-						customData: {
-							tableNumber: record.tableNumber,
-							status: record.status,
-							_id: record._id,
-							location: record.locationId?.nameLocation,
-							locationId: record.locationId?._id,
-							productId: record.productId,
-						},
-				  }))
-				: item?.map((record: any) => ({
-						...record,
-						customData: {
-							tableNumber: record.tableNumber,
-							status: record.status,
-							_id: record._id,
-							location: record.locationId?.nameLocation,
-							locationId: record.locationId?._id,
-							productId: record.productId,
-						},
-				  }))
-
+		const localDataWithCustomData = localDataWithCustomDataUtil(item)
 		const filterLocalDataWithCustomData = localDataWithCustomData?.filter((record: any) =>
-			isEmployeePage ? record.status !== 'order_deleted' : record
+			isEmployeePage
+				? record.status !== 'order_deleted' && record.status !== 'order_done' && !record?.isPaid
+				: record
 		)
 
 		setLocalData(filterLocalDataWithCustomData)
@@ -93,9 +72,10 @@ const CommonTable = (props: inputProps): JSX.Element => {
 
 	const handleStatus = (customData: any) => {
 		const checkConfirmOrder = dummyOrderConfirm.filter((item) => item.id === customData._id)
-		console.log(customData, 'customData')
-
-		if (customData.status === 'order_success' || checkConfirmOrder.length > 0) {
+		if (
+			(customData.status === 'order_success' && !customData?.isPaid) ||
+			checkConfirmOrder.length > 0
+		) {
 			return (
 				<Space direction="vertical">
 					<Space
@@ -140,6 +120,22 @@ const CommonTable = (props: inputProps): JSX.Element => {
 					>
 						<IssuesCloseOutlined style={{ color: 'rgb(255 0 21)', fontSize: ' 18px' }} />
 						<p>Đã hủy</p>
+					</Space>
+				</Space>
+			)
+		} else if (customData.status === 'order_success' && customData?.isPaid) {
+			return (
+				<Space direction="vertical">
+					<Space
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							textAlign: 'center',
+						}}
+					>
+						<CheckCircleOutlined style={{ color: '#40cf0e', fontSize: ' 18px' }} />
+						<p>Đã thanh toán</p>
 					</Space>
 				</Space>
 			)

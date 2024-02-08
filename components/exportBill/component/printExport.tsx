@@ -3,9 +3,15 @@ import ComponentToPrint from './componentToPrint'
 import { CopyOutlined, EditOutlined } from '@ant-design/icons'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'antd'
+import { useDispatch, useSelector } from 'react-redux'
+import { updatePaymentForTableNumber } from '@/redux/componentSlice/orderSlice'
 
 const PrintToExport: React.FC = ({ dataSubmit, totalPrice }) => {
 	const [edit, setEdit] = useState({ isShow: false, name: '' })
+	const dataAllOrderTableNumber = useSelector(
+		(state: any) => state.dataOrder?.dataOrderByNumberTable.data
+	)
+	const dispatch = useDispatch()
 	const componentRef = useRef()
 	const initValue = {
 		tableNumber: '0',
@@ -36,6 +42,31 @@ const PrintToExport: React.FC = ({ dataSubmit, totalPrice }) => {
 			handleEdit(e.target.name, e?.target.value)
 		}
 	}
+
+	const handleAfterPrint = () => {
+		console.log('Sau khi in')
+
+		// Thực hiện các hành động sau khi in nếu cần
+	}
+
+	const clickedItem = async () => {
+		const { payload } = await dispatch(
+			updatePaymentForTableNumber({
+				tableNumber: dataAllOrderTableNumber?.data[0]?.tableNumber,
+				objValues: { status: 'order_done' },
+			})
+		)
+		console.log(dataAllOrderTableNumber?.data[0]?.tableNumber, 'dataAllOrderTableNumber')
+	}
+
+	useEffect(() => {
+		window.addEventListener('afterprint', handleAfterPrint)
+
+		return () => {
+			// Cleanup: loại bỏ sự kiện khi component unmount
+			window.removeEventListener('afterprint', handleAfterPrint)
+		}
+	}, [])
 
 	return (
 		<div className="bg-gray-200 p-6">

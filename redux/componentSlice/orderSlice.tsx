@@ -63,6 +63,14 @@ export const fetchAllOrderByNumberTableAndLocationUser = createAsyncThunk<any, a
 	}
 )
 
+export const updatePaymentForTableNumber = createAsyncThunk<any, any>(
+	'api/updatePaymentForTableNumber',
+	async (options) => {
+		let response = await axiosConfig.post('/order/updatePaymentForTableNumber', options)
+		return response.data
+	}
+)
+
 export const deleteOrder = createAsyncThunk<any, any>('api/deleteOrder', async (options) => {
 	let response = await axiosConfig.post('/order/deleteOrder', options)
 	return response.data
@@ -127,8 +135,6 @@ const orderSlice = createSlice({
 				state.dataOrderByNumberTable.loading = true
 			})
 			.addCase(fetchOrderByNumberTable.fulfilled, (state, action) => {
-				console.log(action.payload, 'action.payload')
-
 				state.dataOrderByNumberTable.loading = false
 				state.dataOrderByNumberTable.data = action.payload
 			})

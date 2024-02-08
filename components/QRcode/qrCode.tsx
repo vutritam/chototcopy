@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Children } from 'react'
 import QRCode from 'react-qr-code'
 import { encodeTableNumber } from '@/components/common/hashCode'
 import { Button, Input, Select, Tree } from 'antd'
@@ -18,6 +18,7 @@ const QRcode: React.FC = () => {
 			title: 'Danh sách toàn bộ QR code',
 			key: '0-0',
 			children: [],
+			isLeaf: false,
 		},
 	]
 	let userRoles = sessionStorage.getItem('user') !== null && sessionStorage.getItem('user')
@@ -42,20 +43,29 @@ const QRcode: React.FC = () => {
 				responseQr.data.data,
 				(item) => item.locationId?.nameLocation
 			)
+
 			const countByClass = _.map(groupedByTableNumber, (group, locationId) => ({
 				length: group.length,
 				location: locationId,
 			}))
 
 			let treeDataClone: TreeDataNode[] = [...treeDataQr]
-			treeDataClone[0].key = '0-0'
-			treeDataClone[0].children = countByClass.map((item, index) => ({
-				title: (
-					<Link href={`${router.asPath}/${item?.location}`}>Danh sách QR code {item.location}</Link>
-				),
-				key: `0-0-${index}`,
-			}))
-			setTreeDataQr(treeDataClone)
+			if (countByClass.length > 0) {
+				treeDataClone[0].key = '0-0'
+				treeDataClone[0].children = countByClass.map((item, index) => ({
+					title: (
+						<Link href={`${router.asPath}/${item?.location}`}>
+							Danh sách QR code {item.location}
+						</Link>
+					),
+					key: `0-0-${index}`,
+				}))
+				setTreeDataQr(treeDataClone)
+			} else {
+				treeDataClone[0].children = []
+				treeDataClone[0].title = 'Hiện chưa có QR code cho địa điểm nào'
+				setTreeDataQr([...treeDataClone])
+			}
 		}
 	}
 
@@ -163,7 +173,7 @@ const QRcode: React.FC = () => {
 
 			{dataQR?.length <= 0 && (
 				<>
-					<p style={{ marginTop: '15px' }}>Danh sách QR code sẽ hiển thị tại đây: </p>
+					<p style={{ marginTop: '15px' }}>Danh sách QR code sẽ hiển thị tại đây:</p>
 					<DirectoryTree
 						multiple
 						defaultExpandAll

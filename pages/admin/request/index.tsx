@@ -1,17 +1,10 @@
 import List_manage_employee from '@/components/main/listManage_Employee'
-import { fetchAllUser, getAllUserRequest } from '@/redux/componentSlice/userSlice'
+import { getAllUserRequest } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
-type Props = {}
-interface DataType {
-	key: React.Key
-	name: string
-	age: number
-	address: string
-}
-function ManageRequest({}: Props) {
+function ManageRequest() {
 	const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
 	const [listUser, setListUser] = useState<React.Key[]>([])
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
