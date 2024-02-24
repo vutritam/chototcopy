@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Dropdown } from 'antd'
+import { Button } from 'antd'
 import { io } from 'socket.io-client'
 import { useDispatch, useSelector } from 'react-redux'
 import {
 	deleteOrder,
 	fetchAllOrderByUserRole,
 	setOrderByNumberTable,
-	updatePaymentForTableNumber,
 	updateStatusOrder,
 } from '@/redux/componentSlice/orderSlice'
 import Toasty from '@/components/common/toasty'
 import ModalConfirm from '@/components/common/commonModal/modalConfirm'
 import CommonTable from '@/components/common/commonTable/commonTableListOrder'
 import CartItem from '@/components/main/cartItem'
-import { ReloadOutlined, FileTextOutlined } from '@ant-design/icons'
-import { localDataWithCustomDataUtil } from '@/components/utilsComponent/customDataUtil'
-import type { MenuProps } from 'antd'
+import { ReloadOutlined } from '@ant-design/icons'
+import EventEmitter from 'events'
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
 	const [open, setOpen] = useState(false)
@@ -47,6 +45,7 @@ const OrderByUser: React.FC = () => {
 			newSocket.disconnect()
 		}
 	}, [ENV_HOST])
+	const eventEmitter = new EventEmitter()
 
 	useEffect(() => {
 		// Fetch dữ liệu ban đầu và cập nhật state
@@ -60,6 +59,7 @@ const OrderByUser: React.FC = () => {
 			if (payload?.success) {
 				setInitLoading(false)
 				await dispatch(setOrderByNumberTable(payload.data))
+				eventEmitter.emit('refreshData')
 				setData(payload.data)
 				setRefresh(false)
 			}

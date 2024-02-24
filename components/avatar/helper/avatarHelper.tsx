@@ -7,12 +7,15 @@ import { CONST_TYPE_ELEMENT } from '@/constanst/constanst.const'
 import moment from 'moment'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import _ from 'lodash'
+
 interface inputProps {
 	dataMessage: any
 	showMessage: Boolean
 	orderSummary: any
 	handleConfirmOrder?: any
 	condition: string
+	dataOrigin?: any
 }
 interface ItemOrder {
 	tableNumber: number
@@ -25,7 +28,8 @@ interface OrderSummary {
 	}
 }
 const HelperMessageForUser = (props: inputProps): JSX.Element => {
-	const { dataMessage, showMessage, orderSummary, handleConfirmOrder, condition } = props
+	const { dataMessage, showMessage, dataOrigin, orderSummary, handleConfirmOrder, condition } =
+		props
 	const isAdmin = condition === 'admin'
 	const isUserOrder = condition === 'userOrder'
 	const isCheckUserOrderData = !isAdmin ? sortByStatus(dataMessage, 'order_inprogess') : dataMessage
@@ -96,19 +100,46 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 			</div>
 		)
 	}
-	console.log(sessionOrder, 'llll')
 
-	return isCheckUserOrderData.length > 0 ? (
+	const renderOrderItem = (orderSummary, ele, dataMessage) => {
+		if (!_.isNil(orderSummary) && ele && ele.tableNumber) {
+			const findOrderSuccess = dataMessage?.some(
+				(item) => item.status === 'order_success' && !item.isPaid
+			)
+			const isCheckExistedOrderNotConfirm =
+				orderSummary[ele.tableNumber]?.confirmedItems ===
+					orderSummary[ele.tableNumber]?.totalOrderedItems ||
+				orderSummary[ele.tableNumber]?.confirmedItems +
+					orderSummary[ele.tableNumber]?.canceledItems ===
+					orderSummary[ele.tableNumber]?.totalOrderedItems
+			if (!isCheckExistedOrderNotConfirm && !ele.isPaid && findOrderSuccess)
+				return true // chưa xác nhận hết và chưa thanh toán
+			else if (isCheckExistedOrderNotConfirm && !ele?.isPaid && findOrderSuccess)
+				return true // đã xác nhận hết và chưa thanh toán
+			else if (isCheckExistedOrderNotConfirm && ele?.isPaid && !findOrderSuccess)
+				return false // đã xác nhận hết và đã thanh toán
+			else return true
+		}
+	}
+
+	const isCheckExistedOrderNotConfirm = !isAdmin
+		? renderOrderItem(orderSummary, isCheckUserOrderData[0], dataOrigin)
+		: true
+
+	return isCheckUserOrderData.length > 0 && isCheckExistedOrderNotConfirm ? (
 		isCheckUserOrderData.map((ele, index) => {
 			if (!isAdmin) {
 				const isOrderSumary = renderOrderSummary(orderSummary, ele)
 				return (
 					<Menu.Item key={index} className={`${showMessage ? '' : 'show-readed-message'}`}>
 						{renderTitleHeading(isOrderSumary, ele)}
-						<AvatarElementHelper
-							item={sessionOrder?.tableNumber}
-							type={CONST_TYPE_ELEMENT.tableNumber}
-						/>
+						{isUserOrder ? (
+							<AvatarElementHelper
+								item={sessionOrder?.tableNumber}
+								type={CONST_TYPE_ELEMENT.tableNumber}
+							/>
+						) : null}
+
 						<AvatarElementHelper
 							item={ele}
 							type={CONST_TYPE_ELEMENT.Date}

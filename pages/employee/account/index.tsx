@@ -1,5 +1,5 @@
 import { Button, Form, Image, Input, Modal, Row, Select, Tooltip } from 'antd'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { CameraOutlined, EditOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Label, TextArea } from 'semantic-ui-react'
 import FileUpload from '@/components/common/upload'
@@ -20,12 +20,13 @@ import { useRouter } from 'next/router'
 import ModalConfirm from '@/components/common/commonModal/modalReasonChangeLocation'
 import { io } from 'socket.io-client'
 import axiosConfig from '../../api/axiosConfigs'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 function Manage_account() {
 	const user = useSelector((state: any) => state.user.account.user)
 	const userListAcceptRequestUsers = useSelector((state: any) => state.user.isAcceptRequestUsers)
 	const [editMode, setEditMode] = useState('')
-	const [selectedLocation, setLocation] = useState('')
+	const [selectedLocation, setLocation] = useState({ _id: '', nameLocation: '' })
 	const [disabledLocation, setDisabledLocation] = useState(false)
 	const router = useRouter()
 	const [loadings, setLoadings] = useState<boolean>(false)
@@ -67,17 +68,25 @@ function Manage_account() {
 		const statusItem = userListAcceptRequestUsers.data.filter(
 			(item) => item.userId._id === user?.data?._id
 		)[0]?.status
-		const nameLocation = userListAcceptRequestUsers.data.filter(
+		const itemLocation = userListAcceptRequestUsers.data.filter(
 			(item) => item.userId._id === user?.data?._id
-		)[0]?.locationId?.nameLocation
+		)[0]
+
 		if (
 			user?.data?.userRequestId?.isRequest === 'change_location' &&
 			statusItem === 'request_pending'
 		) {
-			setLocation(nameLocation)
+			setLocation({
+				_id: itemLocation?.locationId?._id,
+				nameLocation: itemLocation?.locationId?.nameLocation,
+			})
 			setDisabledLocation(true)
 		} else if (user?.data?.userRequestId?.isRequest === 'unChange_location' && statusItem === '') {
-			setLocation(user?.data?.locationId?.nameLocation)
+			setLocation({
+				_id: user?.data?.locationId?.locationId,
+				nameLocation: user?.data?.locationId?.nameLocation,
+			})
+			// {_id: itemLocation?.locationId, nameLocation: itemLocation?.nameLocation}
 			setDisabledLocation(false)
 		} else if (
 			getInforUser?.data?.locationId !== user?.data?.userRequestId?.locationId &&
@@ -88,10 +97,16 @@ function Manage_account() {
 			getInforUser?.data?.locationId !== user?.data?.userRequestId?.locationId &&
 			statusItem === 'request_failure'
 		) {
-			setLocation(user?.data?.locationId?.nameLocation)
+			setLocation({
+				_id: user?.data?.locationId?.locationId,
+				nameLocation: user?.data?.locationId?.nameLocation,
+			})
 			setDisabledLocation(false)
 		} else {
-			setLocation(user?.data?.locationId?.nameLocation)
+			setLocation({
+				_id: user?.data?.locationId?.locationId,
+				nameLocation: user?.data?.locationId?.nameLocation,
+			})
 			setDisabledLocation(false)
 		}
 	}, [editMode, userListAcceptRequestUsers.data])
@@ -99,31 +114,70 @@ function Manage_account() {
 	const handleShow = async (show) => {
 		if (!show && !reason) {
 			setLoadingConfirm(false)
-		} else if (selectedLocation !== '' && reason !== '') {
+		} else if (selectedLocation?._id !== '' && reason !== '') {
+			console.log(
+				{
+					isRequest: 'change_location',
+					reason: reason,
+					_id: user?.data?._id,
+					locationId: selectedLocation?._id,
+					status: 'request_pending',
+				},
+				'o'
+			)
+
 			setLoadingConfirm(true)
 			const { payload } = await dispatch(
 				updateIsChangeRequestUser({
 					isRequest: 'change_location',
 					reason: reason,
 					_id: user?.data?._id,
-					locationId: selectedLocation,
+					locationId: selectedLocation?._id,
 					status: 'request_pending',
 				})
 			)
 			if (payload?.success) {
 				setDisabledLocation(true)
 				setLoadingConfirm(false)
-				setLocation(selectedLocation)
+				setLocation({ _id: selectedLocation?._id, nameLocation: selectedLocation?.nameLocation })
+				Toasty.success(payload.message)
+			} else {
+				Toasty.error(payload.message)
 			}
-			Toasty.success(payload.message)
 		}
 		setReason('')
 		setOpen(show)
 	}
+	const searchParams = useSearchParams()
+	const pathname = usePathname()
+
+	const createQueryString = useCallback(
+		(name: string, value: string) => {
+			const params = new URLSearchParams(searchParams.toString())
+			params.set(name, value)
+
+			return params.toString()
+		},
+		[searchParams]
+	)
+	const search = searchParams.get('action')
+	useEffect(() => {
+		console.log(search, 'fd')
+		if (search !== null) {
+			setEditMode(search)
+		}
+	}, [search])
 
 	const handleEditProfile = (value: string) => {
+		if (value !== '') {
+			router.push(pathname + '?' + createQueryString('action', value))
+		} else {
+			router.push(pathname)
+		}
 		setEditMode(value)
 	}
+	console.log(editMode, 'sdsa')
+
 	const initialValues = {
 		username: user?.data?.username,
 		email: user?.data?.email,
@@ -131,6 +185,7 @@ function Manage_account() {
 		file: user?.data?.file,
 		address: user?.data?.address,
 	}
+
 	const handleMessageStatus = (data) => {
 		const { message, fieldError } = data
 		switch (fieldError) {
@@ -147,6 +202,7 @@ function Manage_account() {
 				break
 		}
 	}
+
 	const onFinish = async (values: any) => {
 		const formData = new FormData()
 		const info = sessionStorage !== null && JSON.parse(sessionStorage.getItem('user'))
@@ -193,11 +249,11 @@ function Manage_account() {
 	}
 
 	const handleChangeLocation = (data) => {
+		const findNameLocation = listLocation?.find((item) => item._id === data)
 		if (data !== user?.data?.locationId?._id) {
 			handleShow(true)
 		}
-
-		setLocation(data)
+		setLocation({ _id: findNameLocation?._id, nameLocation: findNameLocation?.nameLocation })
 	}
 
 	useEffect(() => {
@@ -268,15 +324,16 @@ function Manage_account() {
 		)
 	}
 	const handleUnRequest = async () => {
-		setLocation(user?.data.locationId?.nameLocation)
+		setLocation({
+			_id: user?.data.locationId?.locationId,
+			nameLocation: user?.data.locationId?.nameLocation,
+		})
 		let IsChangeRequest = 'unChange_location'
 		const { payload } = await dispatch(
 			updateIsChangeRequestUser({
 				isRequest: IsChangeRequest,
 				reason: reason,
 				_id: user?.data?._id,
-				locationId: '',
-				status: '',
 			})
 		)
 		if (payload?.success) {
@@ -320,7 +377,7 @@ function Manage_account() {
 						<>
 							<Input
 								disabled={user?.data?.userRequestId?.isRequest !== '' ? true : false}
-								value={selectedLocation}
+								value={selectedLocation?.nameLocation}
 							/>
 							<div className="flex-basic">
 								<p style={{ color: '#e98c13' }}>Đang chờ xác nhận....</p>
@@ -335,7 +392,9 @@ function Manage_account() {
 							placeholder="Nhập địa điểm làm việc"
 							onChange={handleChangeLocation}
 							value={
-								selectedLocation !== '' ? selectedLocation : user?.data?.locationId?.nameLocation
+								selectedLocation?.nameLocation !== ''
+									? selectedLocation?.nameLocation
+									: user?.data?.locationId?.nameLocation
 							}
 						>
 							{listLocation?.map((item, index) => (

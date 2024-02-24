@@ -10,7 +10,7 @@ export const fetchCreateOrder = createAsyncThunk<any, any, any>(
 	}
 )
 
-export const fetchAllOrderByUserRole = createAsyncThunk<any, any, any>(
+export const fetchAllOrderByUserRole = createAsyncThunk(
 	'api/fetchAllOrderByUserRole',
 	async (options: any) => {
 		let response = await axiosConfig.post('/order/getAllOrderByUserRole', options)

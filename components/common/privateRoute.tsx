@@ -1,35 +1,7 @@
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import axiosConfig from '../../pages/api/axiosConfigs'
 
-export async function getServerSideProps(context) {
-	// Lấy cookie "token" từ request
-	// const token = context.req.cookies.token
-	console.log(context, 'contexxt')
-
-	// Xác thực token bằng cách gọi API
-	// let response = await axiosConfig.post('/auth/login', options)
-	// return response.data
-
-	// // Kiểm tra response
-	// if (response.status === 200) {
-	// 	// Người dùng đã đăng nhập
-	// 	return {
-	// 		props: {
-	// 			user: await response.json(),
-	// 		},
-	// 	}
-	// } else {
-	// 	// Người dùng chưa đăng nhập
-	// 	// Chuyển hướng đến trang đăng nhập
-	// 	return {
-	// 		redirect: {
-	// 			destination: '/login',
-	// 			permanent: false,
-	// 		},
-	// 	}
-	// }
-}
 interface PrivateRouteProps {
 	allowedRoles: string[]
 	children: React.ReactNode
@@ -37,6 +9,7 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles, children }) => {
 	const router = useRouter()
+	const [accessChecked, setAccessChecked] = useState(false)
 	let userRoles = sessionStorage.getItem('user')
 
 	useEffect(() => {
@@ -61,17 +34,17 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles, children }) =
 					// Không có quyền truy cập, chuyển hướng đến trang báo lỗi hoặc trang chính khác
 					router.replace('/404') // Ví dụ: Chuyển hướng đến trang báo lỗi
 				}
+				setAccessChecked(true)
 			}
 		}
-
 		checkAccess()
 	}, [router, allowedRoles])
 
-	if (allowedRoles.length !== 0) {
-		return <>{children}</>
+	if (!accessChecked) {
+		return null // hoặc bất kỳ phần tải nào nếu cần
 	}
 
-	return null
+	return <>{children}</>
 }
 
 export default PrivateRoute

@@ -61,6 +61,6 @@ export const itemsOrder = [
 		'1',
 		<DesktopOutlined />
 	),
-	getItem('Khuyến mãi', 'sub2', <TeamOutlined />, [getItem('Team 1', '2'), getItem('Team 2', '3')]),
-	getItem('Ăn vặt', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
+	getItem(<Link href={'payment'}>Thanh toán</Link>, '2', <TeamOutlined />),
+	// getItem('Thanh toán', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
 ]

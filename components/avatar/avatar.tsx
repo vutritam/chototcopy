@@ -155,7 +155,6 @@ const AvatarComponent: React.FC = () => {
 	}
 
 	const handleGetQuantityByTableNumber = (itemOrder) => {
-		// Logic đếm giống như trong ví dụ trước đó
 		// Sử dụng Lodash để nhóm lại các đơn hàng theo bàn
 		const groupedOrders =
 			itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
@@ -196,6 +195,7 @@ const AvatarComponent: React.FC = () => {
 			})
 			setSocket(newSocket)
 		}
+
 		initSocket()
 	}, [ENV_HOST])
 
@@ -459,10 +459,6 @@ const AvatarComponent: React.FC = () => {
 				{/* <SelectSearch /> */}
 
 				<Space wrap>{renderMenuMessage()} Thông báo</Space>
-				<Space wrap>
-					<CartItem />
-					Giỏ hàng
-				</Space>
 				{isOrderPage ? (
 					''
 				) : (

@@ -6,8 +6,14 @@ import HelperMessageForUser from './avatarHelper'
 import { useEffect, useState } from 'react'
 import _ from 'lodash'
 import { CONST_TYPE_KEY_VALUE } from '@/constanst/constanst.const'
+
+interface product {
+	tableNumber: number
+	quantity: number
+}
+
 interface inputProps {
-	dataMessage: Array<[]>
+	dataMessage: product[]
 	showMessage: boolean
 	countMessage: number
 	orderSummary: any
@@ -31,11 +37,11 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 	const isDataMessage = dataMessage && dataMessage
 	const isUserOrder = condition === CONST_TYPE_KEY_VALUE.UserOrder
 	const isAdmin = condition === CONST_TYPE_KEY_VALUE.Admin
-
 	const [data, setData] = useState<Array<[]>>([])
+
 	useEffect(() => {
 		const sortItemByTableNumber = !isAdmin
-			? isDataMessage.reduce((acc, order) => {
+			? isDataMessage.reduce((acc: product[], order) => {
 					const { tableNumber, quantity } = order
 					const existingOrder = acc.find((group) => group.tableNumber === tableNumber)
 
@@ -44,12 +50,11 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 					} else {
 						acc.push({ ...order })
 					}
-
 					return acc
 			  }, [])
 			: dataMessage
-
-		setData(sortItemByTableNumber)
+		const sortItemFilter = sortItemByTableNumber?.filter((item) => item.status !== 'order_done')
+		setData(sortItemFilter)
 	}, [dataMessage.length])
 
 	return (
@@ -61,6 +66,7 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 					</Menu.Item>
 					<HelperMessageForUser
 						dataMessage={data}
+						dataOrigin={dataMessage}
 						showMessage={showMessage}
 						handleConfirmOrder={!isUserOrder ? handleConfirmOrder : null}
 						orderSummary={orderSummary}

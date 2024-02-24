@@ -17,7 +17,8 @@ const OrderByAllUser: React.FC = () => {
 	const dispatch = useDispatch()
 	// const [loading, setLoading] = useState(false)
 	const [data, setData] = useState([])
-	let getLocationEmployee = JSON.parse(sessionStorage.getItem('user') || '')
+	let getLocationEmployee =
+		sessionStorage.getItem('user') !== null && JSON.parse(sessionStorage.getItem('user') || '')
 	const [open, setOpen] = useState(false)
 	const [idOrder, setIdOrder] = useState(null)
 	const [countOrderDoNotComfirm, setCountOrderDontConfirm] = useState(0)
@@ -43,12 +44,15 @@ const OrderByAllUser: React.FC = () => {
 				Toasty.error(payload?.message)
 			} else {
 				setInitLoading(false)
-				let filterOrderDoNotComfirm = payload.data.reduce((accumulator, currentValue) => {
-					if (currentValue.status === 'order_inprogess') {
-						return accumulator + 1
-					}
-					return accumulator
-				}, 0)
+				let filterOrderDoNotComfirm = payload.data.reduce(
+					(accumulator: number, currentValue: any) => {
+						if (currentValue.status === 'order_inprogess') {
+							return accumulator + 1
+						}
+						return accumulator
+					},
+					0
+				)
 				setCountOrderDontConfirm(filterOrderDoNotComfirm)
 				setData(payload.data)
 				setInitLoading(false)
@@ -63,7 +67,7 @@ const OrderByAllUser: React.FC = () => {
 
 	useEffect(() => {
 		if (socket) {
-			socket.emit('joinRoom', `room-${getLocationEmployee.data.locationId}`)
+			socket.emit('joinRoom', `room-${getLocationEmployee?.data?.locationId}`)
 			socket.on('resProductOrder', async (response) => {
 				await dispatch(setOrderByNumberTable(response))
 				setData(response.data)

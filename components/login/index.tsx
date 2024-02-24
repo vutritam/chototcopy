@@ -188,22 +188,24 @@ const LoginForm: React.FC = () => {
 							<Form.Item name="remember" valuePropName="checked" noStyle>
 								<Checkbox>Remember me</Checkbox>
 							</Form.Item>
-
-							<a className="login-form-forgot" href="">
-								Forgot password
-							</a>
 						</Form.Item>
 
 						<Form.Item>
-							<Button
-								type="primary"
-								htmlType="submit"
-								loading={loadings}
-								className="login-form-button"
+							<div
+								style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
 							>
-								Đăng nhập
-							</Button>
-							Or <a href="">register now!</a>
+								<Button
+									type="primary"
+									htmlType="submit"
+									loading={loadings}
+									className="login-form-button"
+								>
+									Đăng nhập
+								</Button>
+								<a className="login-form-forgot" href="#">
+									Quên mật khẩu
+								</a>
+							</div>
 						</Form.Item>
 					</Form>
 				</div>

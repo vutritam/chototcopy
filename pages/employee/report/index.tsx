@@ -83,6 +83,7 @@ const EmployeeReport: React.FC<EmployeeProps> = () => {
 	}
 	return (
 		<div>
+			{/* <h1 className="text-3xl font-bold underline w-full p-3 bg-slate-400">Hello world!</h1> */}
 			<h2>Báo cáo ngày</h2>
 
 			<div style={{ marginBottom: '10px' }}>
@@ -110,6 +111,11 @@ const EmployeeReport: React.FC<EmployeeProps> = () => {
 					Báo cáo
 				</Button>
 			)}
+			{/* <div style={{ display: 'flex' }}>
+				<button style={{ flexGrow: '1' }}>aaaa</button>
+				<button style={{ flexGrow: '1' }}>bbbbbbbb</button>
+				<button style={{ flexGrow: '1' }}>cccc</button>
+			</div> */}
 		</div>
 	)
 }

@@ -1,18 +1,8 @@
-// import ListItem from '@/components/main/listItem'
-// import ManageMoney from '@/components/main/manageMoney'
-import PrivateRoute from '@/components/common/privateRoute'
-import { itemsAdmin } from '@/components/jsonData/menuData'
 import List_manage_employee from '@/components/main/listManage_Employee'
-import MasterLayout from '@/components/masterLayout/masterLayout'
 import { fetchAllUser } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
-import { Dropdown, Space, Table, Tag } from 'antd'
-import { ColumnsType } from 'antd/es/table'
-import { TableRowSelection } from 'antd/es/table/interface'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-// import ListItem from './listItem'
-// import ManageMoney fro'
 
 type Props = {}
 interface DataType {

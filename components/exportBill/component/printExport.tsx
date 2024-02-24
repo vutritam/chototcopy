@@ -73,7 +73,7 @@ const PrintToExport: React.FC = ({ dataSubmit, totalPrice }) => {
 			<Button
 				type="primary"
 				className="bg-gray-500 border border-gray-500 p-2 mb-4"
-				onClick={handlePrint}
+				onClick={clickedItem}
 				icon={<CopyOutlined />}
 			>
 				Xuất ra hóa đơn

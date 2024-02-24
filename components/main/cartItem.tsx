@@ -25,6 +25,9 @@ import { ThunkDispatch } from '@reduxjs/toolkit'
 import CoffeeBill from '../exportBill/exportBill'
 import ModalBill from '../exportBill/component/modalBill'
 import { localDataWithCustomDataForBillUtil } from '../utilsComponent/customDataUtil'
+import EventEmitter from 'events'
+import { useRouter } from 'next/router'
+import { itemsAdmin, itemsEmployee, itemsOrder } from '../jsonData/menuData'
 type MenuItem = Required<MenuProps>['items'][number]
 
 function getItem(
@@ -40,33 +43,56 @@ function getItem(
 		label,
 	} as MenuItem
 }
+
+interface Product {
+	productId: string
+	price: number
+	status: string
+	isPaid: boolean
+	// Các thuộc tính khác của product nếu có
+}
+
+// Định nghĩa kiểu dữ liệu cho mảng dataSubmit
+interface DataSubmitItem {
+	productId: Product
+	// Các thuộc tính khác của dataSubmitItem nếu có
+}
+interface ObjectType {
+	_id: string
+	tableNumber: number
+}
+
 const CartItem: React.FC = (props) => {
 	const { className } = props
+	const router = useRouter()
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [open, setOpen] = React.useState<Boolean>(false)
 	const [openModalBill, setOpenBill] = React.useState<Boolean>(false)
-	const [items, setMappedData] = useState([])
+	const [items, setMappedData] = useState<ObjectType[]>([])
 	const [typeBill, setTypeBill] = React.useState<string>('')
 	const [itemRender, setItemRender] = React.useState<any>([])
 	const [dataSubmit, setDataSubmit] = React.useState<any>([])
 	const [totalPrice, setTotalPrice] = React.useState<any>(0)
 	const [confirmTableNumber, setConfirmTableNumber] = React.useState<any>(null)
 	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
+	// console.log(findItemOrderSuccess, 'k')
+
 	let getLocationEmployee =
 		sessionStorage.getItem('user') !== null && JSON.parse(sessionStorage.getItem('user') || '')
 
-	const itemsOrder: MenuItem[] = [
-		getItem(
-			<Link href={typeof window !== 'undefined' && window.location.pathname}>Thực đơn</Link>,
-			'1',
-			<DesktopOutlined />
-		),
-		getItem('Khuyến mãi', 'sub2', <TeamOutlined />, [
-			getItem('Team 1', '2'),
-			getItem('Team 2', '3'),
-		]),
-		getItem('Ăn vặt', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
-	]
+	// const itemsOrder: MenuItem[] = [
+	// 	getItem(
+	// 		<Link href={typeof window !== 'undefined' && window.location.pathname}>Thực đơn</Link>,
+	// 		'1',
+	// 		<DesktopOutlined />
+	// 	),
+	// 	getItem('Khuyến mãi', 'sub2', <TeamOutlined />, [
+	// 		getItem('Team 1', '2'),
+	// 		getItem('Team 2', '3'),
+	// 	]),
+	// 	getItem('Ăn vặt', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
+	// ]
+
 	const dataNorMal = [
 		{
 			title: 'Ant Design Title 1',
@@ -108,7 +134,10 @@ const CartItem: React.FC = (props) => {
 				)
 				if (payload?.success) {
 					const filterData = payload?.data?.filter(
-						(item) => item?.status !== 'order_inprogess' && !item?.isPaid
+						(item: Product) =>
+							item?.status !== 'order_inprogess' &&
+							item?.status !== 'order_deleted' &&
+							!item?.isPaid
 					)
 					setDataSubmit(filterData)
 				}
@@ -118,7 +147,7 @@ const CartItem: React.FC = (props) => {
 	}, [confirmTableNumber])
 
 	useEffect(() => {
-		const totalPrice = dataSubmit.reduce((acc, curr) => {
+		const totalPrice = dataSubmit.reduce((acc: number, curr: DataSubmitItem) => {
 			acc += curr.productId.price
 
 			return acc
@@ -126,7 +155,7 @@ const CartItem: React.FC = (props) => {
 		setTotalPrice(totalPrice)
 	}, [dataSubmit])
 
-	const handleConfirmPayment = async (tableNumber) => {
+	const handleConfirmPayment = async (tableNumber: number) => {
 		const { payload } = await dispatch(
 			updatePaymentForTableNumber({
 				tableNumber: tableNumber,
@@ -141,23 +170,38 @@ const CartItem: React.FC = (props) => {
 			const { payload } = await dispatch(fetchAllOrder(obj))
 			if (payload?.success) {
 			}
-			console.log(payload?.data, 'hhhhđ')
 
 			// setMappedData([])
 		}
 	}
 
-	useEffect(() => {
+	const handleEventFromA = () => {
 		let data
-		if (open) {
+		if (open && open !== undefined) {
 			data = localDataWithCustomDataForBillUtil(itemAllOrder, setConfirmTableNumber, open)
 		} else {
 			data = localDataWithCustomDataForBillUtil(itemAllOrder, handleConfirmPayment)
 		}
 		setMappedData(data)
+	}
+	const eventEmitter = new EventEmitter()
+
+	useEffect(() => {
+		// Đăng ký sự kiện khi component C được mount
+		// Đăng ký sự kiện từ Component A
+		eventEmitter.on('refreshData', handleEventFromA)
+
+		// Hủy đăng ký sự kiện khi component C bị unmount
+		return () => {
+			eventEmitter.off('refreshData', handleEventFromA)
+		}
+	}, [])
+
+	useEffect(() => {
+		handleEventFromA()
 	}, [itemAllOrder, open])
 
-	const showDrawer = (condition) => {
+	const showDrawer = (condition: string) => {
 		if (!!condition && condition === 'billNormal') {
 			setItemRender(dataNorMal)
 		} else if (!!condition && condition === 'billRed') {
@@ -190,24 +234,39 @@ const CartItem: React.FC = (props) => {
 		)
 	}
 
+	const renderItemMenuMobile = (pathName) => {
+		const menuMobile = [
+			{ key: '/order', value: 'order' },
+			{ key: '/employee', value: 'employee' },
+			{ key: '/admin', value: 'admin' },
+		]
+		let pathNameRoles = menuMobile.find((e) => pathName.startsWith(e.key))?.value
+		switch (pathNameRoles) {
+			case 'order':
+				return itemsOrder
+			case 'employee':
+				return itemsEmployee
+			default:
+				return itemsAdmin
+		}
+	}
+
 	return (
 		<>
-			<Tooltip title="Bạn có 23 sản phẩm" color={'red'} key={'red'}>
-				{className === 'screen-mobile' ? (
-					<MenuUnfoldOutlined
-						style={{ fontSize: '22px', width: '30px', display: 'flex' }}
-						onClick={showDrawer}
-					/>
-				) : className === 'exportBill' ? (
-					<BillExport showDrawer={showDrawer} items={items} />
-				) : (
-					<ShoppingCartOutlined
-						className="style_cart"
-						style={{ fontSize: '22px', width: '30px', display: 'flex' }}
-						onClick={showDrawer}
-					/>
-				)}
-			</Tooltip>
+			{className === 'screen-mobile' ? (
+				<MenuUnfoldOutlined
+					style={{ fontSize: '22px', width: '30px', display: 'flex' }}
+					onClick={showDrawer}
+				/>
+			) : className === 'exportBill' ? (
+				<BillExport showDrawer={showDrawer} items={items} />
+			) : (
+				<ShoppingCartOutlined
+					className="style_cart"
+					style={{ fontSize: '22px', width: '30px', display: 'flex' }}
+					onClick={showDrawer}
+				/>
+			)}
 
 			<Drawer
 				title={
@@ -217,7 +276,7 @@ const CartItem: React.FC = (props) => {
 								? typeBill === 'billNormal'
 									? `Hóa đơn thường (Bàn số ${confirmTableNumber})`
 									: `Hóa đơn đỏ (Bàn số ${confirmTableNumber})`
-								: `Thông tin giỏ hàng (23)`
+								: ''
 						}`
 					) : (
 						<b style={{ color: 'blue' }}>GOLD COFFEE</b>
@@ -229,7 +288,7 @@ const CartItem: React.FC = (props) => {
 			>
 				<Space direction="vertical" style={{ width: '100%' }}>
 					{className && className === 'screen-mobile' ? (
-						<Menu mode={'inline'} theme={'light'} items={itemsOrder} />
+						<Menu mode={'inline'} theme={'light'} items={renderItemMenuMobile(router.asPath)} />
 					) : className === 'exportBill' ? (
 						<div>
 							{confirmTableNumber !== null ? (
