@@ -9,31 +9,20 @@ import { toast } from 'react-toastify'
 import Toasty from '@/components/common/toasty'
 import { io } from 'socket.io-client'
 import axiosConfig from '../../pages/api/axiosConfigs'
+import useSocket from '../common/socketConfig/socketClient'
 
 const LoginForm: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [loadings, setLoadings] = useState<boolean>(false)
 	const [keyTab, setKeyTab] = useState<number>(1)
 	const [listLocation, setListLocation] = useState([])
-	const [socket, setSocket] = useState(null)
+	const [countDownLogin, setCountDownLogin] = useState<number>(0)
 	const passwordInputRef = useRef(null)
 	const usernameInputRef = useRef(null)
 	// const user = JSON.parse(sessionStorage.getItem('user'))
 	let router = useRouter()
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-	useEffect(() => {
-		const initSocket = () => {
-			const newSocket = io(ENV_HOST)
-			newSocket.on('connect', () => {
-				console.log('Socket connected')
-			})
-			newSocket.on('disconnect', () => {
-				console.log('Socket disconnected')
-			})
-			setSocket(newSocket)
-		}
-		initSocket()
-	}, [ENV_HOST])
+	const socket = useSocket(ENV_HOST)
 
 	useEffect(() => {
 		if (
@@ -45,6 +34,7 @@ const LoginForm: React.FC = () => {
 			passwordInputRef.current.focus()
 		}
 	}, [keyTab])
+
 	const onFinish = async (options: any) => {
 		setLoadings(true)
 		if (keyTab === 1) {
@@ -84,6 +74,8 @@ const LoginForm: React.FC = () => {
 
 			setTimeout(() => {
 				setLoadings(false)
+				setCountDownLogin((prev) => prev + 1)
+
 				toast(payload?.message, {
 					position: 'top-center',
 					autoClose: 1500,
@@ -189,7 +181,6 @@ const LoginForm: React.FC = () => {
 								<Checkbox>Remember me</Checkbox>
 							</Form.Item>
 						</Form.Item>
-
 						<Form.Item>
 							<div
 								style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
@@ -199,6 +190,7 @@ const LoginForm: React.FC = () => {
 									htmlType="submit"
 									loading={loadings}
 									className="login-form-button"
+									disabled={countDownLogin >= 5}
 								>
 									Đăng nhập
 								</Button>
@@ -268,7 +260,6 @@ const LoginForm: React.FC = () => {
 							>
 								Đăng ký
 							</Button>
-							{/* Or <a href="">register now!</a> */}
 						</Form.Item>
 					</Form>
 				</div>
@@ -279,11 +270,9 @@ const LoginForm: React.FC = () => {
 		<div className="custom-login backgound-img">
 			{loading ? (
 				<Space direction="vertical" style={{ width: '100%', textAlign: 'center' }}>
-					{/* <Space> */}
 					<Spin tip="Loading" size="small" style={{ color: 'white' }}>
 						<div className="content" />
 					</Spin>
-					{/* </Space> */}
 				</Space>
 			) : (
 				<div className="form-template" style={{ background: 'white' }}>

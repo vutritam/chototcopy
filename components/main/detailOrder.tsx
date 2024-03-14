@@ -1,7 +1,7 @@
 import { Avatar, Button, List, Skeleton, Space, Spin, Tooltip } from 'antd'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
-import { decodeNumber, encodeNumber } from '../common/hashCode'
+import { decodeTableNumber, encodeTableNumber } from '../common/hashCode'
 import { RollbackOutlined } from '@ant-design/icons'
 import PaginationCustom from '../common/pagination'
 import { io } from 'socket.io-client'
@@ -9,6 +9,7 @@ import { setMessage } from '@/redux/componentSlice/messageSocketSlice'
 import Toasty from '../common/toasty'
 import { fetchAllOrder, fetchOrderByNumberTable } from '@/redux/componentSlice/orderSlice'
 import { useDispatch } from 'react-redux'
+import useSocket from '../common/socketConfig/socketClient'
 
 interface DataType {
 	gender?: string
@@ -37,12 +38,10 @@ const DetailOrder: React.FC = () => {
 	const [loading, setLoading] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
-	const [socket, setSocket] = useState(null)
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+	const socket = useSocket(ENV_HOST)
 
 	useEffect(() => {
-		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-		const newSocket = io(ENV_HOST)
-		setSocket(newSocket)
 		if (socket) {
 			// Gửi sự kiện tới Socket.IO server
 			socket.on('response', async (response) => {
@@ -70,27 +69,24 @@ const DetailOrder: React.FC = () => {
 		setTimeout(() => {
 			setLoading(false)
 		}, 1000)
-		return () => {
-			newSocket.disconnect()
-		}
 	}, [idTable])
 
-	useEffect(() => {
-		// setLoading(true)
-		const { orderDetail } = router.query
-		// Giải mã chuỗi JSON
-		const order = JSON.parse(orderDetail)
-		let num = order.order || null // c0
-		let convert
-		if (isNaN(num)) {
-			const [decoded, originalNum] = decodeNumber(num)
-			convert = decoded
-		} else {
-			convert = encodeNumber(Number(num))
-		}
+	// useEffect(() => {
+	// 	// setLoading(true)
+	// 	const { orderDetail } = router.query
+	// 	// Giải mã chuỗi JSON
+	// 	const order = JSON.parse(orderDetail)
+	// 	let num = order.order || null // c0
+	// 	let convert
+	// 	if (isNaN(num)) {
+	// 		const [decoded, originalNum] = decodeTableNumber(num)
+	// 		convert = decoded
+	// 	} else {
+	// 		convert = encodeTableNumber(Number(num))
+	// 	}
 
-		setIdTable(convert)
-	}, [router?.query])
+	// 	setIdTable(convert)
+	// }, [router?.query])
 
 	const onLoadMore = (page) => {
 		setLoading(true)

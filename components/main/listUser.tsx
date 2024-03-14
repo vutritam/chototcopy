@@ -14,16 +14,18 @@ const ListUser: React.FC = (props) => {
 					<List.Item.Meta
 						avatar={
 							<Avatar
-								src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item?.productId?.file}`}
+								src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item?.productId[0]?.file}`}
 							/>
 						}
-						title={<a href="https://ant.design">{item.productId.name}</a>}
+						title={<a href="https://ant.design">{item.productId[0].name}</a>}
 						description={
 							<>
-								<p>{item?.productId?.Description}</p>
+								<p>{item?.productId[0]?.Description}</p>
 								<span>
 									Giá:
-									<span style={{ color: 'blue', marginLeft: '10px' }}>{item.productId.price}</span>
+									<span style={{ color: 'blue', marginLeft: '10px' }}>
+										{item.productId[0].price}
+									</span>
 								</span>
 							</>
 						}

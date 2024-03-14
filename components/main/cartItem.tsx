@@ -148,7 +148,7 @@ const CartItem: React.FC = (props) => {
 
 	useEffect(() => {
 		const totalPrice = dataSubmit.reduce((acc: number, curr: DataSubmitItem) => {
-			acc += curr.productId.price
+			acc += curr.productId[0].price
 
 			return acc
 		}, 0)
@@ -250,6 +250,8 @@ const CartItem: React.FC = (props) => {
 				return itemsAdmin
 		}
 	}
+
+	console.log(dataSubmit, 'dataSubmit')
 
 	return (
 		<>

@@ -35,6 +35,7 @@ const notificationSoundPath = '/sound/am-thanh-thong-bao-messenger-www_hieuung_c
 import HelperMessageToolTip from './helper/avatarTooltip'
 import { CONST_TYPE_KEY_VALUE, CONST_TYPE_SOCKET } from '@/constanst/constanst.const'
 import Toasty from '../common/toasty'
+import useSocket from '../common/socketConfig/socketClient'
 
 const itemsRender: MenuProps['items'] = [
 	{
@@ -99,13 +100,12 @@ const AvatarComponent: React.FC = () => {
 			dataNoti: [],
 		},
 	])
-	const [socket, setSocket] = React.useState<any>(null)
 	const elementBellOrder = useRef()
 	const elementBellOrderEmployee = useRef()
 	const elementBellAdmin = useRef()
 	const [playNotification, { sound }] = useSound(notificationSoundPath)
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-
+	const socket = useSocket(ENV_HOST)
 	let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
 	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 
@@ -185,30 +185,16 @@ const AvatarComponent: React.FC = () => {
 	}
 
 	useEffect(() => {
-		const initSocket = () => {
-			const newSocket = io(ENV_HOST)
-			newSocket.on('connect', () => {
-				console.log('Socket connected')
-			})
-			newSocket.on('disconnect', () => {
-				console.log('Socket disconnected')
-			})
-			setSocket(newSocket)
-		}
-
-		initSocket()
-	}, [ENV_HOST])
-
-	useEffect(() => {
 		if (messageOrder) {
 			Toasty.error(messageOrder)
 		}
+		setMessageOrder('')
 	}, [messageOrder])
 
 	useEffect(() => {
 		const idTableQuery = processRouterQuery(router?.query?.order)
 		if (idTableQuery) {
-			setIdTable(idTableQuery)
+			setIdTable(idTableQuery?.tableNumber)
 		}
 	}, [router.query])
 
@@ -339,8 +325,6 @@ const AvatarComponent: React.FC = () => {
 			}
 			socket.emit(CONST_TYPE_SOCKET.JoinRoom, roomName)
 			socket.on(CONST_TYPE_SOCKET.Response, async (response) => {
-				console.log(response.data, 'employee')
-
 				if (response.data.length > 0) {
 					await dispatch(setMessage(response.data))
 					playNotification()
@@ -349,6 +333,23 @@ const AvatarComponent: React.FC = () => {
 				}
 			})
 			socket.on(CONST_TYPE_SOCKET.ResponseEmployee, async (response) => {
+				if (response.data.length > 0) {
+					await dispatch(setMessageEmployee(response.data))
+					playNotification()
+				}
+			})
+			socket.on('reponseMuptipleUser', async (response) => {
+				console.log(response, 'responseUser')
+
+				if (response.data.length > 0) {
+					await dispatch(setMessage(response.data))
+					playNotification()
+				} else {
+					setMessageOrder(response.message)
+				}
+			})
+			socket.on('reponseMuptipleEmployee', async (response) => {
+				console.log(response, 'response')
 				if (response.data.length > 0) {
 					await dispatch(setMessageEmployee(response.data))
 					playNotification()

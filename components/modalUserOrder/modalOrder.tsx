@@ -6,18 +6,22 @@ import io from 'socket.io-client'
 import axiosConfig from '../../pages/api/axiosConfigs'
 import L10N from '../../L10N/en.json'
 import Toasty from '../common/toasty'
+import useSocket from '../common/socketConfig/socketClient'
 
 interface inputProps {
 	label: string
 	tittle: string
 	item: any
+	type: string
+	styles?: string
 }
 const CommonModal = (props: inputProps): JSX.Element => {
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
+	const [dataItem, setDataItem] = useState<any>({})
 	const [getLocationOrderUser, setGetLocationOrderUser] = useState({})
 	const [dataInput, setDataInput] = useState({
-		quantity: 1,
+		quantity: props.type === 'changeOrder' ? props?.item?.quantity : 1,
 		description: '',
 	})
 
@@ -30,7 +34,6 @@ const CommonModal = (props: inputProps): JSX.Element => {
 			{text}
 		</Space>
 	)
-	const [socket, setSocket] = useState(null)
 	const fetchLocation = async () => {
 		const locationUser = JSON.parse(sessionStorage.getItem('location_user'))
 		let response = await axiosConfig.post(`/location/getLocationById/${locationUser?.locationId}`)
@@ -51,33 +54,47 @@ const CommonModal = (props: inputProps): JSX.Element => {
 			sessionStorage.getItem('user') !== null
 		) {
 			fetchLocation()
+			const convertDataCommon = props.type === 'changeOrder' ? props.item.productId : props.item
+			setDataItem(convertDataCommon)
 		}
-	}, [open])
+		if (!open) {
+			setDataInput({
+				...dataInput,
+				quantity: props.type === 'changeOrder' ? props?.item?.quantity : 1,
+			})
+		}
+	}, [open, props?.item?.quantity])
+
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-
-	useEffect(() => {
-		const newSocket = io(ENV_HOST)
-		setSocket(newSocket)
-
-		return () => {
-			newSocket.disconnect()
-		}
-	}, [ENV_HOST])
+	const socket = useSocket(ENV_HOST)
 
 	const handleOk = () => {
 		setOpen(false)
 		setConfirmLoading(false)
-		if (socket) {
-			// Gửi sự kiện tới Socket.IO server
-			socket.emit('myEvent', {
+		let obj = {}
+		let eventName = 'myEvent'
+		if (dataInput?.quantity > 0) {
+			obj = {
+				type: 'create',
 				tableNumber: getLocationOrderUser?.tableNumber,
-				productId: props.item.id,
+				productId: dataItem._id,
 				locationId: getLocationOrderUser?.location?._id,
 				quantity: dataInput.quantity,
 				description: dataInput.description,
 				status: 'order_inprogess',
-			})
-
+			}
+		} else {
+			obj = {
+				id: props.item._id,
+				type: 'delete',
+				tableNumber: getLocationOrderUser?.tableNumber,
+				locationId: getLocationOrderUser?.location?._id,
+				status: 'order_deleted',
+			}
+		}
+		if (socket) {
+			// Gửi sự kiện tới Socket.IO server
+			socket.emit(eventName, obj)
 			socket.emit('getProductOrder', {
 				message: 'Gửi sự kiện lấy sản phẩm',
 				locationId: getLocationOrderUser?.location?._id,
@@ -103,8 +120,15 @@ const CommonModal = (props: inputProps): JSX.Element => {
 
 	return (
 		<>
-			<Button type="default" onClick={showModal}>
-				{props.label}
+			<Button
+				type={props.type === 'changeOrder' ? 'primary' : 'default'}
+				className={props.styles}
+				onClick={showModal}
+				disabled={dataItem && dataItem.quantity <= 0}
+			>
+				{props.type === 'changeOrder'
+					? `(${props?.item?.quantity}) ${props.label}`
+					: '' + props.label}
 			</Button>
 			<Modal
 				title={confirmLoading ? '' : <p style={{ color: 'blue' }}>{props.tittle}</p>}
@@ -119,11 +143,18 @@ const CommonModal = (props: inputProps): JSX.Element => {
 					<Button
 						key="3"
 						type="primary"
+						style={{
+							background: props.type === 'changeOrder' && dataInput.quantity <= 0 ? 'red' : '',
+						}}
 						loading={confirmLoading}
 						onClick={handleOk}
-						disabled={!getLocationOrderUser?.location?._id || dataInput.quantity <= 0}
+						disabled={
+							props.type !== 'changeOrder'
+								? !getLocationOrderUser?.location?._id || dataInput.quantity <= 0
+								: false
+						}
 					>
-						Đặt ngay
+						{props.type === 'changeOrder' && dataInput.quantity <= 0 ? 'Xóa món' : 'Đặt ngay'}
 					</Button>,
 				]}
 			>
@@ -136,21 +167,21 @@ const CommonModal = (props: inputProps): JSX.Element => {
 				) : (
 					<List>
 						<List.Item
-							key={props.item.id}
+							key={dataItem.id}
 							actions={[
 								<IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
 								<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
 							]}
 						>
 							<List.Item.Meta
-								avatar={<Avatar src={`http://localhost:3000/images/${props.item.file}`} />}
-								title={props.item.name}
+								avatar={<Avatar src={`http://localhost:3000/images/${dataItem.file}`} />}
+								title={dataItem.name}
 								description={
 									<div
 										style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
 									>
-										<Tooltip placement="top" title={props.item.Description}>
-											{props.item.Description}
+										<Tooltip placement="top" title={dataItem.Description}>
+											{dataItem.Description}
 										</Tooltip>
 									</div>
 								}
@@ -159,9 +190,9 @@ const CommonModal = (props: inputProps): JSX.Element => {
 						<Space>
 							<h5>Nhập số lượng: </h5>
 							<InputNumber
-								min={1}
-								max={10}
-								defaultValue={1}
+								min={0}
+								max={100}
+								defaultValue={props.type === 'changeOrder' ? dataItem.quantity : 1}
 								value={dataInput.quantity}
 								onChange={onChangeQuantity}
 							/>

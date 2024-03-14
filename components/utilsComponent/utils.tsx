@@ -1,3 +1,5 @@
+import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
+
 export const handleTextL10N = (text: string, arrayNumberReplace: Array) => {
 	let newString = text
 	if (arrayNumberReplace !== null && arrayNumberReplace.length > 0) {
@@ -23,12 +25,25 @@ export const sortByStatus = (array, status) => {
 }
 
 export const sortByLatestDate = (data, datePropertyName) => {
-	console.log(data, 'data sort')
-
 	return data.sort((a, b) => {
 		const dateA = a[datePropertyName]
 		const dateB = b[datePropertyName]
 
 		return dateB - dateA // Sắp xếp giảm dần (mới nhất đầu tiên)
 	})
+}
+
+export const getListProduct = async (dispatch, setLoading, setDataList) => {
+	try {
+		const allProduct = await dispatch(fetchAllProduct())
+		setLoading(true)
+
+		if (allProduct?.payload?.success) {
+			setLoading(false)
+			setDataList(allProduct?.payload?.data)
+		}
+	} catch (error) {
+		// Handle errors here
+		console.error('Error fetching data:', error)
+	}
 }

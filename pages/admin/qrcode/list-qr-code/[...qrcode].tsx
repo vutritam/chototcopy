@@ -84,8 +84,6 @@ export default function ListQrCodePage() {
 	const [values, setNewValue] = React.useState('')
 
 	const handleCheckCount = (item, renderComment) => {
-		console.log(item)
-
 		if (item.children && item.children.length > 0) {
 			item.count++
 			return (

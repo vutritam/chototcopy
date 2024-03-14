@@ -14,6 +14,7 @@ import CommonTable from '@/components/common/commonTable/commonTableListOrder'
 import CartItem from '@/components/main/cartItem'
 import { ReloadOutlined } from '@ant-design/icons'
 import EventEmitter from 'events'
+import useSocket from '@/components/common/socketConfig/socketClient'
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
 	const [open, setOpen] = useState(false)
@@ -22,7 +23,6 @@ const OrderByUser: React.FC = () => {
 	const [orderData, setOrderData] = useState(null)
 	const [data, setData] = useState([])
 	const list = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
-	const [socket, setSocket] = useState(null)
 	const [refreshPage, setRefresh] = useState(false)
 	const [dummyOrderConfirm, setDummyConfirm] = useState([])
 	const [loadingDataTable, setLoadingDataTable] = useState(false)
@@ -31,20 +31,7 @@ const OrderByUser: React.FC = () => {
 		sessionStorage.getItem('user') && JSON.parse(sessionStorage.getItem('user'))
 
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-
-	useEffect(() => {
-		const newSocket = io(ENV_HOST)
-		newSocket.on('connect', () => {
-			console.log('Socket connected')
-		})
-		newSocket.on('disconnect', () => {
-			console.log('Socket disconnected')
-		})
-		setSocket(newSocket)
-		return () => {
-			newSocket.disconnect()
-		}
-	}, [ENV_HOST])
+	const socket = useSocket(ENV_HOST)
 	const eventEmitter = new EventEmitter()
 
 	useEffect(() => {

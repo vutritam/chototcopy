@@ -33,6 +33,7 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 	const isAdmin = condition === 'admin'
 	const isUserOrder = condition === 'userOrder'
 	const isCheckUserOrderData = !isAdmin ? sortByStatus(dataMessage, 'order_inprogess') : dataMessage
+
 	const router = useRouter()
 	let sessionOrder =
 		sessionStorage.getItem('location_user') !== null &&
@@ -103,22 +104,15 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 
 	const renderOrderItem = (orderSummary, ele, dataMessage) => {
 		if (!_.isNil(orderSummary) && ele && ele.tableNumber) {
-			const findOrderSuccess = dataMessage?.some(
-				(item) => item.status === 'order_success' && !item.isPaid
-			)
 			const isCheckExistedOrderNotConfirm =
 				orderSummary[ele.tableNumber]?.confirmedItems ===
 					orderSummary[ele.tableNumber]?.totalOrderedItems ||
 				orderSummary[ele.tableNumber]?.confirmedItems +
 					orderSummary[ele.tableNumber]?.canceledItems ===
 					orderSummary[ele.tableNumber]?.totalOrderedItems
-			if (!isCheckExistedOrderNotConfirm && !ele.isPaid && findOrderSuccess)
-				return true // chưa xác nhận hết và chưa thanh toán
-			else if (isCheckExistedOrderNotConfirm && !ele?.isPaid && findOrderSuccess)
-				return true // đã xác nhận hết và chưa thanh toán
-			else if (isCheckExistedOrderNotConfirm && ele?.isPaid && !findOrderSuccess)
-				return false // đã xác nhận hết và đã thanh toán
-			else return true
+
+			if (!isCheckExistedOrderNotConfirm) return true // chưa xác nhận hết và chưa thanh toán
+			else return false
 		}
 	}
 

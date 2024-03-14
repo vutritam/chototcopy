@@ -21,11 +21,15 @@ import ModalConfirm from '@/components/common/commonModal/modalReasonChangeLocat
 import { io } from 'socket.io-client'
 import axiosConfig from '../../api/axiosConfigs'
 import { usePathname, useSearchParams } from 'next/navigation'
+import useSocket from '@/components/common/socketConfig/socketClient'
 
 function Manage_account() {
 	const user = useSelector((state: any) => state.user.account.user)
 	const userListAcceptRequestUsers = useSelector((state: any) => state.user.isAcceptRequestUsers)
-	const [editMode, setEditMode] = useState('')
+	const searchParams = useSearchParams()
+	const pathname = usePathname()
+	const search = searchParams.get('action')
+	const [editMode, setEditMode] = useState(search)
 	const [selectedLocation, setLocation] = useState({ _id: '', nameLocation: '' })
 	const [disabledLocation, setDisabledLocation] = useState(false)
 	const router = useRouter()
@@ -39,8 +43,8 @@ function Manage_account() {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const passwordInputRef = useRef(null)
 	const reNewPasswordInputRef = useRef(null)
-	const [socket, setSocket] = useState<any>(null)
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+	const socket = useSocket(ENV_HOST)
 	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
 	useEffect(() => {
 		const fetchDataUser = async () => {
@@ -115,17 +119,6 @@ function Manage_account() {
 		if (!show && !reason) {
 			setLoadingConfirm(false)
 		} else if (selectedLocation?._id !== '' && reason !== '') {
-			console.log(
-				{
-					isRequest: 'change_location',
-					reason: reason,
-					_id: user?.data?._id,
-					locationId: selectedLocation?._id,
-					status: 'request_pending',
-				},
-				'o'
-			)
-
 			setLoadingConfirm(true)
 			const { payload } = await dispatch(
 				updateIsChangeRequestUser({
@@ -148,8 +141,6 @@ function Manage_account() {
 		setReason('')
 		setOpen(show)
 	}
-	const searchParams = useSearchParams()
-	const pathname = usePathname()
 
 	const createQueryString = useCallback(
 		(name: string, value: string) => {
@@ -160,9 +151,8 @@ function Manage_account() {
 		},
 		[searchParams]
 	)
-	const search = searchParams.get('action')
+
 	useEffect(() => {
-		console.log(search, 'fd')
 		if (search !== null) {
 			setEditMode(search)
 		}
@@ -176,7 +166,6 @@ function Manage_account() {
 		}
 		setEditMode(value)
 	}
-	console.log(editMode, 'sdsa')
 
 	const initialValues = {
 		username: user?.data?.username,
@@ -255,20 +244,6 @@ function Manage_account() {
 		}
 		setLocation({ _id: findNameLocation?._id, nameLocation: findNameLocation?.nameLocation })
 	}
-
-	useEffect(() => {
-		const initSocket = () => {
-			const newSocket = io(ENV_HOST)
-			newSocket.on('connect', () => {
-				console.log('Socket connected')
-			})
-			newSocket.on('disconnect', () => {
-				console.log('Socket disconnected')
-			})
-			setSocket(newSocket)
-		}
-		initSocket()
-	}, [ENV_HOST])
 
 	const renderEditPass = () => {
 		return (
@@ -468,7 +443,7 @@ function Manage_account() {
 			>
 				<p>Yêu cầu đổi địa điểm của bạn đã được chấp nhận (vui lòng đăng nhập lại)</p>
 			</Modal>
-			{editMode !== '' ? (
+			{editMode ? (
 				renderComponent(editMode)
 			) : (
 				<div style={{ display: 'flex', gap: '10px' }}>

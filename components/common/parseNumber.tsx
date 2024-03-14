@@ -5,9 +5,9 @@ import { decodeTableNumber, encodeTableNumber } from './hashCode'
 export function processRouterQuery(routerQuery) {
 	let num = routerQuery || {}
 	let convert
-	if (!_.isNil(num) && !_.isObject(num)) {
-		convert = decodeTableNumber(num)
-	}
+	// if (!_.isNil(num) && _.isObject(num)) {
+	convert = decodeTableNumber(num)
+	// }
 	console.log(convert, 'ggg')
 
 	return convert

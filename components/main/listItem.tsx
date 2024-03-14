@@ -2,10 +2,11 @@ import { MessageOutlined, StarOutlined } from '@ant-design/icons'
 import { Button, Image, List, Space, Spin } from 'antd'
 import React, { useState, useEffect } from 'react'
 import CommonModal from '../modalUserOrder/modalOrder'
-import { useRouter } from 'next/router'
+import _ from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
 import Link from 'next/link'
+import { getListProduct } from '../utilsComponent/utils'
 // import ProductDetail from '@/pages/employee/product-detail/[detail]'
 // import SearchParam from '@/utils/searchParamQuery'
 
@@ -35,19 +36,15 @@ const ListItem = (props: inputProps) => {
 	const [loading, setLoading] = useState(true)
 	const [dataList, setDataList] = useState([])
 	const dataStore = useSelector((state) => state.products.products.data)
+	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
+
 	const dispatch = useDispatch()
 
 	useEffect(() => {
-		setLoading(true)
 		;(async () => {
-			const allProduct = await dispatch(fetchAllProduct())
-			setLoading(true)
-			if (allProduct?.payload?.success) {
-				setLoading(false)
-				setDataList(allProduct?.payload?.data)
-			}
+			await getListProduct(dispatch, setLoading, setDataList)
 		})()
-	}, [])
+	}, [dispatch, setLoading, setDataList])
 
 	useEffect(() => {
 		if (dataStore?.success) {
@@ -56,12 +53,32 @@ const ListItem = (props: inputProps) => {
 	}, [dataStore])
 
 	const renderBtn = (isPage, item = null) => {
+		let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
+		const itemAllOrder =
+			itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
+				? itemOrder.data
+				: itemOrder
+		const filterItemOrderPending = itemAllOrder?.find(
+			(element) =>
+				element?.productId?._id === item._id &&
+				getLocationOrderUser?.tableNumber === element?.tableNumber &&
+				element?.status === 'order_inprogess'
+		)
+		const currentOrderItem = itemAllOrder?.find(
+			(element) => element?.productId?._id === item._id && element?.status === 'order_inprogess'
+		)
+
 		switch (isPage) {
 			case 'order':
 				return (
-					item.quantity > 0 && (
-						<CommonModal tittle="Xác nhận chọn món này ?" label="chọn ngay" item={item} />
-					)
+					<>
+						<CommonModal
+							tittle={filterItemOrderPending ? 'Đặt thêm món ?' : 'Xác nhận chọn món này ?'}
+							label={!filterItemOrderPending ? 'Đặt ngay' : 'Đặt thêm'}
+							type={filterItemOrderPending ? 'changeOrder' : 'order'}
+							item={filterItemOrderPending ? currentOrderItem : item}
+						/>
+					</>
 				)
 			case 'admin':
 				return (
@@ -77,12 +94,6 @@ const ListItem = (props: inputProps) => {
 							<Link href="/employee/warehouse/history-transactions">Lịch sử giao dịch</Link>
 						</Button>
 						<Button>
-							{/* <SearchParam
-								pathUrl={'detail'}
-								pathName="/employee/product-detail"
-								param={item.id}
-								title={'ádasd'}
-							/> */}
 							<Link href={`/employee/product-detail/${item.id}`}>Chi tiết sản phẩm</Link>
 						</Button>
 					</>
@@ -127,7 +138,7 @@ const ListItem = (props: inputProps) => {
 							quantity: item.quantity,
 							status: item.status,
 							viewer: item.Viewer,
-							id: item._id,
+							_id: item._id,
 						}
 					})
 				}

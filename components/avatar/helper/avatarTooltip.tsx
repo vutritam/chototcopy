@@ -40,11 +40,11 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 	const [data, setData] = useState<Array<[]>>([])
 
 	useEffect(() => {
+		const filterItemOrder = isDataMessage?.filter((item) => item.status !== 'order_done')
 		const sortItemByTableNumber = !isAdmin
-			? isDataMessage.reduce((acc: product[], order) => {
+			? filterItemOrder.reduce((acc: product[], order) => {
 					const { tableNumber, quantity } = order
 					const existingOrder = acc.find((group) => group.tableNumber === tableNumber)
-
 					if (existingOrder) {
 						existingOrder.quantity += quantity
 					} else {
@@ -53,8 +53,7 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 					return acc
 			  }, [])
 			: dataMessage
-		const sortItemFilter = sortItemByTableNumber?.filter((item) => item.status !== 'order_done')
-		setData(sortItemFilter)
+		setData(sortItemByTableNumber)
 	}, [dataMessage.length])
 
 	return (
@@ -87,7 +86,7 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 							key={'red'}
 							open={showMessage}
 						>
-							<Badge count={countMessage > 10 ? `${10}+` : countMessage}>
+							<Badge dot={countMessage ? true : false}>
 								<BellOutlined
 									ref={elementBellOrder}
 									className="bell style_bell"

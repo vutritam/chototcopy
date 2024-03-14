@@ -14,6 +14,9 @@
     display: flex;
     align-items: center;
 }
+.spacing-btn {
+  margin-left: 10px;
+}
 .flex-table {
   width: 200px;
   height: 100px;

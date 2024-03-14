@@ -1,27 +1,46 @@
 // Import thư viện crypto-js
 import CryptoJS from 'crypto-js'
 
+const hexToBase64 = (hexString) => {
+	// Chuyển đổi chuỗi hex sang mảng byte
+	const bytes = []
+	for (let i = 0; i < hexString.length; i += 2) {
+		bytes.push(parseInt(hexString.substr(i, 2), 16))
+	}
+	// Chuyển đổi mảng byte sang chuỗi base64
+	const base64String = CryptoJS.enc.Base64.stringify(CryptoJS.lib.WordArray.create(bytes))
+	return base64String
+}
+
 // Mã hóa số bàn thành chuỗi
-const encodeTableNumber = (tableNumber: number) => {
-	const encryptedString = encodeURIComponent(
-		CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(tableNumber.toString()))
-	)
+const encodeTableNumber = (tableNumber: number, locationId: string) => {
+	const dataToEncode = tableNumber.toString() + '_' + locationId
+	const encryptedString = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(dataToEncode))
 	return encryptedString
 }
 
-// Giải mã chuỗi thành số bàn
-const decodeTableNumber = (encodedString: string) => {
-	let decryptedNumber = null
+const decodeTableNumber = (encodedString) => {
+	let decryptedData = null
 	try {
-		decryptedNumber = parseInt(
-			CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(encodedString)),
-			10
+		// Giải mã chuỗi từ base64
+		const decodedString = CryptoJS.enc.Base64.parse(decodeURIComponent(encodedString)).toString(
+			CryptoJS.enc.Utf8
 		)
+
+		// Phân tách chuỗi đã giải mã thành tableNumber và locationId
+		const decodedArray = decodedString.split('_')
+		console.log(decodedArray, 'decodedArray')
+
+		const decryptedNumber = parseInt(decodedArray[0], 10)
+		const decryptedLocationId = decodedArray[1]
+
+		decryptedData = { tableNumber: decryptedNumber, locationId: decryptedLocationId }
 	} catch (error) {
 		console.error('Error decoding:', error.message)
 	}
-	return decryptedNumber
+	return decryptedData
 }
+
 export { encodeTableNumber, decodeTableNumber }
 // // Sử dụng
 // const tableNumber = 42;

@@ -35,6 +35,14 @@ export const fetchAllProduct = createAsyncThunk<any, string>('api/fetchAllProduc
 	return response.data
 })
 
+export const fetchAllProductPaginated = createAsyncThunk<any, string>(
+	'api/fetchAllProductPaginated',
+	async (options) => {
+		let response = await axiosConfig.post('/products/getPaginatedResults', options)
+		return response.data
+	}
+)
+
 const productSlice = createSlice({
 	name: 'products',
 	initialState: {

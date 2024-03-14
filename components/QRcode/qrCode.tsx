@@ -93,14 +93,14 @@ const QRcode: React.FC = () => {
 			alert('Không vượt quá 100')
 			return
 		}
-
+		console.log(location, 'location nè')
 		let convertNumber = Number(value)
 		for (let index = 1; index <= convertNumber; index++) {
 			let table = {
 				title: `bàn số ${index}`,
 				tableNumber: index,
-				linkOrder: `http://localhost:3000/order/${encodeTableNumber(index)}`,
-				code: encodeTableNumber(index),
+				linkOrder: `http://localhost:3000/order/${encodeTableNumber(index, location)}`,
+				code: encodeTableNumber(index, location),
 			}
 
 			if (!array.includes(table)) {

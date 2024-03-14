@@ -11,6 +11,7 @@ import { io } from 'socket.io-client'
 import CommonTable from '@/components/common/commonTable/commonTableListOrder'
 import { Button } from 'antd'
 import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
+import useSocket from '@/components/common/socketConfig/socketClient'
 
 const OrderByAllUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
@@ -25,14 +26,10 @@ const OrderByAllUser: React.FC = () => {
 	const [refreshPage, setRefresh] = useState(false)
 	const [dummyOrderConfirm, setDummyConfirm] = useState([])
 	const [loadingDataTable, setLoadingDataTable] = useState(false)
-	const [socket, setSocket] = useState(null)
 	const dataAllOrderAdmin = useSelector((state: any) => state.dataOrder?.dataAllOrderAdmin?.data)
-
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+	const socket = useSocket(ENV_HOST)
 	useEffect(() => {
-		// Fetch dữ liệu ban đầu và cập nhật state
-		const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-		const newSocket = io(ENV_HOST)
-		setSocket(newSocket)
 		let obj = {
 			location: getLocationEmployee?.data?.locationId,
 			userRole: getLocationEmployee?.data?.roles[0],
@@ -60,9 +57,6 @@ const OrderByAllUser: React.FC = () => {
 		}
 
 		fetchData()
-		return () => {
-			newSocket.disconnect()
-		}
 	}, [refreshPage])
 
 	useEffect(() => {

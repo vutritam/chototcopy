@@ -9,6 +9,7 @@ import NotificationTitle from '../notificationTitle/notificationTitle'
 import { processRouterQuery } from '../common/parseNumber'
 import ComfirmLocationOrder from '../confirmLocation/confirmLocation'
 import CommonFilterListItem from '../common/commonFilterListItem/commonFilter'
+import ModalListMenu from '../modalMenu/modalListMenu'
 
 export default function OrderProducts() {
 	const router = useRouter()
@@ -25,51 +26,64 @@ export default function OrderProducts() {
 		(state: any) => state.dataOrder?.dataOrderByNumberTable?.data
 	)
 	const [allProduct, setAllProduct] = React.useState([])
-	const [idTable, setIdTable] = React.useState<any>(0)
-	const [show, setShow] = React.useState(false)
+	// const [idTable, setIdTable] = React.useState<any>(0)
+	const [showListMenu, setShowListMenu] = React.useState(false)
 
 	const handleShow = () => {
-		setShow(false)
+		setShowListMenu(!showListMenu)
 	}
 
-	const handleIdTableNumber = (convertedValue, getLocationOrder) => {
-		if (!_.isNil(convertedValue) && getLocationOrder !== null) {
-			// Kiểm tra trước khi so sánh
-			if (getLocationOrder?.tableNumber === convertedValue) {
-				setShow(false)
-			} else {
-				setShow(true)
-			}
-		} else if (getLocationOrder == null && !getLocationOrder?.location) {
-			setShow(true)
-		}
-	}
+	// const handleIdTableNumber = (convertedValue, getLocationOrder) => {
+	// 	if (!_.isNil(convertedValue) && getLocationOrder !== null) {
+	// 		// Kiểm tra trước khi so sánh
+	// 		if (getLocationOrder?.tableNumber === convertedValue) {
+	// 			setShow(false)
+	// 			setShowListMenu(true)
+	// 		} else {
+	// 			setShow(true)
+	// 			setShowListMenu(false)
+	// 		}
+	// 	} else if (getLocationOrder == null && !getLocationOrder?.location) {
+	// 		setShow(true)
+	// 		setShowListMenu(false)
+	// 	}
+	// }
 
-	const handleCheckPathName = (convertedValue, getLocationOrder) => {
-		const pathString = sessionStorage.getItem('routerAsPath')
-		if (
-			(!isNaN(convertedValue) && !_.isNil(convertedValue)) ||
-			(!_.isNil(idTable) && !_.isNil(getLocationOrder))
-		) {
-			sessionStorage.setItem('routerAsPath', router.asPath)
-			handleIdTableNumber(convertedValue, getLocationOrder)
-		} else if (
-			isNaN(convertedValue) &&
-			_.isNil(convertedValue) &&
-			pathString !== null &&
-			!_.isNil(getLocationOrder)
-		) {
-			router.push(pathString)
-		}
-	}
+	// const handleCheckPathName = (convertedValue, getLocationOrder) => {
+	// 	const pathString = sessionStorage.getItem('routerAsPath')
+	// 	if (
+	// 		(!isNaN(convertedValue) && !_.isNil(convertedValue)) ||
+	// 		(!_.isNil(idTable) && !_.isNil(getLocationOrder))
+	// 	) {
+	// 		sessionStorage.setItem('routerAsPath', router.asPath)
+	// 		setShowListMenu(true)
+	// 		// handleIdTableNumber(convertedValue, getLocationOrder)
+	// 	} else if (
+	// 		isNaN(convertedValue) &&
+	// 		_.isNil(convertedValue) &&
+	// 		pathString !== null &&
+	// 		!_.isNil(getLocationOrder)
+	// 	) {
+	// 		router.push(pathString)
+	// 	}
+	// }
 
 	React.useEffect(() => {
-		const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
+		// const getLocationOrder = JSON.parse(sessionStorage.getItem('location_user'))
 		const convertedValue = processRouterQuery(router?.query?.order) // kiểm tra xem string có được decode ra đúng số hay ko
-		handleCheckPathName(convertedValue, getLocationOrder)
+
+		// handleCheckPathName(convertedValue, getLocationOrder)
 
 		if (!_.isNil(convertedValue)) {
-			setIdTable(convertedValue)
+			sessionStorage.setItem(
+				'location_user',
+				JSON.stringify({
+					tableNumber: convertedValue?.tableNumber,
+					locationId: convertedValue.locationId,
+				})
+			)
+			setShowListMenu(true)
+			// setIdTable(convertedValue)
 		}
 	}, [router?.query?.order])
 
@@ -110,6 +124,16 @@ export default function OrderProducts() {
 		) : null
 	}
 
+	// const onSetLocationData = async () => {
+
+	// 	await dispatch(
+	// 		fetchAllOrderByNumberTableAndLocationUser({
+	// 			tableNumber: props.idTable,
+	// 			locationId: dataInput.locationId,
+	// 		})
+	// 	)
+	// 	// window.location.reload()
+	// }
 	React.useEffect(() => {
 		const fetchData = async () => {
 			const { payload } = await dispatch(fetchAllProduct())
@@ -119,6 +143,14 @@ export default function OrderProducts() {
 		}
 		fetchData()
 	}, [])
+
+	// React.useEffect(() => {
+	// 	if (show) {
+	// 		setShowListMenu(false)
+	// 	} else {
+	// 		setShowListMenu(true)
+	// 	}
+	// }, [show])
 
 	React.useEffect(() => {
 		let sessionOrder = sessionStorage.getItem('warning_text_order')
@@ -142,13 +174,14 @@ export default function OrderProducts() {
 	return (
 		<div>
 			{renderNotiItemOrder()}
-			<ComfirmLocationOrder
+			{/* <ComfirmLocationOrder
 				label="Xác nhận nơi đặt"
 				tittle="Xác nhận nơi đặt"
 				open={show}
 				handleShow={handleShow}
 				idTable={idTable}
-			/>
+			/> */}
+			<ModalListMenu show={showListMenu} handleShow={handleShow} />
 			<CommonFilterListItem allProduct={allProduct} />
 		</div>
 	)

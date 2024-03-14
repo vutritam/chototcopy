@@ -62,5 +62,6 @@ export const itemsOrder = [
 		<DesktopOutlined />
 	),
 	getItem(<Link href={'payment'}>Thanh toán</Link>, '2', <TeamOutlined />),
+	getItem(<Link href={'payment'}>Danh mục</Link>, '3', <TeamOutlined />),
 	// getItem('Thanh toán', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
 ]
