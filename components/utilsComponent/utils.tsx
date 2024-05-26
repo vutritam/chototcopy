@@ -47,3 +47,25 @@ export const getListProduct = async (dispatch, setLoading, setDataList) => {
 		console.error('Error fetching data:', error)
 	}
 }
+
+export const onScrollList = async (
+	e: React.UIEvent<HTMLElement, UIEvent>,
+	ContainerHeight: number,
+	setCountNumber,
+	countNumber,
+	dataAllList
+) => {
+	try {
+		const isNearBottom =
+			Math.abs(e.currentTarget.scrollHeight - e.currentTarget.scrollTop - ContainerHeight) <= 1
+
+		const hasNextPage = dataAllList && countNumber <= Math.ceil(dataAllList.length / 3)
+
+		if (isNearBottom && hasNextPage) {
+			setCountNumber(countNumber + 1)
+		}
+	} catch (error) {
+		// Handle errors here
+		console.error('Error fetching data:', error)
+	}
+}

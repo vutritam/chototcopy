@@ -10,6 +10,7 @@ import { processRouterQuery } from '../common/parseNumber'
 import ComfirmLocationOrder from '../confirmLocation/confirmLocation'
 import CommonFilterListItem from '../common/commonFilterListItem/commonFilter'
 import ModalListMenu from '../modalMenu/modalListMenu'
+import Link from 'next/link'
 
 export default function OrderProducts() {
 	const router = useRouter()
@@ -183,6 +184,11 @@ export default function OrderProducts() {
 			/> */}
 			<ModalListMenu show={showListMenu} handleShow={handleShow} />
 			<CommonFilterListItem allProduct={allProduct} />
+			<div style={{ display: 'flex', justifyContent: 'end' }}>
+				<Link href="#" style={{ fontSize: '13px' }} onClick={() => handleShow()}>
+					Chọn nhanh
+				</Link>
+			</div>
 		</div>
 	)
 }

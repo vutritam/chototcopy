@@ -186,10 +186,7 @@ const CommonFilterListItem = (props: inputProps) => {
 
 	return (
 		<>
-			<div
-				className="catelories"
-				style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '10px' }}
-			>
+			<div className="catelories" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
 				<Space direction="vertical">
 					{itemFilterChecked ? (
 						<Tooltip title="Hủy bỏ tìm kiếm" color={'red'} key={'red'} open={showCancelTooltip}>

@@ -9,6 +9,22 @@
   font-weight: 500;
   font-style: normal;
   }
+  .btn-test {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  .border-full img{
+    border-radius: 50%;
+    height: 210px!important;
+  }
+  .btn-test:active {
+    background-color: #3e8e41;
+    transform: scale(0.95);
+  }
 .style-menu{
   gap: 10px;
     display: flex;

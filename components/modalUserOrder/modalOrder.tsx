@@ -36,6 +36,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 	)
 	const fetchLocation = async () => {
 		const locationUser = JSON.parse(sessionStorage.getItem('location_user'))
+
 		let response = await axiosConfig.post(`/location/getLocationById/${locationUser?.locationId}`)
 
 		if (response.data.success) {
@@ -174,7 +175,7 @@ const CommonModal = (props: inputProps): JSX.Element => {
 							]}
 						>
 							<List.Item.Meta
-								avatar={<Avatar src={`http://localhost:3000/images/${dataItem.file}`} />}
+								avatar={<Avatar src={dataItem.file} />}
 								title={dataItem.name}
 								description={
 									<div

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { UploadOutlined } from '@ant-design/icons'
 import { Button, Upload } from 'antd'
 import { isArray } from 'lodash'
@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 const FileUpload: React.FC = ({ setUpload, dataImage }) => {
 	const [upImage, setUpImage] = useState<UploadFile[]>([])
 	const router = useRouter()
+	console.log(dataImage, 'dataImage')
 
 	const fileList: UploadFile[] =
 		dataImage !== undefined
@@ -16,7 +17,7 @@ const FileUpload: React.FC = ({ setUpload, dataImage }) => {
 						uid: '1',
 						name: dataImage,
 						status: 'done',
-						url: process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${dataImage}`,
+						url: dataImage,
 					},
 			  ]
 			: []
@@ -25,6 +26,7 @@ const FileUpload: React.FC = ({ setUpload, dataImage }) => {
 		setUpImage(value)
 		setUpload({ image: value })
 	}
+
 	return (
 		<>
 			<Upload
@@ -35,12 +37,7 @@ const FileUpload: React.FC = ({ setUpload, dataImage }) => {
 				onChange={handleUpload}
 				defaultFileList={[...fileList]}
 			>
-				<Button
-					disabled={upImage?.fileList && upImage?.fileList.name && true}
-					icon={<UploadOutlined />}
-				>
-					Upload
-				</Button>
+				<Button icon={<UploadOutlined />}>Upload</Button>
 			</Upload>
 		</>
 	)

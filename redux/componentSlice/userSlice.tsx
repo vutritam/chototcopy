@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axiosConfig from '../../pages/api/axiosConfigs'
 
 export const fetchCreatePost = createAsyncThunk<any, string>(
-	'api/fetchCreatePost',
+	'api/fetchCreateUser',
 	async (options) => {
 		let response = await axiosConfig.post('/auth/login', options)
 		return response.data

@@ -10,6 +10,8 @@ import Toasty from '@/components/common/toasty'
 import { io } from 'socket.io-client'
 import axiosConfig from '../../pages/api/axiosConfigs'
 import useSocket from '../common/socketConfig/socketClient'
+import FileUpload from '../common/upload'
+import useImageUpload from '../common/useImageUpload'
 
 const LoginForm: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
@@ -23,6 +25,8 @@ const LoginForm: React.FC = () => {
 	let router = useRouter()
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
 	const socket = useSocket(ENV_HOST)
+	const [UploadImg, setUpload] = useState({ image: '' })
+	const { uploadImage } = useImageUpload()
 
 	useEffect(() => {
 		if (
@@ -96,7 +100,14 @@ const LoginForm: React.FC = () => {
 				}
 			}, 1800)
 		} else {
-			const { payload } = await dispatch(fetchRegisterUser(options))
+			const file = UploadImg?.image?.file
+
+			const imageURL = await uploadImage(file, 'users')
+
+			// Sử dụng URL tải xuống trong dataSubmit
+			const dataSubmit = { ...options, file: imageURL }
+
+			const { payload } = await dispatch(fetchRegisterUser(dataSubmit))
 			if (payload?.success) {
 				setTimeout(() => {
 					setLoadings(false)
@@ -250,6 +261,13 @@ const LoginForm: React.FC = () => {
 									</>
 								))}
 							</Select>
+						</Form.Item>
+						<Form.Item
+							label={<strong>Hình ảnh</strong>}
+							name="file"
+							tooltip="This is a required field"
+						>
+							<FileUpload setUpload={setUpload} />
 						</Form.Item>
 						<Form.Item>
 							<Button

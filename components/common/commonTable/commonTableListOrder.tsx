@@ -180,7 +180,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 					<div>
 						{' '}
 						<Tag color={customData?.status === 'order_deleted' ? 'red' : 'green'}>
-							{customData?.productId[0]?.name.toUpperCase()}
+							{customData?.productId?.name.toUpperCase()}
 						</Tag>
 					</div>
 					<img
@@ -188,7 +188,7 @@ const CommonTable = (props: inputProps): JSX.Element => {
 						height={40}
 						style={{ borderRadius: '50px' }}
 						alt="logo"
-						src={`http://localhost:3000/images/${customData?.productId[0]?.file}`}
+						src={`http://localhost:3000/images/${customData?.productId?.file}`}
 					/>
 				</div>
 			),

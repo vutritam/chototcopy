@@ -275,16 +275,18 @@ const AvatarComponent: React.FC = () => {
 									setUserRequest(payload.username)
 									return
 								}
-								toast('user not found', {
-									position: 'top-center',
-									autoClose: 1000,
-									hideProgressBar: false,
-									closeOnClick: true,
-									pauseOnHover: true,
-									draggable: true,
-									progress: undefined,
-									type: 'error',
-								})
+								sessionStorage.removeItem('user')
+								// toast('user not found', {
+								// 	position: 'top-center',
+								// 	autoClose: 1000,
+								// 	hideProgressBar: false,
+								// 	closeOnClick: true,
+								// 	pauseOnHover: true,
+								// 	draggable: true,
+								// 	progress: undefined,
+								// 	type: 'error',
+								// })
+								router.push('/login')
 								return
 							}
 						} catch (error) {
@@ -470,7 +472,7 @@ const AvatarComponent: React.FC = () => {
 									<Avatar
 										style={{ backgroundColor: '#87d068' }}
 										icon={<UserOutlined />}
-										src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${user?.data?.file}`}
+										src={user?.data?.file}
 									/>
 									{user?.data?.username || userRequest}
 									<DownOutlined />

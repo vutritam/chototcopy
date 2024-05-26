@@ -22,6 +22,7 @@ import { io } from 'socket.io-client'
 import axiosConfig from '../../api/axiosConfigs'
 import { usePathname, useSearchParams } from 'next/navigation'
 import useSocket from '@/components/common/socketConfig/socketClient'
+import useImageUpload from '@/components/common/useImageUpload'
 
 function Manage_account() {
 	const user = useSelector((state: any) => state.user.account.user)
@@ -40,6 +41,7 @@ function Manage_account() {
 	const [reason, setReason] = useState<string>('')
 	const [listLocation, setListLocation] = useState([])
 	const [UploadImg, setUpload] = useState({ image: '' })
+	const [imgShow, setImgShow] = useState('')
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const passwordInputRef = useRef(null)
 	const reNewPasswordInputRef = useRef(null)
@@ -214,18 +216,21 @@ function Manage_account() {
 				}
 				break
 			case 'edit_information':
-				formData.append('_id', info && info.data && info.data.userId)
-				formData.append('username', values.username)
-				formData.append('email', values.email)
-				formData.append('file', dataImage?.originFileObj)
-				formData.append('address', values.address)
-				const { payload } = await dispatch(updateProfileUser(formData))
-				if (payload?.success) {
-					await dispatch(fetchUserById(info.data.userId))
-					Toasty.success(payload?.message)
-					setEditMode('')
-				} else {
-					handleMessageStatus(payload)
+				if (imageURL) {
+					console.log(typeof imageURL, 'imageURL')
+					formData.append('_id', info && info.data && info.data.userId)
+					formData.append('username', values.username)
+					formData.append('email', values.email)
+					formData.append('file', imageURL)
+					formData.append('address', values.address)
+					const { payload } = await dispatch(updateProfileUser(formData))
+					if (payload?.success) {
+						await dispatch(fetchUserById(info.data.userId))
+						Toasty.success(payload?.message)
+						setEditMode('')
+					} else {
+						handleMessageStatus(payload)
+					}
 				}
 				break
 			default:
@@ -236,6 +241,20 @@ function Manage_account() {
 	const handleChangeReason = (value: string) => {
 		setReason(value)
 	}
+	const { imageURL, uploading, error, uploadImage } = useImageUpload()
+	useEffect(() => {
+		const file = UploadImg?.image
+		const removeItemDefault = UploadImg?.image?.fileList?.filter((ele, index) => ele.uid !== '1')
+		if (removeItemDefault?.length > 0) {
+			if (removeItemDefault[0]) {
+				uploadImage(removeItemDefault[0], 'users')
+			}
+		}
+
+		// if (UploadImg?.image !== '') {
+		// 	uploadImage(file)
+		// }
+	}, [UploadImg])
 
 	const handleChangeLocation = (data) => {
 		const findNameLocation = listLocation?.find((item) => item._id === data)
@@ -447,12 +466,12 @@ function Manage_account() {
 				renderComponent(editMode)
 			) : (
 				<div style={{ display: 'flex', gap: '10px' }}>
-					<Image
-						width={200}
-						src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBQps5fClhHJiKDtaRZl2ly6FBIYnIkiORBt-4HqfoYFrU2hFzBqx8hmszfsQ7SzrpPM0&usqp=CAU`}
-					/>
+					<div className="border-full">
+						<Image width={207} src={user?.data?.file} />
+					</div>
 					<div>
 						<h2 style={{ color: 'blue' }}>{user?.data?.username}</h2>
+
 						<div>
 							<span>
 								<b>Vai trò</b>: Nhân viên

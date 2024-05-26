@@ -12,7 +12,7 @@ import {
 	Space,
 	InputNumber,
 } from 'antd'
-import { getListProduct } from '../utilsComponent/utils'
+import { getListProduct, onScrollList } from '../utilsComponent/utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import { useDispatch } from 'react-redux'
 import VirtualList from 'rc-virtual-list'
@@ -72,16 +72,6 @@ const ModalListMenu: React.FC = ({ show, handleShow }) => {
 	}, [countNumber])
 
 	const ContainerHeight = 148 * 3
-	const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
-		const isNearBottom =
-			Math.abs(e.currentTarget.scrollHeight - e.currentTarget.scrollTop - ContainerHeight) <= 1
-
-		const hasNextPage = dataAllList && countNumber <= Math.ceil(dataAllList.length / 3)
-
-		if (isNearBottom && hasNextPage) {
-			setCountNumber(countNumber + 1)
-		}
-	}
 
 	const onChange: CheckboxProps['onChange'] = (e, item) => {
 		let cloneItem = [...checkedListId]
@@ -152,7 +142,7 @@ const ModalListMenu: React.FC = ({ show, handleShow }) => {
 	return (
 		<>
 			<Modal
-				title="Danh sách sản phẩm"
+				title="Danh sách chọn nhanh"
 				open={show}
 				onOk={handleShow}
 				onCancel={handleShow}
@@ -173,7 +163,9 @@ const ModalListMenu: React.FC = ({ show, handleShow }) => {
 						height={ContainerHeight}
 						itemHeight={47}
 						itemKey="email"
-						onScroll={onScroll}
+						onScroll={(e) =>
+							onScrollList(e, ContainerHeight, setCountNumber, countNumber, dataAllList)
+						}
 					>
 						{(item) => (
 							<List.Item key={item.id}>
@@ -185,7 +177,7 @@ const ModalListMenu: React.FC = ({ show, handleShow }) => {
 											height={50}
 											style={{ borderRadius: '50px', objectFit: 'cover' }}
 											alt="logo"
-											src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`}
+											src={item.file}
 										/>
 									}
 									title={item.name}

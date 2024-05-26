@@ -32,7 +32,7 @@ const decodeTableNumber = (encodedString) => {
 		console.log(decodedArray, 'decodedArray')
 
 		const decryptedNumber = parseInt(decodedArray[0], 10)
-		const decryptedLocationId = decodedArray[1]
+		const decryptedLocationId = decodedArray[1] || undefined
 
 		decryptedData = { tableNumber: decryptedNumber, locationId: decryptedLocationId }
 	} catch (error) {

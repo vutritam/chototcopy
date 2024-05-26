@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react'
 import CommonModal from '../modalUserOrder/modalOrder'
 import _ from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchAllProduct } from '@/redux/componentSlice/productSlice'
+import { fetchAllProduct, fetchAllProductPaginated } from '@/redux/componentSlice/productSlice'
 import Link from 'next/link'
-import { getListProduct } from '../utilsComponent/utils'
+import { getListProduct, onScrollList } from '../utilsComponent/utils'
+import VirtualList from 'rc-virtual-list'
 // import ProductDetail from '@/pages/employee/product-detail/[detail]'
 // import SearchParam from '@/utils/searchParamQuery'
 
@@ -33,24 +34,47 @@ interface inputProps {
 }
 const ListItem = (props: inputProps) => {
 	const { isPage } = props
-	const [loading, setLoading] = useState(true)
+	const [loading, setLoading] = useState(false)
 	const [dataList, setDataList] = useState([])
 	const dataStore = useSelector((state) => state.products.products.data)
 	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
-
+	const [dataAllList, setDataAllList] = useState([])
+	const [countNumber, setCountNumber] = useState(1)
 	const dispatch = useDispatch()
 
 	useEffect(() => {
 		;(async () => {
-			await getListProduct(dispatch, setLoading, setDataList)
+			await getListProduct(dispatch, setLoading, setDataAllList)
 		})()
-	}, [dispatch, setLoading, setDataList])
+	}, [dispatch, setLoading, setDataAllList])
+
+	const appendData = async (countNumber) => {
+		if (loading) return // Tránh gọi nếu đang trong quá trình loading
+
+		setLoading(true)
+
+		try {
+			const { payload } = await dispatch(
+				fetchAllProductPaginated({ pageNumber: countNumber, limitCount: 3 })
+			)
+
+			if (payload?.success) {
+				const uniqueSet = new Set([...dataList, ...payload?.data])
+				setDataList([...uniqueSet])
+			}
+		} finally {
+			setLoading(false)
+		}
+	}
+	console.log(dataList, 'sss')
 
 	useEffect(() => {
-		if (dataStore?.success) {
-			setDataList(dataStore?.data)
+		try {
+			appendData(countNumber)
+		} catch (error) {
+			console.error('Error in appendData:', error)
 		}
-	}, [dataStore])
+	}, [countNumber])
 
 	const renderBtn = (isPage, item = null) => {
 		let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
@@ -94,6 +118,12 @@ const ListItem = (props: inputProps) => {
 							<Link href="/employee/warehouse/history-transactions">Lịch sử giao dịch</Link>
 						</Button>
 						<Button>
+							{/* <SearchParam
+								pathUrl={'detail'}
+								pathName="/employee/product-detail"
+								param={item.id}
+								title={'ádasd'}
+							/> */}
 							<Link href={`/employee/product-detail/${item.id}`}>Chi tiết sản phẩm</Link>
 						</Button>
 					</>
@@ -103,6 +133,9 @@ const ListItem = (props: inputProps) => {
 				break
 		}
 	}
+
+	const ContainerHeight = 148 * 3
+
 	return (
 		<>
 			<List
@@ -117,92 +150,72 @@ const ListItem = (props: inputProps) => {
 				loading={loading}
 				itemLayout="vertical"
 				size="large"
-				pagination={{
-					onChange: (page) => {
-						console.log(page)
-					},
-					pageSize: 3,
-				}}
-				dataSource={
-					dataList &&
-					dataList.map((item, index) => {
-						return {
-							Description: item.Description,
-							EndDate: item.EndDate,
-							Like: item.Like,
-							StartDate: item.StartDate,
-							file: item.file,
-							name: item.name,
-							position: item.position,
-							price: item.price,
-							quantity: item.quantity,
-							status: item.status,
-							viewer: item.Viewer,
-							_id: item._id,
-						}
-					})
-				}
-				footer={
-					<div>
-						<b>Tạo Bởi by Tam Vu Tri</b>
-					</div>
-				}
-				renderItem={(item) => (
-					<List.Item
-						key={item.id}
-						actions={[
-							<IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-							<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
-							renderBtn(isPage, item),
-						]}
-						extra={
-							<div className="show-desktop-menu">
-								<Image
-									width={172}
-									height={172}
-									style={{ objectFit: 'contain' }}
-									alt="logo"
-									src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`}
-								/>
-							</div>
-						}
-					>
-						<List.Item.Meta
-							avatar={
-								<Image
-									width={50}
-									height={50}
-									style={{ borderRadius: '50px', objectFit: 'cover' }}
-									alt="logo"
-									src={process.env.NEXT_PUBLIC_HOST_CLIENT + `/images/${item.file}`}
-								/>
+			>
+				<VirtualList
+					data={dataList}
+					height={ContainerHeight}
+					itemHeight={47}
+					itemKey="email"
+					onScroll={(e) =>
+						onScrollList(e, ContainerHeight, setCountNumber, countNumber, dataAllList)
+					}
+				>
+					{(item) => (
+						<List.Item
+							key={item.id}
+							actions={[renderBtn(isPage, item)]}
+							extra={
+								<div className="show-desktop-menu">
+									<Image
+										width={172}
+										height={172}
+										style={{ objectFit: 'contain' }}
+										src={item.file}
+									/>
+								</div>
 							}
-							title={item.name}
-							description={
-								<>
-									<span>
-										Giá:
-										<span style={{ color: 'blue', marginLeft: '10px' }}>
-											<span className="">{item.price}</span>
+						>
+							<List.Item.Meta
+								style={{ margin: 10 }}
+								avatar={
+									<Image
+										width={50}
+										height={50}
+										style={{ borderRadius: '50px', objectFit: 'cover' }}
+										alt="logo"
+										src={item.file}
+									/>
+								}
+								title={item.name}
+								description={
+									<>
+										<span>
+											Giá:
+											<span style={{ color: 'blue', marginLeft: '10px' }}>
+												<span className="">{item.price}</span>
+											</span>
 										</span>
-									</span>
-									<div>
-										Số lượng:{' '}
-										{item.quantity > 0 ? (
-											item.quantity
-										) : (
-											<span style={{ color: 'red' }}>Đã hết hàng</span>
-										)}
-									</div>
-								</>
-							}
-						/>
-						{item.Description}
-					</List.Item>
-				)}
-			/>
+										<div className="flex-box">
+											<span>
+												Số lượng:{' '}
+												{item.quantity > 0 ? (
+													item.quantity
+												) : (
+													<span style={{ color: 'red' }}>Đã hết hàng</span>
+												)}
+											</span>
+										</div>
+									</>
+								}
+							/>
+
+							{item.Description}
+						</List.Item>
+					)}
+				</VirtualList>
+			</List>
 		</>
 	)
 }
 
-export default React.memo(ListItem)
+export default ListItem
