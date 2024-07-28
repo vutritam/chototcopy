@@ -6,10 +6,13 @@ import { Button } from 'antd'
 import axiosConfig from '../../pages/api/axiosConfigs'
 import QRCode from 'react-qr-code'
 interface Props {}
-
+interface QRData {
+	tableNumber: number
+	code: string
+}
 const ListQrCode: React.FC<Props> = () => {
 	const router = useRouter()
-	const [dataQR, setData] = useState<Array<object>>([])
+	const [dataQR, setData] = useState<QRData[]>([])
 
 	useEffect(() => {
 		const { qrcode } = router.query

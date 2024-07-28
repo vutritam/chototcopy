@@ -16,7 +16,7 @@ const Products: React.FC = () => {
 	const [loadings, setLoadings] = useState<boolean>(false)
 	const [UploadImg, setUpload] = useState({ image: '' })
 
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const onRequiredTypeChange = ({ requiredMarkValue }: { requiredMarkValue: RequiredMark }) => {
 		setRequiredMarkType(requiredMarkValue)
 	}

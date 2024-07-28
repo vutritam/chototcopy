@@ -24,7 +24,7 @@ import Toasty from '../common/toasty'
 import useSocket from '../common/socketConfig/socketClient'
 
 const ModalListMenu: React.FC = ({ show, handleShow }) => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [loading, setLoading] = useState(false)
 	const [loadingBtn, setLoadingBtn] = useState(false)
 	const [dataList, setDataList] = useState([])

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { UploadOutlined } from '@ant-design/icons'
 import { Button, Upload } from 'antd'
-import { isArray } from 'lodash'
 import type { UploadFile } from 'antd/es/upload/interface'
-import { useRouter } from 'next/router'
 
-const FileUpload: React.FC = ({ setUpload, dataImage }) => {
+interface InputData {
+	setUpload: any
+	dataImage?: any
+}
+const FileUpload = (props: InputData): JSX.Element => {
+	const { setUpload, dataImage } = props
 	const [upImage, setUpImage] = useState<UploadFile[]>([])
-	const router = useRouter()
-	console.log(dataImage, 'dataImage')
 
 	const fileList: UploadFile[] =
 		dataImage !== undefined

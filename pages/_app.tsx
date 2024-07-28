@@ -13,6 +13,7 @@ import PrivateRoute from '@/components/common/privateRoute'
 import MasterLayout from '@/components/masterLayout/masterLayout'
 import { getRole } from '@/utils/accessRoles'
 import { CHECK_TYPE_INPUT } from '@/constanst/constanst.const'
+import NextNProgress from 'nextjs-progressbar'
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 	getLayout?: (page: ReactElement) => ReactNode
 }
@@ -50,6 +51,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 		<Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
 				<ToastContainer />
+				<NextNProgress />
 				{renderComponent()}
 			</PersistGate>
 		</Provider>

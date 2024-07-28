@@ -1,7 +1,7 @@
 // Import thư viện crypto-js
 import CryptoJS from 'crypto-js'
 
-const hexToBase64 = (hexString) => {
+const hexToBase64 = (hexString: string) => {
 	// Chuyển đổi chuỗi hex sang mảng byte
 	const bytes = []
 	for (let i = 0; i < hexString.length; i += 2) {
@@ -19,7 +19,7 @@ const encodeTableNumber = (tableNumber: number, locationId: string) => {
 	return encryptedString
 }
 
-const decodeTableNumber = (encodedString) => {
+const decodeTableNumber = (encodedString: string) => {
 	let decryptedData = null
 	try {
 		// Giải mã chuỗi từ base64
@@ -36,7 +36,7 @@ const decodeTableNumber = (encodedString) => {
 
 		decryptedData = { tableNumber: decryptedNumber, locationId: decryptedLocationId }
 	} catch (error) {
-		console.error('Error decoding:', error.message)
+		console.error('Error decoding:', error)
 	}
 	return decryptedData
 }

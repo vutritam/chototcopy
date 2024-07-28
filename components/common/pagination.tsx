@@ -1,7 +1,13 @@
 import React from 'react'
 import { Pagination } from 'antd'
 
-const PaginationCustom: React.FC = ({ data, pageSize, onChangeItem }) => (
+interface InputData {
+	data: any
+	pageSize: any
+	onChangeItem: (value: any) => void
+}
+
+const PaginationCustom: React.FC<InputData> = ({ data, pageSize, onChangeItem }) => (
 	<Pagination
 		total={data}
 		onChange={onChangeItem}

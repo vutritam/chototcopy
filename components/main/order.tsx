@@ -14,7 +14,7 @@ import Link from 'next/link'
 
 export default function OrderProducts() {
 	const router = useRouter()
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const isOrderPage = router.pathname.startsWith('/order')
 	const [dataTotalOrderAndConfirm, setDataTotalOrderAndConfirm] = React.useState({
 		totalOrderedItems: 0,

@@ -40,7 +40,7 @@ const ListItem = (props: inputProps) => {
 	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const [dataAllList, setDataAllList] = useState([])
 	const [countNumber, setCountNumber] = useState(1)
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
 	useEffect(() => {
 		;(async () => {

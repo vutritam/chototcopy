@@ -30,7 +30,7 @@ interface DataType {
 const count = 3
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat,picture&noinfo`
 const DetailOrder: React.FC = () => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [idTable, setIdTable] = useState<any>(0)
 	let router = useRouter()
 

@@ -6,10 +6,10 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 
 const useImageUpload = () => {
 	const [uploading, setUploading] = useState(false)
-	const [error, setError] = useState(null)
+	const [error, setError] = useState<any>(null)
 	const [success, setSuccess] = useState(false)
 
-	const uploadImage = async (file, folderAddPath) => {
+	const uploadImage = async (file: any, folderAddPath: string) => {
 		setUploading(true)
 		setError(null)
 
@@ -25,7 +25,7 @@ const useImageUpload = () => {
 			setSuccess(true)
 			return downloadURL
 		} catch (err) {
-			setError(err.message)
+			setError(err)
 			throw err
 		} finally {
 			setUploading(false)

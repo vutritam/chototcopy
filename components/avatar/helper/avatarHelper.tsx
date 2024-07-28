@@ -37,7 +37,7 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 	const router = useRouter()
 	let sessionOrder =
 		sessionStorage.getItem('location_user') !== null &&
-		JSON.parse(sessionStorage.getItem('location_user'))
+		JSON.parse(sessionStorage.getItem('location_user') || '')
 	const getUserOrderMessage = (isOrderSumary: boolean) => {
 		return isOrderSumary !== null && !isOrderSumary
 			? 'Đang chờ nhân viên xác nhận'
@@ -101,19 +101,22 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 			</div>
 		)
 	}
-
-	const renderOrderItem = (orderSummary, ele, dataMessage) => {
+	const renderOrderItem = (
+		orderSummary: Record<string, any>,
+		ele: { tableNumber: string },
+		dataMessage: any
+	): boolean => {
 		if (!_.isNil(orderSummary) && ele && ele.tableNumber) {
-			const isCheckExistedOrderNotConfirm =
-				orderSummary[ele.tableNumber]?.confirmedItems ===
-					orderSummary[ele.tableNumber]?.totalOrderedItems ||
-				orderSummary[ele.tableNumber]?.confirmedItems +
-					orderSummary[ele.tableNumber]?.canceledItems ===
-					orderSummary[ele.tableNumber]?.totalOrderedItems
+			const confirmedItems = orderSummary[ele.tableNumber]?.confirmedItems ?? 0
+			const canceledItems = orderSummary[ele.tableNumber]?.canceledItems ?? 0
+			const totalOrderedItems = orderSummary[ele.tableNumber]?.totalOrderedItems ?? 0
 
-			if (!isCheckExistedOrderNotConfirm) return true // chưa xác nhận hết và chưa thanh toán
-			else return false
+			const isCheckExistedOrderNotConfirm =
+				confirmedItems === totalOrderedItems || confirmedItems + canceledItems === totalOrderedItems
+
+			return !isCheckExistedOrderNotConfirm // chưa xác nhận hết và chưa thanh toán
 		}
+		return false // Trường hợp không thỏa điều kiện
 	}
 
 	const isCheckExistedOrderNotConfirm = !isAdmin
@@ -121,7 +124,7 @@ const HelperMessageForUser = (props: inputProps): JSX.Element => {
 		: true
 
 	return isCheckUserOrderData.length > 0 && isCheckExistedOrderNotConfirm ? (
-		isCheckUserOrderData.map((ele, index) => {
+		isCheckUserOrderData.map((ele: any, index: string) => {
 			if (!isAdmin) {
 				const isOrderSumary = renderOrderSummary(orderSummary, ele)
 				return (

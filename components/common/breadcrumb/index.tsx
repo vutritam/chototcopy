@@ -11,7 +11,7 @@ export const BreadcrumbItem = () => {
 	const renderBreadcrumb = (intitalValue: any) => {
 		return (
 			<Breadcrumb style={{ margin: '16px 0' }}>
-				{intitalValue?.map((item, index) => (
+				{intitalValue?.map((item: any, index: any) => (
 					<Breadcrumb.Item key={index}>{item}</Breadcrumb.Item>
 				))}
 			</Breadcrumb>

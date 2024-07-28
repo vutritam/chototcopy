@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react'
-import io from 'socket.io-client'
+import io, { Socket } from 'socket.io-client'
+// Explicitly define Socket type
 
 const useSocket = (endpoint: string) => {
-	const [socket, setSocket] = useState(null)
+	const [socket, setSocket] = useState<Socket | null>(null)
 
 	useEffect(() => {
 		const newSocket: any = io(endpoint)
 		setSocket(newSocket)
 
-		return () => {
-			newSocket.disconnect() // Ngắt kết nối khi component unmount
-		}
+		return () => newSocket.disconnect()
 	}, [endpoint])
 
 	return socket

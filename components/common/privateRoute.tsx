@@ -21,7 +21,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ allowedRoles, children }) =
 			if (!userRoles) {
 				router.replace('/login')
 			} else if (!parsedUser?.data) {
-				localStorage.removeItem('user')
+				sessionStorage.removeItem('user')
 				router.replace('/login')
 			} else {
 				// Ví dụ: Vai trò của người dùng lấy từ thông tin xác thực

@@ -22,7 +22,7 @@ export const fetchProductById = createAsyncThunk<any, string>(
 	}
 )
 
-export const fetchProductByFilterCondition = createAsyncThunk<any, string>(
+export const fetchProductByFilterCondition = createAsyncThunk<any, any>(
 	'api/fetchProductByFilterCondition',
 	async (options) => {
 		let response = await axiosConfig.post('/products/filterByCondition', options)
@@ -30,7 +30,7 @@ export const fetchProductByFilterCondition = createAsyncThunk<any, string>(
 	}
 )
 
-export const fetchAllProduct = createAsyncThunk<any, string>('api/fetchAllProduct', async () => {
+export const fetchAllProduct = createAsyncThunk<any>('api/fetchAllProduct', async () => {
 	let response = await axiosConfig.get('/products')
 	return response.data
 })

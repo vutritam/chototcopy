@@ -23,13 +23,13 @@ const HelperMenu = (props: inputProps) => {
 
 	return (
 		<div style={{ marginRight: '5px' }}>
-			{userListAcceptRequestUsers.data.filter((item) => item.status === 'request_pending').length <=
-			0 ? (
+			{userListAcceptRequestUsers.data.filter((item: any) => item.status === 'request_pending')
+				.length <= 0 ? (
 				icon
 			) : (
 				<Badge
 					count={
-						userListAcceptRequestUsers.data.filter((item) => item.status === 'request_pending')
+						userListAcceptRequestUsers.data.filter((item: any) => item.status === 'request_pending')
 							.length
 					}
 				/>

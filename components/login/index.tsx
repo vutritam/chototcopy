@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Checkbox, Form, Input, Select, Space, Spin, Tabs } from 'antd'
+import { Button, Checkbox, Form, Input, InputRef, Select, Space, Spin, Tabs } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchRegisterUser, fetchCreatePost, setUser } from '../../redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
@@ -16,32 +16,35 @@ import useImageUpload from '../common/useImageUpload'
 const LoginForm: React.FC = () => {
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [loadings, setLoadings] = useState<boolean>(false)
-	const [keyTab, setKeyTab] = useState<number>(1)
+	const [keyTab, setKeyTab] = useState<string>('1')
 	const [listLocation, setListLocation] = useState([])
 	const [countDownLogin, setCountDownLogin] = useState<number>(0)
-	const passwordInputRef = useRef(null)
-	const usernameInputRef = useRef(null)
+	const passwordInputRef = useRef<InputRef>(null)
+	const usernameInputRef = useRef<InputRef>(null)
 	// const user = JSON.parse(sessionStorage.getItem('user'))
 	let router = useRouter()
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
-	const socket = useSocket(ENV_HOST)
-	const [UploadImg, setUpload] = useState({ image: '' })
+	const socket = useSocket(ENV_HOST || '')
+	const [UploadImg, setUpload] = useState<any>({ image: '' })
 	const { uploadImage } = useImageUpload()
 
 	useEffect(() => {
+		const usernameInput = usernameInputRef.current?.input
+		const passwordInput = passwordInputRef.current?.input
 		if (
-			usernameInputRef.current &&
-			passwordInputRef.current &&
-			(usernameInputRef.current.input.value && passwordInputRef.current.input.value) !== ''
+			usernameInput &&
+			passwordInput &&
+			usernameInput.value !== '' &&
+			passwordInput.value !== ''
 		) {
-			usernameInputRef.current.focus()
-			passwordInputRef.current.focus()
+			usernameInput.focus()
+			passwordInput.focus()
 		}
 	}, [keyTab])
 
 	const onFinish = async (options: any) => {
 		setLoadings(true)
-		if (keyTab === 1) {
+		if (keyTab === '1') {
 			const { payload } = await dispatch(fetchCreatePost(options))
 			if (payload?.success) {
 				sessionStorage.setItem('user', JSON.stringify(payload))
@@ -55,7 +58,7 @@ const LoginForm: React.FC = () => {
 						router.push('/admin')
 					} else {
 						if (socket && sessionStorage.getItem('user') !== null) {
-							let getUserId = JSON.parse(sessionStorage.getItem('user'))
+							let getUserId = JSON.parse(sessionStorage.getItem('user') || '')
 							// Gửi sự kiện tới Socket.IO server
 							socket.emit('afterUserLogin', {
 								message: 'Hello from client',
@@ -91,10 +94,15 @@ const LoginForm: React.FC = () => {
 					progress: undefined,
 					type: 'error',
 				})
-				if (passwordInputRef !== null && payload && payload.fieldError === 'username') {
+				if (
+					usernameInputRef.current !== null &&
+					passwordInputRef.current !== null &&
+					payload &&
+					payload.fieldError === 'username'
+				) {
 					usernameInputRef.current.focus()
 					usernameInputRef.current.select()
-				} else {
+				} else if (passwordInputRef.current !== null) {
 					passwordInputRef.current.focus()
 					passwordInputRef.current.select()
 				}
@@ -112,7 +120,7 @@ const LoginForm: React.FC = () => {
 				setTimeout(() => {
 					setLoadings(false)
 					Toasty.success(payload?.message)
-					setKeyTab(1)
+					setKeyTab('1')
 				}, 1000)
 				return
 			}
@@ -133,7 +141,7 @@ const LoginForm: React.FC = () => {
 		}
 	}
 
-	const onChange = (key: number) => {
+	const onChange = (key: any) => {
 		setKeyTab(key)
 	}
 	const [loading, setLoading] = useState(true)
@@ -156,7 +164,7 @@ const LoginForm: React.FC = () => {
 	const items = [
 		{
 			label: `Đăng nhập`,
-			key: 1,
+			key: '1',
 			children: (
 				<div>
 					<h3 style={{ marginBottom: '40px' }}>ĐĂNG NHẬP HỆ THỐNG</h3>
@@ -216,7 +224,7 @@ const LoginForm: React.FC = () => {
 		},
 		{
 			label: `Đăng ký`,
-			key: 2,
+			key: '2',
 			children: (
 				<div>
 					<h3 style={{ marginBottom: '40px' }}>ĐĂNG KÝ HỆ THỐNG</h3>
@@ -253,7 +261,7 @@ const LoginForm: React.FC = () => {
 								suffixIcon={<LockOutlined className="site-form-item-icon" />}
 								placeholder="Nhập địa điểm làm việc"
 							>
-								{listLocation?.map((item, index) => (
+								{listLocation?.map((item: any, index) => (
 									<>
 										<Select.Option key={index} value={item._id}>
 											{item.nameLocation}
@@ -295,10 +303,10 @@ const LoginForm: React.FC = () => {
 			) : (
 				<div className="form-template" style={{ background: 'white' }}>
 					<Tabs
-						activeKey={Number(keyTab)}
+						activeKey={keyTab}
 						onChange={onChange}
 						type="card"
-						items={items.map((ele, i) => {
+						items={items.map((ele: any, i) => {
 							return {
 								label: ele.label,
 								key: ele.key,

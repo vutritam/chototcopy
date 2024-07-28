@@ -2,7 +2,7 @@ import React from 'react'
 import { Dropdown, Space } from 'antd'
 
 interface inputProps {
-	trigger: Array<string>
+	trigger: ('contextMenu' | 'click' | 'hover')[]
 	handleDropdown?: (e: any, value: boolean) => void
 	tittle: string
 	items: any
@@ -10,6 +10,7 @@ interface inputProps {
 
 const CommonDropdown = (props: inputProps): JSX.Element => {
 	const { trigger, handleDropdown, tittle, items } = props
+
 	return (
 		<Dropdown menu={{ items }} trigger={trigger}>
 			<Space>{tittle}</Space>

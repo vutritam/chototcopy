@@ -62,8 +62,11 @@ interface ObjectType {
 	tableNumber: number
 }
 
-const CartItem: React.FC = (props) => {
-	const { className } = props
+interface Props {
+	className: string
+}
+
+const CartItem: React.FC<Props> = ({ className }) => {
 	const router = useRouter()
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [open, setOpen] = React.useState<Boolean>(false)
@@ -80,18 +83,18 @@ const CartItem: React.FC = (props) => {
 	let getLocationEmployee =
 		sessionStorage.getItem('user') !== null && JSON.parse(sessionStorage.getItem('user') || '')
 
-	// const itemsOrder: MenuItem[] = [
-	// 	getItem(
-	// 		<Link href={typeof window !== 'undefined' && window.location.pathname}>Thực đơn</Link>,
-	// 		'1',
-	// 		<DesktopOutlined />
-	// 	),
-	// 	getItem('Khuyến mãi', 'sub2', <TeamOutlined />, [
-	// 		getItem('Team 1', '2'),
-	// 		getItem('Team 2', '3'),
-	// 	]),
-	// 	getItem('Ăn vặt', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
-	// ]
+	const itemsOrder: MenuItem[] = [
+		getItem(
+			<Link href={typeof window !== 'undefined' && window.location.pathname}>Thực đơn</Link>,
+			'1',
+			<DesktopOutlined />
+		),
+		getItem('Khuyến mãi', 'sub2', <TeamOutlined />, [
+			getItem('Team 1', '2'),
+			getItem('Team 2', '3'),
+		]),
+		getItem('Ăn vặt', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),
+	]
 
 	const dataNorMal = [
 		{
@@ -122,7 +125,7 @@ const CartItem: React.FC = (props) => {
 		},
 	]
 
-	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
+	let getInforUser = JSON.parse(sessionStorage.getItem('user') || '')
 	useEffect(() => {
 		if (confirmTableNumber !== null) {
 			const fetch = async () => {
@@ -148,7 +151,7 @@ const CartItem: React.FC = (props) => {
 
 	useEffect(() => {
 		const totalPrice = dataSubmit.reduce((acc: number, curr: DataSubmitItem) => {
-			acc += curr.productId[0].price
+			acc += curr.productId?.price
 
 			return acc
 		}, 0)
@@ -156,7 +159,7 @@ const CartItem: React.FC = (props) => {
 	}, [dataSubmit])
 
 	const handleConfirmPayment = async (tableNumber: number) => {
-		const { payload } = await dispatch(
+		const { payload }: { payload: any } = await dispatch(
 			updatePaymentForTableNumber({
 				tableNumber: tableNumber,
 				objValues: { isPaid: true },
@@ -167,7 +170,7 @@ const CartItem: React.FC = (props) => {
 				locationId: getLocationEmployee?.data?.locationId,
 			}
 
-			const { payload } = await dispatch(fetchAllOrder(obj))
+			const { payload }: { payload: any } = await dispatch(fetchAllOrder(obj))
 			if (payload?.success) {
 			}
 
@@ -234,7 +237,7 @@ const CartItem: React.FC = (props) => {
 		)
 	}
 
-	const renderItemMenuMobile = (pathName) => {
+	const renderItemMenuMobile = (pathName: string) => {
 		const menuMobile = [
 			{ key: '/order', value: 'order' },
 			{ key: '/employee', value: 'employee' },
@@ -251,14 +254,12 @@ const CartItem: React.FC = (props) => {
 		}
 	}
 
-	console.log(dataSubmit, 'dataSubmit')
-
 	return (
 		<>
 			{className === 'screen-mobile' ? (
 				<MenuUnfoldOutlined
 					style={{ fontSize: '22px', width: '30px', display: 'flex' }}
-					onClick={showDrawer}
+					onClick={showDrawer as any}
 				/>
 			) : className === 'exportBill' ? (
 				<BillExport showDrawer={showDrawer} items={items} />
@@ -266,7 +267,7 @@ const CartItem: React.FC = (props) => {
 				<ShoppingCartOutlined
 					className="style_cart"
 					style={{ fontSize: '22px', width: '30px', display: 'flex' }}
-					onClick={showDrawer}
+					onClick={showDrawer as any}
 				/>
 			)}
 

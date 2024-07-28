@@ -124,6 +124,7 @@ const QRcode: React.FC = () => {
 			let response = await axiosConfig.post(`/qrcode/add`, dataArray)
 			if (response.data.success) {
 				fetchData()
+				setLocation('')
 				Toasty.success(response.data.message)
 			}
 		}

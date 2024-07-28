@@ -18,7 +18,7 @@ import useSocket from '@/components/common/socketConfig/socketClient'
 const OrderByUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
 	const [open, setOpen] = useState(false)
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [idOrder, setIdOrder] = useState(null)
 	const [orderData, setOrderData] = useState(null)
 	const [data, setData] = useState([])

@@ -5,7 +5,8 @@ import { jsPDF } from 'jspdf'
 import { Button } from 'antd'
 import PrintToExport from './component/printExport'
 
-const ExportHTMLToPDF = ({ getContentForExport, handleShowBill }) => {
+const ExportHTMLToPDF = (props: any) => {
+	const { getContentForExport, handleShowBill } = props
 	const ExportHTMLToPDF = () => {
 		if (getContentForExport && getContentForExport.current) {
 			html2canvas(getContentForExport.current).then((canvas) => {

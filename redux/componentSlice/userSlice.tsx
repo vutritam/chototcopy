@@ -66,13 +66,10 @@ export const approvedChangeRequestUser = createAsyncThunk<any, string>(
 		return response.data
 	}
 )
-export const getAllUserRequest = createAsyncThunk<any, string>(
-	'api/getAllUserRequest',
-	async () => {
-		let response = await axiosConfig.get('/userRequest/request')
-		return response.data
-	}
-)
+export const getAllUserRequest = createAsyncThunk<any>('api/getAllUserRequest', async () => {
+	let response = await axiosConfig.get('/userRequest/request')
+	return response.data
+})
 
 const userSlice = createSlice({
 	name: 'user',

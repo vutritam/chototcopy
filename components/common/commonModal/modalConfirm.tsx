@@ -20,12 +20,13 @@ interface inputProps {
 	position?: string
 	open?: boolean
 	item: any
-	setOpen?: React.Dispatch<React.SetStateAction<boolean>>
+	setOpen?: any
 	handleSubmit?: () => void
 	size?: number
 }
 const ModalConfirm = (props: inputProps): JSX.Element => {
 	// const [open, setOpen] = useState(false)
+	const { handleSubmit, setOpen, position } = props
 	const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default')
 
 	const onFormLayoutChange = ({ size }: { size: SizeType }) => {
@@ -39,7 +40,6 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 
 	const renderDeleteItemOrder = () => {
 		const { item } = props
-		console.log(item, 'item')
 		const itemRender = item !== null && item.productId
 		return (
 			<List.Item>
@@ -61,8 +61,8 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 	}
 
 	const handleOk = (isShow: Boolean) => {
-		props.handleSubmit()
-		props.setOpen(isShow)
+		handleSubmit && handleSubmit()
+		setOpen && setOpen(isShow)
 	}
 
 	const renderThu = () => {
@@ -100,7 +100,7 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 	}
 
 	const handleRender = () => {
-		return renderItem(props.position || undefined)
+		return renderItem(position || '')
 	}
 
 	const renderItem = (position: string) => {

@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux'
 
 export default function EmployeeWareHouseComponent() {
 	const [allProduct, setAllProduct] = React.useState([])
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
 	React.useEffect(() => {
 		const fetchData = async () => {

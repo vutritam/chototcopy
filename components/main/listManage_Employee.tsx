@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Avatar, Button, List, MenuProps, Skeleton, Space } from 'antd'
+import { Avatar, Button, List, MenuProps, Modal, Skeleton, Space } from 'antd'
 import CommonShowHistory from '../modalShowHistory/modalShowHistory'
 import CommonFilter from '../common/commonInput/commonFilter'
 import InputDateTime from '../common/commonInput/inputDateTime'
@@ -40,6 +40,7 @@ const List_manage_employee: React.FC = (props) => {
 	const [initLoading, setInitLoading] = useState(true)
 	const [loading, setLoading] = useState(false)
 	const [showHistory, setShowHistory] = useState(false)
+	const [isModalOpenHistoryListAccept, setIsModalOpenHistoryListAccept] = useState(false)
 	const [data, setData] = useState<DataType[]>([])
 	const [list, setList] = useState<DataType[]>([])
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
@@ -234,7 +235,19 @@ const List_manage_employee: React.FC = (props) => {
 				</div>
 			)}
 			<h3>Danh sách yêu cầu</h3>
-
+			<Button type="primary" onClick={() => setIsModalOpenHistoryListAccept(true)}>
+				lịch sử chấp nhận
+			</Button>
+			<Modal
+				title="Basic Modal"
+				open={isModalOpenHistoryListAccept}
+				onOk={() => setIsModalOpenHistoryListAccept(false)}
+				onCancel={() => setIsModalOpenHistoryListAccept(false)}
+			>
+				<p>Some contents...</p>
+				<p>Some contents...</p>
+				<p>Some contents...</p>
+			</Modal>
 			<List
 				className="demo-loadmore-list"
 				loading={initLoading}
@@ -259,11 +272,7 @@ const List_manage_employee: React.FC = (props) => {
 								<List.Item.Meta
 									avatar={
 										<>
-											<Avatar
-												src={
-													'https://top10dienbien.com/wp-content/uploads/2022/10/avatar-cute-9.jpg'
-												}
-											/>
+											<Avatar src={item?.file} />
 											<span className="online-avatar"></span>
 										</>
 									}

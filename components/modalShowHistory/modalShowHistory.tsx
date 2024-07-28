@@ -20,7 +20,7 @@ const CommonShowHistory = (props: inputProps): JSX.Element => {
 	const isOrderPage = router.pathname.startsWith('/order')
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const showModal = () => {
 		setOpen(true)
 	}

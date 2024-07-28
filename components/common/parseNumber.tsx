@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { decodeTableNumber, encodeTableNumber } from './hashCode'
 import { useRouter } from 'next/router'
 // logic.js
-export function processRouterQuery(routerQuery) {
+export function processRouterQuery(routerQuery: any) {
 	let num = routerQuery || {}
 	let convert
 	convert = decodeTableNumber(num)

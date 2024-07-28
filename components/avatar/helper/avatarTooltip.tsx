@@ -10,11 +10,12 @@ import { CONST_TYPE_KEY_VALUE } from '@/constanst/constanst.const'
 interface product {
 	tableNumber: number
 	quantity: number
+	status: string
 }
 
 interface inputProps {
 	dataMessage: product[]
-	showMessage: boolean
+	showMessage: any
 	countMessage: number
 	orderSummary: any
 	handleUpdateSeenMessage: any
@@ -37,7 +38,7 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 	const isDataMessage = dataMessage && dataMessage
 	const isUserOrder = condition === CONST_TYPE_KEY_VALUE.UserOrder
 	const isAdmin = condition === CONST_TYPE_KEY_VALUE.Admin
-	const [data, setData] = useState<Array<[]>>([])
+	const [data, setData] = useState<any>([])
 
 	useEffect(() => {
 		const filterItemOrder = isDataMessage?.filter((item) => item.status !== 'order_done')
@@ -74,7 +75,6 @@ const HelperMessageToolTip = (props: inputProps): JSX.Element => {
 				</Menu>
 			)}
 			trigger={['click']}
-			onClick={() => handleUpdateSeenMessage(true)}
 		>
 			<a onClick={(e) => e.preventDefault()}>
 				<Space size="large">

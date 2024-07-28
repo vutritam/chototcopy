@@ -23,6 +23,7 @@ function getItem(
 		label,
 	} as MenuItem
 }
+const pathname = typeof window !== 'undefined' ? window.location.pathname : ''
 
 export const itemsAdmin = [
 	getItem(<Link href="/admin/manage_work">Quản lý ca</Link>, '1', <PieChartOutlined />),
@@ -56,11 +57,7 @@ export const itemsEmployee = [
 ]
 
 export const itemsOrder = [
-	getItem(
-		<Link href={typeof window !== 'undefined' && window.location.pathname}>Thực đơn</Link>,
-		'1',
-		<DesktopOutlined />
-	),
+	getItem(<Link href={pathname}>Thực đơn</Link>, '1', <DesktopOutlined />),
 	getItem(<Link href={'payment'}>Thanh toán</Link>, '2', <TeamOutlined />),
 	getItem(<Link href={'payment'}>Danh mục</Link>, '3', <TeamOutlined />),
 	// getItem('Thanh toán', 'sub3', <TeamOutlined />, [getItem('Team 1', '4'), getItem('Team 2', '5')]),

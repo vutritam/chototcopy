@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { Button, MenuProps, Space, Tooltip } from 'antd'
+import { Button, Menu, MenuProps, Space, Tooltip } from 'antd'
 import CommonFilter from '../commonInput/commonFilter'
 import { FilterOutlined, FileSearchOutlined, DeleteOutlined, StopOutlined } from '@ant-design/icons'
 import Toasty from '../toasty'
 import { fetchAllProduct, fetchProductByFilterCondition } from '@/redux/componentSlice/productSlice'
 import { useDispatch } from 'react-redux'
 import Link from 'next/link'
+import { ThunkDispatch } from '@reduxjs/toolkit'
 
 interface inputProps {
 	allProduct: any[] | undefined
 }
-
+interface MenuItem {
+	key: string
+	value: any
+	label: React.ReactNode
+	// Các thuộc tính khác nếu có
+}
 const CommonFilterListItem = (props: inputProps) => {
 	const { allProduct } = props
 	const initItem = {
@@ -21,119 +27,119 @@ const CommonFilterListItem = (props: inputProps) => {
 		comparition: '=',
 		dateTime: new Date(),
 	}
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	const [itemFilterChecked, setItemFilter] = React.useState(false)
 	const [showCancelTooltip, setCancelTooltip] = React.useState(false)
 	const [itemFilterValueChecked, setItemFilterValueChecked] = React.useState(initItem)
 	const [disableFilter, setDisableFilter] = React.useState(true)
 
-	const itemsFilterValue0: MenuProps['items'] = [
+	const itemsFilterValue0: any = [
 		{
 			key: '1',
 			value: 'or',
-			label: <p value={1}>Or</p>,
+			label: <div>Or</div>,
 		},
 		{
 			key: '2',
 			value: 'And',
-			label: <p value={2}>And</p>,
+			label: <div>And</div>,
 		},
 		{
 			key: '3',
 			value: 'Not',
-			label: <p value={3}>Not</p>,
+			label: <div>Not</div>,
 		},
 	]
 
-	const itemsFilterValue: MenuProps['items'] = [
+	const itemsFilterValue: any = [
 		{
 			key: '1',
-			value: '>',
-			label: <p value={'greaterThan'}>{'>'}</p>,
+			value: 'greaterThan',
+			label: <div>{'>'}</div>,
 		},
 		{
 			key: '2',
-			value: '<',
-			label: <p value={'lessThan'}>{'<'}</p>,
+			value: 'lessThan',
+			label: <div>{'<'}</div>,
 		},
 		{
 			key: '3',
-			value: '=',
-			label: <p value={'Equal'}>=</p>,
+			value: 'Equal',
+			label: <div>=</div>,
 		},
 	]
 
-	const itemsFilterValue1: MenuProps['items'] = [
+	const itemsFilterValue1: any = [
 		{
 			key: '1',
-			value: 'nước mía',
-			label: <p value={1}>Nước mía</p>,
+			value: '1',
+			label: <p>Nước mía</p>,
 		},
 		{
 			key: '2',
-			value: 'cà phê ',
-			label: <p value={2}>Cafe</p>,
+			value: '2',
+			label: <p>Cafe</p>,
 		},
 		{
 			key: '3',
-			value: 'Đồ ăn vặt',
-			label: <p value={3}>Đồ ăn vặt</p>,
+			value: '3',
+			label: <p>Đồ ăn vặt</p>,
 		},
 		{
 			key: '4',
-			value: 'nước cam',
-			label: <p value={4}>Nước cam</p>,
+			value: '4',
+			label: <p>Nước cam</p>,
 		},
 		{
 			key: '5',
 			value: 'all',
-			label: <p value={5}>Tất cả</p>,
+			label: <p>Tất cả</p>,
 		},
 	]
-	const itemsFilterValue2: MenuProps['items'] = [
+	const itemsFilterValue2: any = [
 		{
 			key: '1',
 			value: '100000',
-			label: <p value={1}>100000</p>,
+			label: <p>100000</p>,
 		},
 		{
 			key: '2',
 			value: '200000',
-			label: <p value={2}>200000</p>,
+			label: <p>200000</p>,
 		},
 		{
 			key: '3',
 			value: '300000',
-			label: <p value={3}>300000</p>,
+			label: <p>300000</p>,
 		},
 
 		{
 			key: '4',
 			value: 'all',
-			label: <p value={4}>Tất cả</p>,
+			label: <p>Tất cả</p>,
 		},
 	]
 
-	const itemsFilterValue3: MenuProps['items'] = [
+	const itemsFilterValue3: any = [
 		{
 			key: '1',
 			value: 'Banh',
-			label: <p value={1}>Bánh</p>,
+			label: <p>Bánh</p>,
 		},
 		{
 			key: '2',
 			value: 'Keo',
-			label: <p value={2}>Kẹo</p>,
+			label: <p>Kẹo</p>,
 		},
 		{
 			key: '3',
 			value: 'Banhtrangtron',
-			label: <p value={2}>Bánh tráng trộn</p>,
+			label: <p>Bánh tráng trộn</p>,
 		},
 		{
 			key: '4',
 			value: 'all',
-			label: <p value={4}>Tất cả</p>,
+			label: <p>Tất cả</p>,
 		},
 	]
 	React.useEffect(() => {
@@ -145,12 +151,12 @@ const CommonFilterListItem = (props: inputProps) => {
 		}
 	}, [itemFilterChecked])
 
-	const handleFilterItem = (fieldName, value) => {
+	const handleFilterItem = (fieldName: string, value: any) => {
 		setItemFilterValueChecked({ ...itemFilterValueChecked, [fieldName]: value })
 		setDisableFilter(false)
 	}
 
-	const renderItemSelected = (itemsFilter, state, fieldName) => {
+	const renderItemSelected = (itemsFilter: any, state: any, fieldName: string) => {
 		return (
 			<div style={{ width: '100%' }}>
 				<CommonFilter
@@ -163,8 +169,8 @@ const CommonFilterListItem = (props: inputProps) => {
 		)
 	}
 
-	const handleSelectedFilterItem = () => {
-		setItemFilter(!itemFilterChecked)
+	const handleSelectedFilterItem = (itemFilterChecked: any) => {
+		setItemFilter(itemFilterChecked)
 	}
 
 	const handleSubmit = async () => {
@@ -204,7 +210,7 @@ const CommonFilterListItem = (props: inputProps) => {
 				</Space>
 				<Space wrap>
 					<div style={{ width: '220px' }}>
-						<b style={{ fontSize: '17px' }}>Danh mục sản phẩm ({allProduct.length})</b>
+						<b style={{ fontSize: '17px' }}>Danh mục sản phẩm ({allProduct?.length || []})</b>
 					</div>
 				</Space>
 			</div>

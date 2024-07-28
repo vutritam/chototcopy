@@ -9,13 +9,14 @@ interface inputProps {
 	item: any
 	loading: boolean
 	reason: string
-	handleShow: () => void
+	handleShow: (value: any) => void
 	setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 	handleSubmit?: () => void
-	handleChangeReason?: () => void
+	handleChangeReason: (value: any) => void
 	size?: number
 }
 const ModalConfirm = (props: inputProps): JSX.Element => {
+	const { handleChangeReason, handleShow } = props
 	const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default')
 
 	const onFormLayoutChange = ({ size }: { size: SizeType }) => {
@@ -24,13 +25,11 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 	const { TextArea } = Input
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		console.log('Change:', e.target.value)
-		props.handleChangeReason(e.target.value)
+		handleChangeReason(e.target.value)
 	}
 
 	const handleOk = (isShow: Boolean) => {
-		// props.handleSubmit()
-		props.handleShow(isShow)
+		handleShow(isShow)
 	}
 
 	const renderComponent = () => {
@@ -42,8 +41,6 @@ const ModalConfirm = (props: inputProps): JSX.Element => {
 				initialValues={{ size: componentSize }}
 				onValuesChange={onFormLayoutChange}
 				size={componentSize as SizeType}
-
-				// style={{ maxWidth: 600 }}
 			>
 				<div style={{ padding: '10px' }}>
 					<TextArea

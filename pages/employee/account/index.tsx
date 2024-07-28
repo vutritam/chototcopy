@@ -47,7 +47,7 @@ function Manage_account() {
 	const reNewPasswordInputRef = useRef(null)
 	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
 	const socket = useSocket(ENV_HOST)
-	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
+	let getInforUser = JSON.parse(sessionStorage.getItem('user') || '')
 	useEffect(() => {
 		const fetchDataUser = async () => {
 			try {
@@ -77,41 +77,38 @@ function Manage_account() {
 		const itemLocation = userListAcceptRequestUsers.data.filter(
 			(item) => item.userId._id === user?.data?._id
 		)[0]
-
-		if (
-			user?.data?.userRequestId?.isRequest === 'change_location' &&
-			statusItem === 'request_pending'
-		) {
+		console.log(itemLocation, 'item')
+		if (itemLocation?.isRequest === 'change_location' && statusItem === 'request_pending') {
 			setLocation({
 				_id: itemLocation?.locationId?._id,
 				nameLocation: itemLocation?.locationId?.nameLocation,
 			})
 			setDisabledLocation(true)
-		} else if (user?.data?.userRequestId?.isRequest === 'unChange_location' && statusItem === '') {
+		} else if (itemLocation?.isRequest === 'unChange_location' && statusItem === '') {
 			setLocation({
-				_id: user?.data?.locationId?.locationId,
-				nameLocation: user?.data?.locationId?.nameLocation,
+				_id: itemLocation?.locationId,
+				nameLocation: itemLocation?.nameLocation,
 			})
 			// {_id: itemLocation?.locationId, nameLocation: itemLocation?.nameLocation}
 			setDisabledLocation(false)
 		} else if (
-			getInforUser?.data?.locationId !== user?.data?.userRequestId?.locationId &&
+			getInforUser?.data?.locationId !== itemLocation?.locationId?._id &&
 			statusItem === 'request_accepted'
 		) {
 			setOpenAcceptRequest(true)
 		} else if (
-			getInforUser?.data?.locationId !== user?.data?.userRequestId?.locationId &&
+			getInforUser?.data?.locationId !== itemLocation?.locationId?._id &&
 			statusItem === 'request_failure'
 		) {
 			setLocation({
-				_id: user?.data?.locationId?.locationId,
-				nameLocation: user?.data?.locationId?.nameLocation,
+				_id: itemLocation?.locationId?._id,
+				nameLocation: itemLocation?.locationId?.nameLocation,
 			})
 			setDisabledLocation(false)
 		} else {
 			setLocation({
-				_id: user?.data?.locationId?.locationId,
-				nameLocation: user?.data?.locationId?.nameLocation,
+				_id: itemLocation?.locationId?._id,
+				nameLocation: itemLocation?.locationId?.nameLocation,
 			})
 			setDisabledLocation(false)
 		}
@@ -198,6 +195,8 @@ function Manage_account() {
 		const formData = new FormData()
 		const info = sessionStorage !== null && JSON.parse(sessionStorage.getItem('user'))
 		const dataImage = UploadImg?.image?.file
+
+		const imageURL = await uploadImage(dataImage, 'users')
 		// console.log(values, 'dataform')
 
 		switch (editMode) {
@@ -216,21 +215,18 @@ function Manage_account() {
 				}
 				break
 			case 'edit_information':
-				if (imageURL) {
-					console.log(typeof imageURL, 'imageURL')
-					formData.append('_id', info && info.data && info.data.userId)
-					formData.append('username', values.username)
-					formData.append('email', values.email)
-					formData.append('file', imageURL)
-					formData.append('address', values.address)
-					const { payload } = await dispatch(updateProfileUser(formData))
-					if (payload?.success) {
-						await dispatch(fetchUserById(info.data.userId))
-						Toasty.success(payload?.message)
-						setEditMode('')
-					} else {
-						handleMessageStatus(payload)
-					}
+				formData.append('_id', info && info.data && info.data.userId)
+				formData.append('username', values.username)
+				formData.append('email', values.email)
+				formData.append('file', imageURL)
+				formData.append('address', values.address)
+				const { payload } = await dispatch(updateProfileUser(formData))
+				if (payload?.success) {
+					await dispatch(fetchUserById(info.data.userId))
+					Toasty.success(payload?.message)
+					setEditMode('')
+				} else {
+					handleMessageStatus(payload)
 				}
 				break
 			default:
@@ -250,10 +246,6 @@ function Manage_account() {
 				uploadImage(removeItemDefault[0], 'users')
 			}
 		}
-
-		// if (UploadImg?.image !== '') {
-		// 	uploadImage(file)
-		// }
 	}, [UploadImg])
 
 	const handleChangeLocation = (data) => {

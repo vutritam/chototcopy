@@ -2,6 +2,31 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 // import { asyncGetList, asyncWrapper } from '../../helper/asyncHelper'
 import axiosConfig from '../../pages/api/axiosConfigs'
 
+// Define the types for options and the response data
+interface FetchAllOrderOptions {
+	locationId: number
+}
+
+interface Order {
+	id: number
+	name: string
+	// Các thuộc tính khác của đơn hàng
+}
+
+interface FetchAllOrderResponse {
+	data: any
+}
+
+// Define the types for the request and response
+interface UpdatePaymentRequest {
+	tableNumber: string
+	objValues: any
+}
+
+interface UpdatePaymentResponse {
+	success: boolean
+	message: string
+}
 export const fetchCreateOrder = createAsyncThunk<any, any, any>(
 	'api/fetchCreateOrder',
 	async (options) => {
@@ -34,8 +59,11 @@ export const deleteAllRecordOrder = createAsyncThunk<any, any, any>(
 	}
 )
 
-export const fetchAllOrder = createAsyncThunk<any, any>('api/fetchAllOrder', async (options) => {
-	let response = await axiosConfig.post('/order/getAllOrderByLocation', options)
+export const fetchAllOrder = createAsyncThunk('api/fetchAllOrder', async (options: any) => {
+	let response = await axiosConfig.post<FetchAllOrderResponse>(
+		'/order/getAllOrderByLocation',
+		options
+	)
 	return response.data
 })
 
@@ -63,10 +91,10 @@ export const fetchAllOrderByNumberTableAndLocationUser = createAsyncThunk<any, a
 	}
 )
 
-export const updatePaymentForTableNumber = createAsyncThunk<any, any>(
+export const updatePaymentForTableNumber = createAsyncThunk(
 	'api/updatePaymentForTableNumber',
-	async (options) => {
-		let response = await axiosConfig.post('/order/updatePaymentForTableNumber', options)
+	async (dataObj: any) => {
+		const response = await axiosConfig.post<UpdatePaymentResponse>('/payment/update', dataObj)
 		return response.data
 	}
 )
@@ -81,7 +109,7 @@ const orderSlice = createSlice({
 	initialState: {
 		dataOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataOrderByNumberTable: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
-		dataAllOrder: { data: null, loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
+		dataAllOrder: { data: '', loading: false, error: '' }, // 0: options 0 trong menu dropdown client, 1: ...
 		dataAllOrderAdmin: { data: null, loading: false, error: '' },
 		idNotiConfirm: [],
 		message: { data: [], loading: false, error: '', checkSeen: false }, // 0: options 0 trong menu dropdown client, 1: ...
@@ -98,8 +126,8 @@ const orderSlice = createSlice({
 		setAllOrder: (state, action) => {
 			state.dataAllOrder.data = action.payload
 		},
-		setIdNotiConfirm: (state, action) => {
-			const newId = action.payload
+		setIdNotiConfirm: (state: any, action) => {
+			const newId = action.payload as string
 			if (!state.idNotiConfirm.includes(newId)) {
 				state.idNotiConfirm.push(newId)
 			}
@@ -169,7 +197,7 @@ const orderSlice = createSlice({
 			})
 			.addCase(fetchAllOrder.fulfilled, (state, action) => {
 				state.dataAllOrder.loading = false
-				state.dataAllOrder.data = action.payload
+				state.dataAllOrder.data = action.payload as any
 			})
 			.addCase(fetchAllOrder.rejected, (state, action) => {
 				state.dataAllOrder.loading = false

@@ -15,7 +15,7 @@ import useSocket from '@/components/common/socketConfig/socketClient'
 
 const OrderByAllUser: React.FC = () => {
 	const [initLoading, setInitLoading] = useState(true)
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 	// const [loading, setLoading] = useState(false)
 	const [data, setData] = useState([])
 	let getLocationEmployee =

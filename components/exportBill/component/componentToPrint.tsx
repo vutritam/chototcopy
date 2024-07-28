@@ -5,11 +5,9 @@ const RnderToPrint = (props: any, ref: any) => {
 	const { dataSubmit, edit, totalPrice, userData, handleChangeData, handleForcusOut, handleEdit } =
 		props
 	const amountProduct = dataSubmit.reduce(
-		(accumulator, currentValue) => accumulator + currentValue?.quantity,
+		(accumulator: any, currentValue: any) => accumulator + currentValue?.quantity,
 		0
 	)
-
-	console.log(amountProduct, 'amountProduct') // Output: 15
 
 	return (
 		<div>
@@ -121,7 +119,7 @@ const RnderToPrint = (props: any, ref: any) => {
 						<th style={{ textAlign: 'start' }}>Giá tiền</th>
 					</thead>
 					<tbody style={{ fontSize: 14, textAlign: 'start' }}>
-						{dataSubmit?.map((item, index) => {
+						{dataSubmit?.map((item: any, index: string) => {
 							return (
 								<tr key={index}>
 									<td>

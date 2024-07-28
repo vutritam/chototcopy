@@ -4,7 +4,7 @@ import { Button, Dropdown } from 'antd'
 import { FileTextOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 
-const BillExport: React.FC = (props) => {
+const BillExport: React.FC = (props: any) => {
 	const { showDrawer, items } = props
 	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
 	const itemsShowBill: MenuProps['items'] = [
@@ -22,7 +22,7 @@ const BillExport: React.FC = (props) => {
 			? itemAllOrder.data
 			: itemAllOrder
 	const isHasItemConfirmed = dataCustomItem?.some(
-		(item) => item.status === 'order_success' || (item.status === 'order_done' && !item.isPaid)
+		(item: any) => item.status === 'order_success' || (item.status === 'order_done' && !item.isPaid)
 	)
 
 	return (

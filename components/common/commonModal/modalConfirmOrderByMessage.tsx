@@ -1,15 +1,14 @@
 import React, { useState } from 'react'
 import { Button, Image, Modal } from 'antd'
 
-interface inputProps {
+interface InputProps {
 	label: string
 	title: string
 	item?: any
 }
-const ModalCommonOrderByNumberTable: React.FC = (props: inputProps) => {
+const ModalCommonOrderByNumberTable: React.FC<InputProps> = (props) => {
 	const [open, setOpen] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
-	const [modalText, setModalText] = useState('Content of the modal')
 
 	const showModal = () => {
 		setOpen(true)
@@ -46,7 +45,7 @@ const ModalCommonOrderByNumberTable: React.FC = (props: inputProps) => {
 				]}
 			>
 				<p>
-					{props.item?.map((ele, index) => (
+					{props.item?.map((ele: any, index: any) => (
 						<div key={index}>
 							<span>{ele.name}</span>
 							<span>

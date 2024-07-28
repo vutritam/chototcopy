@@ -19,7 +19,6 @@ import { fetchUserById } from '@/redux/componentSlice/userSlice'
 import { ThunkDispatch } from '@reduxjs/toolkit'
 import { fetchMessageByUserRole } from '@/redux/componentSlice/messageSocketSlice'
 import { processRouterQuery } from '../common/parseNumber'
-import { io } from 'socket.io-client'
 import {
 	fetchAllOrderByNumberTableAndLocationUser,
 	fetchOrderByNumberTable,
@@ -68,7 +67,7 @@ const itemsRender: MenuProps['items'] = [
 ]
 
 interface propsData {
-	userInfo: object
+	userInfo: any
 	dataNoti: Array<any>
 }
 
@@ -93,7 +92,9 @@ const AvatarComponent: React.FC = () => {
 	const [showMessageAdmin, setShowMessageAdmin] = React.useState<Boolean>(false)
 	const itemOrder = useSelector((state: any) => state.dataOrder?.dataOrderByNumberTable?.data)
 	const itemAllOrder = useSelector((state: any) => state.dataOrder?.dataAllOrder?.data)
-	const [orderSummary, setOrderSummary] = React.useState({})
+	const [orderSummary, setOrderSummary] = React.useState<{
+		[key: string]: { totalOrderedItems: number; confirmedItems: number; canceledItems: number }
+	}>({})
 	const [dataLocal, setDataLocal] = React.useState<Object>([
 		{
 			userInfo: {},
@@ -104,10 +105,14 @@ const AvatarComponent: React.FC = () => {
 	const elementBellOrderEmployee = useRef()
 	const elementBellAdmin = useRef()
 	const [playNotification, { sound }] = useSound(notificationSoundPath)
-	const ENV_HOST = process.env.NEXT_PUBLIC_HOST
+	const ENV_HOST = process.env.NEXT_PUBLIC_HOST ?? ''
 	const socket = useSocket(ENV_HOST)
-	let getLocationOrderUser = JSON.parse(sessionStorage.getItem('location_user'))
-	let getInforUser = JSON.parse(sessionStorage.getItem('user'))
+	let getLocationOrderUser = sessionStorage.getItem('location_user')
+		? JSON.parse(sessionStorage.getItem('location_user') || '')
+		: null
+	let getInforUser = sessionStorage.getItem('user')
+		? JSON.parse(sessionStorage.getItem('user') || '')
+		: null
 
 	const handleLogOut = () => {
 		if (sessionStorage.getItem('user') !== null) {
@@ -154,7 +159,7 @@ const AvatarComponent: React.FC = () => {
 		}
 	}
 
-	const handleGetQuantityByTableNumber = (itemOrder) => {
+	const handleGetQuantityByTableNumber = (itemOrder: any) => {
 		// Sử dụng Lodash để nhóm lại các đơn hàng theo bàn
 		const groupedOrders =
 			itemOrder !== null && typeof itemOrder === 'object' && !Array.isArray(itemOrder)
@@ -198,7 +203,7 @@ const AvatarComponent: React.FC = () => {
 		}
 	}, [router.query])
 
-	const handleCallApiRender = async (idTable) => {
+	const handleCallApiRender = async (idTable: any) => {
 		if (isOrderPage) {
 			const item = sessionStorage.getItem('warning_text_order')
 			if (item && message?.length <= 0) {
@@ -222,13 +227,14 @@ const AvatarComponent: React.FC = () => {
 				}, 2000)
 			}
 		} else if (isEmployeePage) {
-			const { payload } = await dispatch(
+			const { payload }: { payload: any } = await dispatch(
 				fetchAllOrder({
 					locationId: getInforUser?.data.locationId,
 				})
 			)
+			console.log(payload, 'ừ')
 
-			if (payload) {
+			if (payload?.success) {
 				setShowMessageEmployee(true)
 				await dispatch(setMessageEmployee(payload.data))
 				setCountMessage(payload.data.length)
@@ -273,9 +279,15 @@ const AvatarComponent: React.FC = () => {
 								const { payload } = await dispatch(fetchUserById(userInfo.userId))
 								if (payload?.success) {
 									setUserRequest(payload.username)
+									// const dataConfig = payload?.data?.filter(
+									// 	(item: any, index: string) => !item?.email && !item?.file
+									// )
+									// console.log(dataConfig, 'confuig')
+
+									// sessionStorage.setItem('user', JSON.stringify(dataConfig))
 									return
 								}
-								sessionStorage.removeItem('user')
+								// sessionStorage.removeItem('user')
 								// toast('user not found', {
 								// 	position: 'top-center',
 								// 	autoClose: 1000,
@@ -286,7 +298,7 @@ const AvatarComponent: React.FC = () => {
 								// 	progress: undefined,
 								// 	type: 'error',
 								// })
-								router.push('/login')
+								// router.push('/login')
 								return
 							}
 						} catch (error) {
@@ -312,7 +324,7 @@ const AvatarComponent: React.FC = () => {
 		} else if (isEmployeePage) {
 			summary = handleGetQuantityByTableNumber(itemAllOrder)
 		}
-		setOrderSummary(summary)
+		setOrderSummary(summary ?? {})
 	}, [itemOrder, itemAllOrder])
 
 	useEffect(() => {
@@ -326,7 +338,7 @@ const AvatarComponent: React.FC = () => {
 				roomName = 'room'
 			}
 			socket.emit(CONST_TYPE_SOCKET.JoinRoom, roomName)
-			socket.on(CONST_TYPE_SOCKET.Response, async (response) => {
+			socket.on(CONST_TYPE_SOCKET.Response, async (response: any) => {
 				if (response.data.length > 0) {
 					await dispatch(setMessage(response.data))
 					playNotification()
@@ -334,13 +346,13 @@ const AvatarComponent: React.FC = () => {
 					setMessageOrder(response.message)
 				}
 			})
-			socket.on(CONST_TYPE_SOCKET.ResponseEmployee, async (response) => {
+			socket.on(CONST_TYPE_SOCKET.ResponseEmployee, async (response: any) => {
 				if (response.data.length > 0) {
 					await dispatch(setMessageEmployee(response.data))
 					playNotification()
 				}
 			})
-			socket.on('reponseMuptipleUser', async (response) => {
+			socket.on('reponseMuptipleUser', async (response: any) => {
 				console.log(response, 'responseUser')
 
 				if (response.data.length > 0) {
@@ -350,20 +362,20 @@ const AvatarComponent: React.FC = () => {
 					setMessageOrder(response.message)
 				}
 			})
-			socket.on('reponseMuptipleEmployee', async (response) => {
+			socket.on('reponseMuptipleEmployee', async (response: any) => {
 				console.log(response, 'response')
 				if (response.data.length > 0) {
 					await dispatch(setMessageEmployee(response.data))
 					playNotification()
 				}
 			})
-			socket.on(CONST_TYPE_SOCKET.ResponseAfterUserLogin, async (response) => {
+			socket.on(CONST_TYPE_SOCKET.ResponseAfterUserLogin, async (response: any) => {
 				if (response) {
 					await dispatch(setMessageAdmin(response))
 				}
 				playNotification()
 			})
-			socket.on(CONST_TYPE_SOCKET.ResAllOrderByStatus, async (response) => {
+			socket.on(CONST_TYPE_SOCKET.ResAllOrderByStatus, async (response: any) => {
 				if (response) {
 					await dispatch(setOrderByNumberTable(response))
 				}
@@ -372,7 +384,7 @@ const AvatarComponent: React.FC = () => {
 		}
 	}, [socket, getLocationOrderUser, getInforUser])
 
-	const handleConfirmOrder = async (event, item: any) => {
+	const handleConfirmOrder = async (event: any, item: any) => {
 		event.stopPropagation()
 		await dispatch(setIdNotiConfirm(item._id))
 		await dispatch(
@@ -429,16 +441,23 @@ const AvatarComponent: React.FC = () => {
 	}
 
 	const handleUpdateSeenMessage = async () => {
+		let element: any
+
 		if (isOrderPage) {
-			const element = elementBellOrder.current
-			elementBellOrder.current && element.classList.remove('bell')
+			element = elementBellOrder.current
 		} else if (isEmployeePage) {
-			const element = elementBellOrderEmployee.current
-			elementBellOrderEmployee.current && element.classList.remove('bell')
+			element = elementBellOrderEmployee.current
 		} else {
-			const element = elementBellAdmin.current
-			elementBellAdmin.current && element.classList.remove('bell')
+			element = elementBellAdmin.current
 		}
+
+		// Kiểm tra element có phải là một đối tượng DOM không
+		if (element instanceof HTMLElement) {
+			element.classList.remove('bell')
+		} else {
+			console.warn('Element is not a valid HTMLElement')
+		}
+
 		setCountMessage(0)
 		setShowMessage(false)
 	}

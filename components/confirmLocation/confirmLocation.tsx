@@ -12,16 +12,18 @@ interface inputProps {
 	tittle?: string
 	open: any
 	idTable?: any
+	handleShow?: () => void
 }
 const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
+	const { handleShow } = props
 	const [dataInput, setDataInput] = useState({
 		locationId: '',
 	})
-	const [listLocation, setListLocation] = useState([])
+	const [listLocation, setListLocation] = useState<any>([])
 	const dispatch = useDispatch<ThunkDispatch<any, any, any>>()
 
 	const handleOk = async () => {
-		props.handleShow()
+		handleShow && handleShow()
 
 		sessionStorage.setItem(
 			'location_user',
@@ -81,23 +83,25 @@ const ComfirmLocationOrder = (props: inputProps): JSX.Element => {
 					</Button>,
 				]}
 			>
-				<Space style={{ marginTop: '5px' }}>
-					<h5>Nơi đặt: </h5>
-					<Select
-						showSearch
-						style={{ width: '100%' }}
-						placeholder="Search to Select"
-						optionFilterProp="children"
-						onChange={onChangeLocation}
-						filterOption={(input, option) => (option?.label ?? '').includes(input)}
-						filterSort={(optionA, optionB) =>
-							(optionA?.label ?? '')
-								.toLowerCase()
-								.localeCompare((optionB?.label ?? '').toLowerCase())
-						}
-						options={listLocation}
-					/>
-				</Space>
+				<Select
+					showSearch
+					style={{ width: '100%' }}
+					placeholder="Search to Select"
+					optionFilterProp="children"
+					onChange={onChangeLocation}
+					filterOption={(input: any, option: any) =>
+						option && typeof option.label === 'string' && option.label.includes(input)
+					}
+					filterSort={(optionA, optionB) =>
+						optionA &&
+						optionB &&
+						typeof optionA.label === 'string' &&
+						typeof optionB.label === 'string'
+							? optionA.label.toLowerCase().localeCompare(optionB.label.toLowerCase())
+							: 0
+					}
+					options={listLocation}
+				/>
 			</Modal>
 		</>
 	)

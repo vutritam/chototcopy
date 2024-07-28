@@ -1,6 +1,17 @@
 import { Button, Dropdown, Menu, Space } from 'antd'
 
-const CommonFilter: React.FC = ({ items, state, fieldName, handleLocationChange }) => {
+interface CommonFilterProps {
+	items: any[] // Bạn có thể thay 'any' bằng type cụ thể của items nếu biết rõ
+	state: any // Bạn có thể thay 'any' bằng type cụ thể của state nếu biết rõ
+	fieldName: string
+	handleLocationChange: (location: any, item: any) => void // Bạn có thể thay 'any' bằng type cụ thể của location nếu biết rõ
+}
+const CommonFilter: React.FC<CommonFilterProps> = ({
+	items,
+	state,
+	fieldName,
+	handleLocationChange,
+}) => {
 	// const [labelAll, setLableAll] = useState(state === 'Tất cả' ? 'all' : state)
 
 	return (
@@ -15,7 +26,6 @@ const CommonFilter: React.FC = ({ items, state, fieldName, handleLocationChange 
 							<Menu.Item
 								key={item.key}
 								style={{ width: '100%' }}
-								value={state}
 								disabled={item.value === state}
 								onClick={() => handleLocationChange(fieldName, item.value)}
 							>
